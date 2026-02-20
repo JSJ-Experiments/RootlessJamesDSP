@@ -20,6 +20,17 @@ class EqualizerSurface(context: Context?, attrs: AttributeSet?) : BaseEqualizerS
             field = value
             invalidate()
         }
+    var sampleRate: Int = 48000
+        set(value) {
+            field = value.coerceAtLeast(1)
+            invalidate()
+        }
+    var isViperOriginalMode: Boolean = false
+        set(value) {
+            field = value
+            visibleBands = if (value) VIPER_ORIGINAL_SCALE.size else SCALE.size
+            invalidate()
+        }
 
     private val cplxRe = DoubleArray(nPts)
     private val cplxIm = DoubleArray(nPts)
@@ -32,18 +43,19 @@ class EqualizerSurface(context: Context?, attrs: AttributeSet?) : BaseEqualizerS
         response: FloatArray
     ) {
         when(mode) {
-            Mode.Fir -> JdspImpResToolbox.ComputeEqResponse(15, freqs, gains, 1, resolution, dispFreq, response)
+            Mode.Fir -> JdspImpResToolbox.ComputeEqResponse(freqs.size, freqs, gains, 1, resolution, dispFreq, response)
             Mode.Iir -> {
-                JdspImpResToolbox.ComputeIIREqualizerCplx(48000, iirOrder, freqs, gains, resolution, dispFreq, cplxRe, cplxIm)
+                JdspImpResToolbox.ComputeIIREqualizerCplx(sampleRate, iirOrder, freqs, gains, resolution, dispFreq, cplxRe, cplxIm)
                 JdspImpResToolbox.ComputeIIREqualizerResponse(nPts, cplxRe, cplxIm, response)
             }
         }
     }
 
     override val frequencyScale: DoubleArray
-        get() = SCALE
+        get() = if (isViperOriginalMode) VIPER_ORIGINAL_SCALE else SCALE
 
     companion object {
         val SCALE = doubleArrayOf(25.0, 40.0, 63.0, 100.0, 160.0, 250.0, 400.0, 630.0, 1000.0, 1600.0, 2500.0, 4000.0, 6300.0, 10000.0, 16000.0)
+        val VIPER_ORIGINAL_SCALE = doubleArrayOf(31.0, 62.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0, 16000.0)
     }
 }

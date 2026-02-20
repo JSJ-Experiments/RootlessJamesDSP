@@ -536,7 +536,7 @@
     <!-- Slider widget -->
     <string name="slider_dialog_title">値の編集</string>
     <string name="slider_dialog_format_error">無効な数値形式です。変更は適用されません。</string>
-    <string name="slider_dialog_step_error">値は %1$dの倍数でなければなりません。変更は適用されません。</string>
+    <string name="slider_dialog_step_error">値は %1$sの倍数でなければなりません。変更は適用されません。</string>
     <!-- Revert confirmation -->
     <string name="revert_confirmation_title">よろしいですか？</string>
     <string name="revert_confirmation">現在のJamesDSPプリセットをデフォルト値にリセットしますか？</string>

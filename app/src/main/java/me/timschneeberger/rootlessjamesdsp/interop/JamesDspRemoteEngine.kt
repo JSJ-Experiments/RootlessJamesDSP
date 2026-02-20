@@ -44,6 +44,12 @@ class JamesDspRemoteEngine(
     }
 
     var effect: AudioEffectHidden? = createEffect()
+    private var isSpectrumExtensionSupported: Boolean? = null
+    private var isClaritySupported: Boolean? = null
+    private var isFieldSurroundSupported: Boolean? = null
+    private var hasShownSpectrumExtensionUnsupportedToast = false
+    private var hasShownClarityUnsupportedToast = false
+    private var hasShownFieldSurroundUnsupportedToast = false
 
     override var enabled: Boolean
         set(value) { effect?.enabled = value }
@@ -96,6 +102,12 @@ class JamesDspRemoteEngine(
         try {
             effect?.release()
             effect = createEffect()
+            isSpectrumExtensionSupported = null
+            isClaritySupported = null
+            isFieldSurroundSupported = null
+            hasShownSpectrumExtensionUnsupportedToast = false
+            hasShownClarityUnsupportedToast = false
+            hasShownFieldSurroundUnsupportedToast = false
         }
         catch (ex: IllegalStateException) {
             Timber.e("Failed to re-instantiate JamesDSP effect")
@@ -120,6 +132,24 @@ class JamesDspRemoteEngine(
         effect?.release()
         effect = null
         super.close()
+    }
+
+    private fun markFeatureUnsupported(
+        featureName: String,
+        errorCode: Int,
+        enableRequested: Boolean,
+        toastMessage: String,
+        setSupported: (Boolean) -> Unit,
+        hasShownToast: () -> Boolean,
+        setHasShownToast: (Boolean) -> Unit,
+    ): Boolean {
+        setSupported(false)
+        Timber.w("Remote plugin rejected $featureName command (error=$errorCode)")
+        if (enableRequested && !hasShownToast()) {
+            setHasShownToast(true)
+            context.toast(toastMessage, false)
+        }
+        return false
     }
 
     override fun setOutputControl(threshold: Float, release: Float, postGain: Float): Boolean {
@@ -174,6 +204,81 @@ class JamesDspRemoteEngine(
         return ret and (effect.setParameter(1204, enable.toShort()) == AudioEffect.SUCCESS)
     }
 
+    protected override fun setFieldSurroundInternal(
+        enable: Boolean,
+        outputMode: Int,
+        widening: Int,
+        midImage: Int,
+        depth: Int,
+        phaseOffset: Int,
+        monoSumMix: Int,
+        monoSumPan: Int,
+        delayLeftMs: Float,
+        delayRightMs: Float,
+        hpfFrequencyHz: Float,
+        hpfGainDb: Float,
+        hpfQ: Float,
+        branchThreshold: Int,
+        gainScaleDb: Float,
+        gainOffsetDb: Float,
+        gainCap: Float,
+        stereoFloor: Float,
+        stereoFallback: Float
+    ): Boolean {
+        val markUnsupported = { errorCode: Int, enableRequested: Boolean ->
+            markFeatureUnsupported(
+                featureName = "Field Surround",
+                errorCode = errorCode,
+                enableRequested = enableRequested,
+                toastMessage = "Field Surround requires a ViPER-compatible plugin version.",
+                setSupported = { isFieldSurroundSupported = it },
+                hasShownToast = { hasShownFieldSurroundUnsupportedToast },
+                setHasShownToast = { hasShownFieldSurroundUnsupportedToast = it },
+            )
+        }
+
+        /*
+         * Remote plugin compatibility limitation:
+         * only widening/midImage/depth + enable are supported by the exposed remote parameter IDs.
+         * The remaining arguments are intentionally ignored here because the plugin does not provide
+         * matching controls over this transport yet.
+         * TODO: Wire these parameters once remote protocol support is available.
+         */
+        if (isFieldSurroundSupported == false) {
+            return markUnsupported(-1, enable)
+        }
+
+        if (enable) {
+            val widenResult = effect.setParameter(PARAM_FIELD_SURROUND_WIDENING, widening.toShort())
+            if (widenResult != AudioEffect.SUCCESS) {
+                return markUnsupported(widenResult, true)
+            }
+
+            val midResult = effect.setParameter(PARAM_FIELD_SURROUND_MID_IMAGE, midImage.toShort())
+            if (midResult != AudioEffect.SUCCESS) {
+                return markUnsupported(midResult, true)
+            }
+
+            val depthResult = effect.setParameter(PARAM_FIELD_SURROUND_DEPTH, depth.toShort())
+            if (depthResult != AudioEffect.SUCCESS) {
+                return markUnsupported(depthResult, true)
+            }
+        }
+
+        if (enable || isFieldSurroundSupported == true) {
+            val enableResult = effect.setParameter(PARAM_FIELD_SURROUND_ENABLE, enable.toShort())
+            if (enableResult != AudioEffect.SUCCESS) {
+                return markUnsupported(enableResult, enable)
+            }
+        }
+
+        if (enable) {
+            isFieldSurroundSupported = true
+        }
+
+        return true
+    }
+
     override fun setVacuumTube(enable: Boolean, level: Float): Boolean {
         var ret = true
         if (enable)
@@ -190,8 +295,10 @@ class JamesDspRemoteEngine(
         var ret = true
 
         if (enable) {
+            // VIPER original (type 6) is not supported remotely; fallback to mode 0 for compatibility.
+            val mode = if(filterType == 6) 0 else filterType
             val properties = floatArrayOf(
-                filterType.toFloat(),
+                mode.toFloat(),
                 if(interpolationMode == 1) 1.0f else -1.0f
             ) + bands.map { it.toFloat() }
             ret = effect.setParameterFloatArray(116, properties) == AudioEffect.SUCCESS
@@ -258,6 +365,135 @@ class JamesDspRemoteEngine(
         return effect.setParameter(1213, enable.toShort()) == AudioEffect.SUCCESS
     }
 
+    override fun setSpectrumExtensionInternal(
+        enable: Boolean,
+        strengthLinear: Float,
+        referenceFreq: Int,
+        wetMix: Float,
+        postGainDb: Float,
+        safetyEnabled: Boolean,
+        hpQ: Float,
+        lpQ: Float,
+        lpCutoffOffsetHz: Int,
+        harmonics: DoubleArray
+    ): Boolean {
+        val markUnsupported = { errorCode: Int, enableRequested: Boolean ->
+            markFeatureUnsupported(
+                featureName = "Spectrum Extension",
+                errorCode = errorCode,
+                enableRequested = enableRequested,
+                toastMessage = "Spectrum Extension requires a newer JamesDSP plugin version.",
+                setSupported = { isSpectrumExtensionSupported = it },
+                hasShownToast = { hasShownSpectrumExtensionUnsupportedToast },
+                setHasShownToast = { hasShownSpectrumExtensionUnsupportedToast = it },
+            )
+        }
+
+        if (isSpectrumExtensionSupported == false) {
+            return markUnsupported(-1, enable)
+        }
+
+        if (enable) {
+            val payload = floatArrayOf(
+                strengthLinear,
+                referenceFreq.toFloat(),
+                wetMix,
+                postGainDb,
+                if (safetyEnabled) 1.0f else 0.0f,
+                hpQ,
+                lpQ,
+                lpCutoffOffsetHz.toFloat()
+            ) + harmonics.map { it.toFloat() }
+            val configResult = effect.setParameterFloatArray(PARAM_SPECTRUM_EXTENSION, payload)
+            if (configResult != AudioEffect.SUCCESS) {
+                return markUnsupported(configResult, true)
+            }
+        }
+
+        if (enable || isSpectrumExtensionSupported == true) {
+            val enableResult = effect.setParameter(PARAM_SPECTRUM_EXTENSION_ENABLE, enable.toShort())
+            if (enableResult != AudioEffect.SUCCESS) {
+                return markUnsupported(enableResult, enable)
+            }
+        }
+
+        if (enable) {
+            isSpectrumExtensionSupported = true
+        }
+
+        return true
+    }
+
+    override fun setClarityInternal(
+        enable: Boolean,
+        mode: Int,
+        gain: Float,
+        postGainDb: Float,
+        safetyEnabled: Boolean,
+        safetyThresholdDb: Float,
+        safetyReleaseMs: Float,
+        naturalLpfOffsetHz: Int,
+        ozoneFreqHz: Int,
+        xhifiLowCutHz: Int,
+        xhifiHighCutHz: Int,
+        xhifiHpMix: Float,
+        xhifiBpMix: Float,
+        xhifiBpDelayDivisor: Int,
+        xhifiLpDelayDivisor: Int
+    ): Boolean {
+        val markUnsupported = { errorCode: Int, enableRequested: Boolean ->
+            markFeatureUnsupported(
+                featureName = "Clarity",
+                errorCode = errorCode,
+                enableRequested = enableRequested,
+                toastMessage = "Clarity requires a newer JamesDSP plugin version.",
+                setSupported = { isClaritySupported = it },
+                hasShownToast = { hasShownClarityUnsupportedToast },
+                setHasShownToast = { hasShownClarityUnsupportedToast = it },
+            )
+        }
+
+        if (isClaritySupported == false) {
+            return markUnsupported(-1, enable)
+        }
+
+        if (enable) {
+            val payload = floatArrayOf(
+                mode.toFloat(),
+                gain,
+                postGainDb,
+                if (safetyEnabled) 1.0f else 0.0f,
+                safetyThresholdDb,
+                safetyReleaseMs,
+                naturalLpfOffsetHz.toFloat(),
+                ozoneFreqHz.toFloat(),
+                xhifiLowCutHz.toFloat(),
+                xhifiHighCutHz.toFloat(),
+                xhifiHpMix,
+                xhifiBpMix,
+                xhifiBpDelayDivisor.toFloat(),
+                xhifiLpDelayDivisor.toFloat()
+            )
+            val configResult = effect.setParameterFloatArray(PARAM_CLARITY, payload)
+            if (configResult != AudioEffect.SUCCESS) {
+                return markUnsupported(configResult, true)
+            }
+        }
+
+        if (enable || isClaritySupported == true) {
+            val enableResult = effect.setParameter(PARAM_CLARITY_ENABLE, enable.toShort())
+            if (enableResult != AudioEffect.SUCCESS) {
+                return markUnsupported(enableResult, enable)
+            }
+        }
+
+        if (enable) {
+            isClaritySupported = true
+        }
+
+        return true
+    }
+
     // Feature support
     override fun supportsEelVmAccess(): Boolean { return false }
     override fun supportsCustomCrossfeed(): Boolean { return false }
@@ -298,6 +534,16 @@ class JamesDspRemoteEngine(
     }
 
     companion object {
+        // Follows existing remote command layout: float payload IDs after 116 and free enable slots.
+        private const val PARAM_SPECTRUM_EXTENSION = 117
+        private const val PARAM_CLARITY = 118
+        private const val PARAM_SPECTRUM_EXTENSION_ENABLE = 1207
+        private const val PARAM_CLARITY_ENABLE = 1209
+        private const val PARAM_FIELD_SURROUND_ENABLE = 65553
+        private const val PARAM_FIELD_SURROUND_WIDENING = 65554
+        private const val PARAM_FIELD_SURROUND_MID_IMAGE = 65555
+        private const val PARAM_FIELD_SURROUND_DEPTH = 65556
+
         private val EFFECT_TYPE_CUSTOM = UUID.fromString("f98765f4-c321-5de6-9a45-123459495ab2")
         private val EFFECT_JAMESDSP = UUID.fromString("f27317f4-c984-4de6-9a90-545759495bf2")
 

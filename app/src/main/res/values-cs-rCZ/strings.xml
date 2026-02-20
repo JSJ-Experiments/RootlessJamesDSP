@@ -530,7 +530,7 @@
     <!-- Slider widget -->
     <string name="slider_dialog_title">Upravit hodnotu</string>
     <string name="slider_dialog_format_error">Neplatný formát čísla. Změny nejsou použity.</string>
-    <string name="slider_dialog_step_error">Hodnota musí být násobek %1$d. Změny nebyly použity.</string>
+    <string name="slider_dialog_step_error">Hodnota musí být násobek %1$s. Změny nebyly použity.</string>
     <!-- Revert confirmation -->
     <string name="revert_confirmation_title">Jste si jisti?</string>
     <string name="revert_confirmation">Chcete resetovat aktuální předvolbu JamesDSP na výchozí hodnoty?</string>

@@ -5,8 +5,8 @@
 
 cmake_minimum_required(VERSION 3.22.1)
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -ffunction-sections -fdata-sections -Ofast -ftree-vectorize -DDEBUG")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffunction-sections -fdata-sections -Ofast -ftree-vectorize -DDEBUG")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -ffunction-sections -fdata-sections -Ofast -ftree-vectorize")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffunction-sections -fdata-sections -Ofast -ftree-vectorize")
 
 # Declares and names the project.
 project(jamesdsp LANGUAGES C)
@@ -28,12 +28,20 @@ add_library( # Sets the name of the library.
 
         # Provides a relative path to your source file(s).
         ${LIBJAMESDSP_SOURCE_FILES}
+        # Keep C++ sources explicit to avoid accidentally compiling stray files via recursive globs.
+        ${CMAKE_CURRENT_LIST_DIR}/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/clarity_adapter.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/libjamesdsp-wrapper/clarity/ClarityProcessor.cpp
         EELStdOutExtension.c
         EELStdOutExtension.h)
 
 target_compile_options(jamesdsp PRIVATE -O2)
-target_compile_options(jamesdsp PRIVATE -std=gnu11)
+target_compile_options(jamesdsp PRIVATE $<$<COMPILE_LANGUAGE:C>:-std=gnu11>)
+set_target_properties(jamesdsp PROPERTIES
+        CXX_STANDARD 17
+        CXX_STANDARD_REQUIRED YES
+        CXX_EXTENSIONS NO)
 target_include_directories(jamesdsp PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/)
+target_include_directories(jamesdsp PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libjamesdsp-wrapper/clarity)
 
 find_library( # Sets the name of the path variable.
         log-lib

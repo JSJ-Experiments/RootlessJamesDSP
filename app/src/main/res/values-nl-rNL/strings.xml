@@ -533,7 +533,7 @@
     <!-- Slider widget -->
     <string name="slider_dialog_title">Waarde bewerken</string>
     <string name="slider_dialog_format_error">Ongeldig nummerformaat. Wijzigingen niet toegepast.</string>
-    <string name="slider_dialog_step_error">Waarde moet een veelvoud van %1$d zijn. Wijzigingen niet toegepast.</string>
+    <string name="slider_dialog_step_error">Waarde moet een veelvoud van %1$s zijn. Wijzigingen niet toegepast.</string>
     <!-- Revert confirmation -->
     <string name="revert_confirmation_title">Weet u het zeker?</string>
     <string name="revert_confirmation">Wilt u uw huidige JamesDSP voorinstelling herstellen naar de standaardwaarden?</string>

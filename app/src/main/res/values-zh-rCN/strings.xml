@@ -533,7 +533,7 @@
     <!-- Slider widget -->
     <string name="slider_dialog_title">编辑值</string>
     <string name="slider_dialog_format_error">数字格式无效。未应用更改。</string>
-    <string name="slider_dialog_step_error">值必须是 %1$d 的倍数。未应用更改。</string>
+    <string name="slider_dialog_step_error">值必须是 %1$s 的倍数。未应用更改。</string>
     <!-- Revert confirmation -->
     <string name="revert_confirmation_title">您确定吗？</string>
     <string name="revert_confirmation">是否要将当前的 JamesDSP 预设重置为默认值？</string>

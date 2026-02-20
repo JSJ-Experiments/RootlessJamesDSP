@@ -60,7 +60,6 @@ class DspFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListen
         }
 
         // Should show notice?
-        Timber.e(Locale.getDefault().language.toString())
         binding.translationNotice.isVisible =
            prefsVar.get<Long>(R.string.key_snooze_translation_notice) < (System.currentTimeMillis() / 1000L) &&
                     !Locale.getDefault().language.equals("en")
@@ -70,7 +69,7 @@ class DspFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListen
         transition.enableTransitionType(LayoutTransition.CHANGING)
         binding.cardContainer.layoutTransition = transition
 
-        childFragmentManager.beginTransaction()
+        val transaction = childFragmentManager.beginTransaction()
             .replace(R.id.card_device_profiles, DeviceProfilesCardFragment.newInstance())
             .replace(
                 R.id.card_output_control, PreferenceGroupFragment.newInstance(Constants.PREF_OUTPUT,
@@ -109,6 +108,10 @@ class DspFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListen
                     R.xml.dsp_tube_preferences
                 ))
             .replace(
+                R.id.card_field_surround, PreferenceGroupFragment.newInstance(Constants.PREF_FIELD_SURROUND,
+                    R.xml.dsp_field_surround_preferences
+                ))
+            .replace(
                 R.id.card_stereowide, PreferenceGroupFragment.newInstance(Constants.PREF_STEREOWIDE,
                     R.xml.dsp_stereowide_preferences
                 ))
@@ -120,7 +123,16 @@ class DspFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListen
                 R.id.card_reverb, PreferenceGroupFragment.newInstance(Constants.PREF_REVERB,
                     R.xml.dsp_reverb_preferences
                 ))
-            .commit()
+            .replace(
+                R.id.card_clarity, PreferenceGroupFragment.newInstance(Constants.PREF_CLARITY,
+                    R.xml.dsp_clarity_preferences
+                ))
+            .replace(
+                R.id.card_spectrum_ext, PreferenceGroupFragment.newInstance(Constants.PREF_SPECTRUM_EXT,
+                    R.xml.dsp_spectrum_ext_preferences
+                ))
+
+        transaction.commit()
 
         // Load initial preferences
         arrayOf(R.string.key_device_profiles_enable).forEach {

@@ -9,9 +9,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.annotation.XmlRes
+import androidx.preference.EditTextPreference
 import androidx.preference.Preference
 import androidx.preference.Preference.SummaryProvider
 import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.ListPreference
 import androidx.preference.PreferenceScreen
 import androidx.recyclerview.widget.RecyclerView
 import me.timschneeberger.rootlessjamesdsp.R
@@ -28,12 +30,15 @@ import me.timschneeberger.rootlessjamesdsp.preference.SwitchPreferenceGroup
 import me.timschneeberger.rootlessjamesdsp.utils.Constants
 import me.timschneeberger.rootlessjamesdsp.utils.extensions.ContextExtensions.registerLocalReceiver
 import me.timschneeberger.rootlessjamesdsp.utils.extensions.ContextExtensions.sendLocalBroadcast
+import me.timschneeberger.rootlessjamesdsp.utils.extensions.ContextExtensions.toast
 import me.timschneeberger.rootlessjamesdsp.utils.extensions.ContextExtensions.unregisterLocalReceiver
 import me.timschneeberger.rootlessjamesdsp.utils.preferences.Preferences
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
 import kotlin.math.roundToInt
+import kotlin.math.log10
+import kotlin.math.pow
 
 
 class PreferenceGroupFragment : PreferenceFragmentCompat(), KoinComponent {
@@ -184,6 +189,44 @@ class PreferenceGroupFragment : PreferenceFragmentCompat(), KoinComponent {
                     true
                 }
             }
+            R.xml.dsp_spectrum_ext_preferences -> {
+                val unitPref = findPreference<ListPreference>(getString(R.string.key_spectrum_ext_strength_unit))
+                val strengthPercentPref = findPreference<MaterialSeekbarPreference>(getString(R.string.key_spectrum_ext_strength_percent))
+                val strengthDbPref = findPreference<MaterialSeekbarPreference>(getString(R.string.key_spectrum_ext_strength_db))
+                val harmonicsPref = findPreference<EditTextPreference>(getString(R.string.key_spectrum_ext_harmonics))
+
+                bindStrengthUnitPreferences(
+                    unitPref = unitPref,
+                    strengthPercentPref = strengthPercentPref,
+                    strengthDbPref = strengthDbPref,
+                    maxDb = 12.0f,
+                    minPercent = 1.0f,
+                    maxPercent = 400.0f
+                )
+
+                harmonicsPref?.setOnPreferenceChangeListener { _, newValue ->
+                    val harmonicsRaw = (newValue as? String)?.trim().orEmpty()
+                    if (isValidSemicolonDelimitedHarmonics(harmonicsRaw)) {
+                        true
+                    } else {
+                        requireContext().toast(getString(R.string.invalid_harmonics_format), false)
+                        false
+                    }
+                }
+            }
+            R.xml.dsp_clarity_preferences -> {
+                val unitPref = findPreference<ListPreference>(getString(R.string.key_clarity_strength_unit))
+                val strengthPercentPref = findPreference<MaterialSeekbarPreference>(getString(R.string.key_clarity_strength_percent))
+                val strengthDbPref = findPreference<MaterialSeekbarPreference>(getString(R.string.key_clarity_strength_db))
+                bindStrengthUnitPreferences(
+                    unitPref = unitPref,
+                    strengthPercentPref = strengthPercentPref,
+                    strengthDbPref = strengthDbPref,
+                    maxDb = 16.0f,
+                    minPercent = 0.0f,
+                    maxPercent = 631.0f
+                )
+            }
         }
 
         updateIconState()
@@ -216,6 +259,83 @@ class PreferenceGroupFragment : PreferenceFragmentCompat(), KoinComponent {
         preferenceManager.sharedPreferences?.unregisterOnSharedPreferenceChangeListener(listener)
     }
 
+    private fun bindStrengthUnitPreferences(
+        unitPref: ListPreference?,
+        strengthPercentPref: MaterialSeekbarPreference?,
+        strengthDbPref: MaterialSeekbarPreference?,
+        maxDb: Float,
+        minPercent: Float,
+        maxPercent: Float,
+        minLinear: Float = 0.01f,
+    ) {
+        val maxLinear = dbToLinear(maxDb)
+        var internalUpdate = false
+
+        strengthPercentPref?.setOnPreferenceChangeListener { _, newValue ->
+            if (internalUpdate) return@setOnPreferenceChangeListener true
+            val percent = (newValue as Float).coerceIn(minPercent, maxPercent)
+            val linear = clampLinear(percent / 100.0f, minLinear, maxLinear)
+            val db = linearToDb(linear).coerceIn(-40.0f, maxDb)
+            internalUpdate = true
+            strengthDbPref?.setValue(db)
+            internalUpdate = false
+            true
+        }
+
+        strengthDbPref?.setOnPreferenceChangeListener { _, newValue ->
+            if (internalUpdate) return@setOnPreferenceChangeListener true
+            val db = (newValue as Float).coerceIn(-40.0f, maxDb)
+            val linear = clampLinear(dbToLinear(db), minLinear, maxLinear)
+            val percent = (linear * 100.0f).coerceIn(minPercent, maxPercent)
+            internalUpdate = true
+            strengthPercentPref?.setValue(percent)
+            internalUpdate = false
+            true
+        }
+
+        unitPref?.setOnPreferenceChangeListener { _, newValue ->
+            setStrengthVisibility(newValue as String, strengthPercentPref, strengthDbPref)
+            true
+        }
+
+        setStrengthVisibility(
+            unitPref?.value ?: requireContext().getString(R.string.strength_unit_value_percent),
+            strengthPercentPref,
+            strengthDbPref
+        )
+    }
+
+    private fun setStrengthVisibility(
+        unit: String,
+        strengthPercentPref: MaterialSeekbarPreference?,
+        strengthDbPref: MaterialSeekbarPreference?,
+    ) {
+        val percentUnit = requireContext().getString(R.string.strength_unit_value_percent)
+        val dbUnit = requireContext().getString(R.string.strength_unit_value_db)
+        strengthPercentPref?.isVisible = unit == percentUnit
+        strengthDbPref?.isVisible = unit == dbUnit
+    }
+
+    private fun linearToDb(linear: Float): Float = 20.0f * log10(linear)
+
+    private fun dbToLinear(db: Float): Float = 10.0.pow((db / 20.0f).toDouble()).toFloat()
+
+    /**
+     * Domain-specific clamping for linear gain values used by [linearToDb] and [dbToLinear].
+     * Inputs and bounds are linear-domain amplitudes and must stay positive for log conversion.
+     */
+    private fun clampLinear(linear: Float, minLinear: Float, maxLinear: Float): Float {
+        return linear.coerceIn(minLinear, maxLinear)
+    }
+
+    private fun isValidSemicolonDelimitedHarmonics(raw: String): Boolean {
+        if (raw.isBlank()) {
+            return false
+        }
+        val parts = raw.split(";")
+        return parts.size == EXPECTED_HARMONICS_COUNT && parts.all { it.isNotBlank() && it.trim().toDoubleOrNull() != null }
+    }
+
     @Suppress("DEPRECATION")
     override fun onDisplayPreferenceDialog(preference: Preference) {
         when (preference) {
@@ -241,6 +361,8 @@ class PreferenceGroupFragment : PreferenceFragmentCompat(), KoinComponent {
     companion object {
         private const val BUNDLE_PREF_NAME = "preferencesName"
         private const val BUNDLE_XML_RES = "preferencesXmlRes"
+        // Semicolon-separated decimal numbers used by Spectrum Extension harmonics list.
+        private const val EXPECTED_HARMONICS_COUNT = 10
 
         fun newInstance(preferencesName: String?, @XmlRes preferencesXmlRes: Int): PreferenceGroupFragment {
             return PreferenceGroupFragment().apply {

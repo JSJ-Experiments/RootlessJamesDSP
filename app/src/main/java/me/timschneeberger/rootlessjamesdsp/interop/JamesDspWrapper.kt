@@ -38,7 +38,60 @@ object JamesDspWrapper {
     external fun setCrossfeed(self: JamesDspHandle, enable: Boolean, mode: Int, customFcut: Int, customFeed: Int): Boolean
     external fun setBassBoost(self: JamesDspHandle, enable: Boolean, maxGain: Float): Boolean
     external fun setStereoEnhancement(self: JamesDspHandle, enable: Boolean, level: Float): Boolean
+    external fun setFieldSurround(
+        self: JamesDspHandle,
+        enable: Boolean,
+        outputMode: Int,
+        widening: Int,
+        midImage: Int,
+        depth: Int,
+        phaseOffset: Int,
+        monoSumMix: Int,
+        monoSumPan: Int,
+        delayLeftMs: Float,
+        delayRightMs: Float,
+        hpfFrequencyHz: Float,
+        hpfGainDb: Float,
+        hpfQ: Float,
+        branchThreshold: Int,
+        gainScaleDb: Float,
+        gainOffsetDb: Float,
+        gainCap: Float,
+        stereoFloor: Float,
+        stereoFallback: Float
+    ): Boolean
     external fun setVacuumTube(self: JamesDspHandle, enable: Boolean, level: Float): Boolean
+    external fun setSpectrumExtension(
+        self: JamesDspHandle,
+        enable: Boolean,
+        strengthLinear: Float,
+        referenceFreq: Int,
+        wetMix: Float,
+        postGainDb: Float,
+        safetyEnabled: Boolean,
+        hpQ: Float,
+        lpQ: Float,
+        lpCutoffOffsetHz: Int,
+        harmonics: DoubleArray
+    ): Boolean
+    external fun setClarity(
+        self: JamesDspHandle,
+        enable: Boolean,
+        mode: Int,
+        gain: Float,
+        postGainDb: Float,
+        safetyEnabled: Boolean,
+        safetyThresholdDb: Float,
+        safetyReleaseMs: Float,
+        naturalLpfOffsetHz: Int,
+        ozoneFreqHz: Int,
+        xhifiLowCutHz: Int,
+        xhifiHighCutHz: Int,
+        xhifiHpMix: Float,
+        xhifiBpMix: Float,
+        xhifiBpDelayDivisor: Int,
+        xhifiLpDelayDivisor: Int
+    ): Boolean
     external fun setLiveprog(self: JamesDspHandle, enable: Boolean, id: String, liveprogContent: String): Boolean
 
     // EEL VM utilities

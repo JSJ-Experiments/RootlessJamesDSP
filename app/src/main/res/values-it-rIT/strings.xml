@@ -533,7 +533,7 @@
     <!-- Slider widget -->
     <string name="slider_dialog_title">Modifica valore</string>
     <string name="slider_dialog_format_error">Formato del numero non valido. Le modifiche non sono state applicate.</string>
-    <string name="slider_dialog_step_error">Il valore deve essere un multiplo di %1$d. Le modifiche non sono state applicate.</string>
+    <string name="slider_dialog_step_error">Il valore deve essere un multiplo di %1$s. Le modifiche non sono state applicate.</string>
     <!-- Revert confirmation -->
     <string name="revert_confirmation_title">Sei sicuro?</string>
     <string name="revert_confirmation">Vuoi reimpostare le attuali preimpostazioni di JamesDSP ai valori predefiniti?</string>

@@ -116,6 +116,51 @@ class JamesDspLocalEngine(context: Context, callbacks: JamesDspWrapper.JamesDspC
         return JamesDspWrapper.setStereoEnhancement(handle, enable, level)
     }
 
+    protected override fun setFieldSurroundInternal(
+        enable: Boolean,
+        outputMode: Int,
+        widening: Int,
+        midImage: Int,
+        depth: Int,
+        phaseOffset: Int,
+        monoSumMix: Int,
+        monoSumPan: Int,
+        delayLeftMs: Float,
+        delayRightMs: Float,
+        hpfFrequencyHz: Float,
+        hpfGainDb: Float,
+        hpfQ: Float,
+        branchThreshold: Int,
+        gainScaleDb: Float,
+        gainOffsetDb: Float,
+        gainCap: Float,
+        stereoFloor: Float,
+        stereoFallback: Float
+    ): Boolean {
+        return JamesDspWrapper.setFieldSurround(
+            handle,
+            enable,
+            outputMode,
+            widening,
+            midImage,
+            depth,
+            phaseOffset,
+            monoSumMix,
+            monoSumPan,
+            delayLeftMs,
+            delayRightMs,
+            hpfFrequencyHz,
+            hpfGainDb,
+            hpfQ,
+            branchThreshold,
+            gainScaleDb,
+            gainOffsetDb,
+            gainCap,
+            stereoFloor,
+            stereoFallback
+        )
+    }
+
     override fun setVacuumTube(enable: Boolean, level: Float): Boolean
     {
         return JamesDspWrapper.setVacuumTube(handle, enable, level)
@@ -160,6 +205,70 @@ class JamesDspLocalEngine(context: Context, callbacks: JamesDspWrapper.JamesDspC
 
     override fun setLiveprogInternal(enable: Boolean, name: String, script: String): Boolean {
         return JamesDspWrapper.setLiveprog(handle, enable, name, script)
+    }
+
+    override fun setSpectrumExtensionInternal(
+        enable: Boolean,
+        strengthLinear: Float,
+        referenceFreq: Int,
+        wetMix: Float,
+        postGainDb: Float,
+        safetyEnabled: Boolean,
+        hpQ: Float,
+        lpQ: Float,
+        lpCutoffOffsetHz: Int,
+        harmonics: DoubleArray
+    ): Boolean {
+        return JamesDspWrapper.setSpectrumExtension(
+            handle,
+            enable,
+            strengthLinear,
+            referenceFreq,
+            wetMix,
+            postGainDb,
+            safetyEnabled,
+            hpQ,
+            lpQ,
+            lpCutoffOffsetHz,
+            harmonics
+        )
+    }
+
+    override fun setClarityInternal(
+        enable: Boolean,
+        mode: Int,
+        gain: Float,
+        postGainDb: Float,
+        safetyEnabled: Boolean,
+        safetyThresholdDb: Float,
+        safetyReleaseMs: Float,
+        naturalLpfOffsetHz: Int,
+        ozoneFreqHz: Int,
+        xhifiLowCutHz: Int,
+        xhifiHighCutHz: Int,
+        xhifiHpMix: Float,
+        xhifiBpMix: Float,
+        xhifiBpDelayDivisor: Int,
+        xhifiLpDelayDivisor: Int
+    ): Boolean {
+        return JamesDspWrapper.setClarity(
+            handle,
+            enable,
+            mode,
+            gain,
+            postGainDb,
+            safetyEnabled,
+            safetyThresholdDb,
+            safetyReleaseMs,
+            naturalLpfOffsetHz,
+            ozoneFreqHz,
+            xhifiLowCutHz,
+            xhifiHighCutHz,
+            xhifiHpMix,
+            xhifiBpMix,
+            xhifiBpDelayDivisor,
+            xhifiLpDelayDivisor
+        )
     }
 
     // Feature support

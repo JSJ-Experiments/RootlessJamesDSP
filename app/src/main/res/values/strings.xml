@@ -69,6 +69,9 @@
     <string name="no_activity_found">No Activity found to handle action</string>
     <string name="permission_allowed">Allowed</string>
     <string name="permission_not_allowed">Not allowed</string>
+    <string name="reset">Reset</string>
+    <string name="strength_unit_value_percent" translatable="false">percent</string>
+    <string name="strength_unit_value_db" translatable="false">db</string>
     <string name="preparing">Preparing…</string>
     <string name="error_projection_api_missing">Your device manufacturer has disabled the internal audio recording APIs. This application cannot work without them.</string>
 
@@ -97,6 +100,7 @@
     <string name="eq_filter_type_iir_8_order">IIR 8th order</string>
     <string name="eq_filter_type_iir_10_order">IIR 10th order</string>
     <string name="eq_filter_type_iir_12_order">IIR 12th order</string>
+    <string name="eq_filter_type_viper_original">ViPER original (10-band IIR)</string>
     <string name="eq_interpolator_chip">Piecewise Cubic Hermite Interpolating Polynomial</string>
     <string name="eq_interpolator_mha">Modified Hiroshi Akima spline</string>
     <string name="eq_preset_acoustic">Acoustic</string>
@@ -140,6 +144,21 @@
     <string name="reverb_preset_long_reverb1">Long reverb 1</string>
     <string name="reverb_preset_long_reverb2">Long reverb 2</string>
 
+    <string name="spectrum_ext_enable">Spectrum extension</string>
+    <string name="spectrum_ext_strength">Strength</string>
+    <string name="spectrum_ext_strength_unit">Strength unit</string>
+    <string name="strength_unit_percent">Percent</string>
+    <string name="strength_unit_db">dB</string>
+    <string name="spectrum_ext_ref_freq">Reference frequency</string>
+    <string name="spectrum_ext_wet_mix">Wet mix</string>
+    <string name="spectrum_ext_post_gain">Post gain</string>
+    <string name="spectrum_ext_safety">Safety limiter</string>
+    <string name="spectrum_ext_expert_header">Expert controls</string>
+    <string name="spectrum_ext_hp_q">HP Q</string>
+    <string name="spectrum_ext_lp_q">LP Q</string>
+    <string name="spectrum_ext_lp_offset">LP cutoff offset</string>
+    <string name="spectrum_ext_harmonics">Harmonic coefficients</string>
+
     <string name="convolver_enable">Convolver</string>
     <string name="convolver_impulse">Impulse response</string>
     <string name="convolver_advanced_editing">Advanced waveform editing</string>
@@ -176,6 +195,30 @@
     <string name="stereowide_level_very_narrow">Very narrow</string>
     <string name="stereowide_level_narrow">Narrow</string>
 
+    <string name="field_surround_enable">Field surround</string>
+    <string name="field_surround_output_mode">Output mode</string>
+    <string name="field_surround_mode_normal">Normal stereo</string>
+    <string name="field_surround_mode_pure_side_mono">Pure side (mono)</string>
+    <string name="field_surround_mode_mid_only_mono">Mid only (mono downmix)</string>
+    <string name="field_surround_widening">Widening</string>
+    <string name="field_surround_mid_image">Mid image</string>
+    <string name="field_surround_depth">Depth</string>
+    <string name="field_surround_phase_offset">Channel phase offset</string>
+    <string name="field_surround_mono_sum_mix">Mono sum mix</string>
+    <string name="field_surround_mono_sum_pan">Mono sum pan</string>
+    <string name="field_surround_advanced_header">Advanced controls</string>
+    <string name="field_surround_delay_left_ms">Depth delay left</string>
+    <string name="field_surround_delay_right_ms">Depth delay right</string>
+    <string name="field_surround_hpf_frequency_hz">Depth HPF frequency</string>
+    <string name="field_surround_hpf_gain_db">Depth HPF gain</string>
+    <string name="field_surround_hpf_q">Depth HPF Q</string>
+    <string name="field_surround_branch_threshold">Depth phase flip threshold</string>
+    <string name="field_surround_gain_scale_db">Depth gain scale</string>
+    <string name="field_surround_gain_offset_db">Depth gain offset</string>
+    <string name="field_surround_gain_cap">Depth gain cap</string>
+    <string name="field_surround_stereo_floor">Stereo normalize floor</string>
+    <string name="field_surround_stereo_fallback">Stereo normalize fallback</string>
+
     <string name="crossfeed_enable">Crossfeed</string>
     <string name="crossfeed_preset">Preset</string>
     <string name="crossfeed_preset_bs2b_weak">BS2B Weak</string>
@@ -184,6 +227,27 @@
     <string name="crossfeed_preset_surround1">Surround 1</string>
     <string name="crossfeed_preset_surround2">Surround 2</string>
     <string name="crossfeed_preset_realistic_surround">Joe0Bloggs Realistic surround</string>
+
+    <string name="clarity_enable">ViPER Clarity</string>
+    <string name="clarity_mode">Mode</string>
+    <string name="clarity_mode_natural">Natural</string>
+    <string name="clarity_mode_ozone">OZone+</string>
+    <string name="clarity_mode_xhifi">XHiFi</string>
+    <string name="clarity_strength">Strength</string>
+    <string name="clarity_strength_unit">Strength unit</string>
+    <string name="clarity_post_gain">Post gain</string>
+    <string name="clarity_safety">Safety limiter</string>
+    <string name="clarity_safety_threshold">Safety threshold</string>
+    <string name="clarity_safety_release">Safety release</string>
+    <string name="clarity_expert_header">Expert controls</string>
+    <string name="clarity_natural_lpf_offset">Natural LPF offset</string>
+    <string name="clarity_ozone_frequency">OZone+ shelf frequency</string>
+    <string name="clarity_xhifi_low_cut">XHiFi low crossover</string>
+    <string name="clarity_xhifi_high_cut">XHiFi high crossover</string>
+    <string name="clarity_xhifi_hp_mix">XHiFi HP mix</string>
+    <string name="clarity_xhifi_bp_mix">XHiFi BP mix</string>
+    <string name="clarity_xhifi_bp_delay_divisor">XHiFi BP delay divisor</string>
+    <string name="clarity_xhifi_lp_delay_divisor">XHiFi LP delay divisor</string>
 
     <!-- Onboarding -->
     <string name="title_activity_onboarding">Onboarding</string>
@@ -578,7 +642,9 @@
     <!-- Slider widget -->
     <string name="slider_dialog_title">Edit value</string>
     <string name="slider_dialog_format_error">Invalid number format. Changes not applied.</string>
-    <string name="slider_dialog_step_error">Value must be a multiple of %1$d. Changes not applied.</string>
+    <string name="slider_dialog_step_error">Value must be a multiple of %1$s. Changes not applied.</string>
+    <string name="slider_dialog_range_error">Value must be between %1$.3f and %2$.3f.</string>
+    <string name="invalid_harmonics_format">Invalid harmonics format. Enter 10 semicolon-separated numbers.</string>
 
     <!-- Revert confirmation -->
     <string name="revert_confirmation_title">Are you sure?</string>

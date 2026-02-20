@@ -11,9 +11,10 @@ import android.widget.TextView
 import androidx.preference.Preference
 import androidx.preference.PreferenceViewHolder
 import androidx.preference.SeekBarPreference
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.slider.Slider
 import me.timschneeberger.rootlessjamesdsp.R
-import me.timschneeberger.rootlessjamesdsp.utils.extensions.ContextExtensions.showInputAlert
+import me.timschneeberger.rootlessjamesdsp.databinding.DialogTextinputBinding
 import me.timschneeberger.rootlessjamesdsp.utils.extensions.ContextExtensions.toast
 import timber.log.Timber
 import java.math.BigDecimal
@@ -32,6 +33,7 @@ class MaterialSeekbarPreference : Preference {
     var mTrackingTouch/* synthetic access */ = false
     lateinit var mSeekBar: /* synthetic access */Slider
     private var mSeekBarValueTextView: TextView? = null
+    private var mDefaultSeekBarValue: Float? = null
 
     var mUnit: String = ""
     var mPrecision: Int = 2
@@ -183,41 +185,14 @@ class MaterialSeekbarPreference : Preference {
         mSeekBar.isEnabled = isEnabled
 
         this.setOnPreferenceClickListener {
-            context.showInputAlert(
-                LayoutInflater.from(context), 
-                context.getString(R.string.slider_dialog_title),
-                title?.toString(),
-                "%.${mPrecision}f".format(Locale.ROOT, getValue()),
-                true,
-                mUnit
-            ) {
-                it ?: return@showInputAlert
-                try {
-                    if(mSeekBar.stepSize <= 0 || valueLandsOnTick(it.toFloat())) {
-                        setValue(it.toFloat())
-                    }
-                    else {
-                        context.toast(
-                            context.getString(R.string.slider_dialog_step_error, mSeekBar.stepSize.roundToInt()),
-                            false
-                        )
-                    }
-                }
-                catch (ex: Exception) {
-                    Timber.e("Failed to parse number input")
-                    Timber.d(ex)
-                    context.toast(
-                        context.getString(R.string.slider_dialog_format_error),
-                        false
-                    )
-                }
-            }
+            showEditDialog()
             true
         }
     }
 
     override fun onSetInitialValue(defaultValue: Any?) {
-        setValue(getPersistedFloat((defaultValue as? Float ?: 0f)))
+        mDefaultSeekBarValue = parseFloatValue(defaultValue)
+        setValue(getPersistedFloat(mDefaultSeekBarValue ?: 0f))
     }
 
     override fun onGetDefaultValue(a: TypedArray, index: Int): Any {
@@ -430,15 +405,26 @@ class MaterialSeekbarPreference : Preference {
     @SuppressLint("SetTextI18n")
     fun  /* synthetic access */updateLabelValue(value: Float) {
         if (mSeekBarValueTextView != null) {
+            mSeekBarValueTextView!!.text = if (valueLabelOverride == null) {
+                "${formatNumericValue(value)}$mUnit"
+            } else {
+                try {
+                    valueLabelOverride!!(value)
+                } catch (ex: Exception) {
+                    Timber.e(ex, "Failed to render seekbar value label override")
+                    "${formatNumericValue(value)}$mUnit"
+                }
+            }
+        }
+    }
 
-            if(valueLabelOverride == null)
-            {
-                mSeekBarValueTextView!!.text = "%.${mPrecision}f${mUnit}".format(Locale.ROOT, value)
-            }
-            else
-            {
-                mSeekBarValueTextView!!.text = valueLabelOverride!!(value)
-            }
+    private fun formatNumericValue(value: Float): String {
+        val safePrecision = mPrecision.coerceAtLeast(0)
+        return try {
+            "%.${safePrecision}f".format(Locale.ROOT, value)
+        } catch (ex: IllegalFormatException) {
+            Timber.e(ex, "Invalid seekbar precision value: $mPrecision")
+            value.toString()
         }
     }
 
@@ -455,5 +441,69 @@ class MaterialSeekbarPreference : Preference {
 
         // If the result is a whole number, it means the value is a multiple of stepSize.
         return abs(result.roundToInt() - result) < 1.0E-4
+    }
+
+    private fun parseFloatValue(value: Any?): Float? {
+        return when (value) {
+            is Float -> value
+            is Double -> value.toFloat()
+            is Int -> value.toFloat()
+            is Long -> value.toFloat()
+            is String -> value.toFloatOrNull()
+            else -> null
+        }
+    }
+
+    private fun showEditDialog() {
+        val content = DialogTextinputBinding.inflate(LayoutInflater.from(context))
+        content.textInputLayout.hint = title?.toString()
+        content.textInputLayout.suffixText = mUnit
+        content.text1.setText(formatNumericValue(getValue()))
+        content.text1.inputType =
+            android.text.InputType.TYPE_CLASS_NUMBER or
+                android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL or
+                android.text.InputType.TYPE_NUMBER_FLAG_SIGNED
+
+        MaterialAlertDialogBuilder(context)
+            .setTitle(context.getString(R.string.slider_dialog_title))
+            .setView(content.root)
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                val value = content.text1.text?.toString() ?: return@setPositiveButton
+                applyInputValue(value)
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .apply {
+                if (mDefaultSeekBarValue != null) {
+                    setNeutralButton(R.string.geq_reset) { _, _ ->
+                        setValue(mDefaultSeekBarValue!!)
+                    }
+                }
+            }
+            .show()
+    }
+
+    private fun applyInputValue(input: String) {
+        try {
+            val parsedValue = input.toFloat()
+            if (parsedValue < mMin || parsedValue > mMax) {
+                context.toast(context.getString(R.string.slider_dialog_range_error, mMin, mMax), false)
+                return
+            }
+            if (mSeekBar.stepSize > 0 && !valueLandsOnTick(parsedValue)) {
+                context.toast(
+                    context.getString(R.string.slider_dialog_step_error, formatNumericValue(mSeekBar.stepSize)),
+                    false
+                )
+                return
+            }
+            setValue(parsedValue)
+        } catch (ex: Exception) {
+            Timber.e("Failed to parse number input")
+            Timber.d(ex)
+            context.toast(
+                context.getString(R.string.slider_dialog_format_error),
+                false
+            )
+        }
     }
 }

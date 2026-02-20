@@ -533,7 +533,7 @@
     <!-- Slider widget -->
     <string name="slider_dialog_title">Wert bearbeiten</string>
     <string name="slider_dialog_format_error">Ungültiges Zahlenformat. Änderungen nicht angewendet.</string>
-    <string name="slider_dialog_step_error">Wert muss ein Vielfaches von %1$d sein. Änderungen nicht angewendet.</string>
+    <string name="slider_dialog_step_error">Wert muss ein Vielfaches von %1$s sein. Änderungen nicht angewendet.</string>
     <!-- Revert confirmation -->
     <string name="revert_confirmation_title">Sind Sie sicher?</string>
     <string name="revert_confirmation">Möchten Sie Ihre aktuellen Einstellungen auf die Standardwerte zurücksetzen?</string>

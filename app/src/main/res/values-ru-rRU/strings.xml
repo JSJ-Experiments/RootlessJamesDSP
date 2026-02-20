@@ -533,7 +533,7 @@
     <!-- Slider widget -->
     <string name="slider_dialog_title">Редактировать значение</string>
     <string name="slider_dialog_format_error">Неверный формат числа. Изменения не применены.</string>
-    <string name="slider_dialog_step_error">Значение должно быть кратно %1$d. Изменения не применены.</string>
+    <string name="slider_dialog_step_error">Значение должно быть кратно %1$s. Изменения не применены.</string>
     <!-- Revert confirmation -->
     <string name="revert_confirmation_title">Вы уверены?</string>
     <string name="revert_confirmation">Сбросить текущий пресет JamesDSP к значениям по умолчанию?</string>

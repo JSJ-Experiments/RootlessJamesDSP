@@ -534,7 +534,7 @@
     <!-- Slider widget -->
     <string name="slider_dialog_title">แก้ไขค่า</string>
     <string name="slider_dialog_format_error">รูปแบบตัวเลขไม่ถูกต้อง  การเปลี่ยนแปลงไม่ได้ใช้ </string>
-    <string name="slider_dialog_step_error">ค่าต้องเป็นผลคูณของ %1$d  การเปลี่ยนแปลงไม่ได้ใช้ </string>
+    <string name="slider_dialog_step_error">ค่าต้องเป็นผลคูณของ %1$s  การเปลี่ยนแปลงไม่ได้ใช้ </string>
     <!-- Revert confirmation -->
     <string name="revert_confirmation_title">คุณแน่ใจไหม?</string>
     <string name="revert_confirmation">คุณต้องการรีเซ็ตการตั้งค่าล่วงหน้าของ JamesDSP ปัจจุบันเป็นค่าเริ่มต้นหรือไม่</string>

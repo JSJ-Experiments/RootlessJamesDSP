@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <me.timschneeberger.rootlessjamesdsp.preference.SwitchPreferenceGroup
+        android:key="@string/key_field_surround_enable"
+        android:disableDependentsState="false"
+        android:title="@string/field_surround_enable"
+        android:icon="@drawable/ic_baseline_cone_24dp"
+        app:iconSpaceReserved="false">
+
+        <ListPreference
+            android:key="@string/key_field_surround_output_mode"
+            android:title="@string/field_surround_output_mode"
+            android:defaultValue="0"
+            android:entries="@array/field_surround_output_modes"
+            android:entryValues="@array/field_surround_output_modes_values"
+            app:useSimpleSummaryProvider="true"
+            app:iconSpaceReserved="false"/>
+
+        <me.timschneeberger.rootlessjamesdsp.preference.MaterialSeekbarPreference
+            android:key="@string/key_field_surround_widening"
+            android:title="@string/field_surround_widening"
+            android:defaultValue="100"
+            app:minValue="0"
+            app:maxValue="800"
+            app:unit=" %"
+            app:allowDividerAbove="false"
+            app:updatesContinuously="true"
+            app:showSeekBarValue="true"
+            app:iconSpaceReserved="false" />
+
+        <me.timschneeberger.rootlessjamesdsp.preference.MaterialSeekbarPreference
+            android:key="@string/key_field_surround_mid_image"
+            android:title="@string/field_surround_mid_image"
+            android:defaultValue="100"
+            app:minValue="0"
+            app:maxValue="800"
+            app:unit=" %"
+            app:allowDividerAbove="false"
+            app:updatesContinuously="true"
+            app:showSeekBarValue="true"
+            app:iconSpaceReserved="false" />
+
+        <me.timschneeberger.rootlessjamesdsp.preference.MaterialSeekbarPreference
+            android:key="@string/key_field_surround_depth"
+            android:title="@string/field_surround_depth"
+            android:defaultValue="100"
+            app:minValue="0"
+            app:maxValue="800"
+            app:unit=" %"
+            app:allowDividerAbove="false"
+            app:updatesContinuously="true"
+            app:showSeekBarValue="true"
+            app:iconSpaceReserved="false" />
+
+        <me.timschneeberger.rootlessjamesdsp.preference.MaterialSeekbarPreference
+            android:key="@string/key_field_surround_phase_offset"
+            android:title="@string/field_surround_phase_offset"
+            android:defaultValue="0"
+            app:minValue="-100"
+            app:maxValue="100"
+            app:unit=" %"
+            app:allowDividerAbove="false"
+            app:updatesContinuously="true"
+            app:showSeekBarValue="true"
+            app:iconSpaceReserved="false" />
+
+        <me.timschneeberger.rootlessjamesdsp.preference.MaterialSeekbarPreference
+            android:key="@string/key_field_surround_mono_sum_mix"
+            android:title="@string/field_surround_mono_sum_mix"
+            android:defaultValue="0"
+            app:minValue="0"
+            app:maxValue="100"
+            app:unit=" %"
+            app:allowDividerAbove="false"
+            app:updatesContinuously="true"
+            app:showSeekBarValue="true"
+            app:iconSpaceReserved="false" />
+
+        <me.timschneeberger.rootlessjamesdsp.preference.MaterialSeekbarPreference
+            android:key="@string/key_field_surround_mono_sum_pan"
+            android:title="@string/field_surround_mono_sum_pan"
+            android:defaultValue="0"
+            app:minValue="-100"
+            app:maxValue="100"
+            app:unit=" %"
+            app:allowDividerAbove="false"
+            app:updatesContinuously="true"
+            app:showSeekBarValue="true"
+            app:iconSpaceReserved="false" />
+
+        <PreferenceCategory
+            app:title="@string/field_surround_advanced_header"
+            app:iconSpaceReserved="false">
+
+            <me.timschneeberger.rootlessjamesdsp.preference.MaterialSeekbarPreference
+                android:key="@string/key_field_surround_delay_left_ms"
+                android:title="@string/field_surround_delay_left_ms"
+                android:defaultValue="20"
+                app:minValue="1"
+                app:maxValue="100"
+                app:unit=" ms"
+                app:allowDividerAbove="false"
+                app:updatesContinuously="true"
+                app:showSeekBarValue="true"
+                app:iconSpaceReserved="false" />
+
+            <me.timschneeberger.rootlessjamesdsp.preference.MaterialSeekbarPreference
+                android:key="@string/key_field_surround_delay_right_ms"
+                android:title="@string/field_surround_delay_right_ms"
+                android:defaultValue="14"
+                app:minValue="1"
+                app:maxValue="100"
+                app:unit=" ms"
+                app:allowDividerAbove="false"
+                app:updatesContinuously="true"
+                app:showSeekBarValue="true"
+                app:iconSpaceReserved="false" />
+
+            <me.timschneeberger.rootlessjamesdsp.preference.MaterialSeekbarPreference
+                android:key="@string/key_field_surround_hpf_frequency_hz"
+                android:title="@string/field_surround_hpf_frequency_hz"
+                android:defaultValue="800"
+                app:minValue="20"
+                app:maxValue="4000"
+                app:unit=" Hz"
+                app:allowDividerAbove="false"
+                app:updatesContinuously="true"
+                app:showSeekBarValue="true"
+                app:iconSpaceReserved="false" />
+
+            <me.timschneeberger.rootlessjamesdsp.preference.MaterialSeekbarPreference
+                android:key="@string/key_field_surround_hpf_gain_db"
+                android:title="@string/field_surround_hpf_gain_db"
+                android:defaultValue="-11"
+                app:minValue="-30"
+                app:maxValue="12"
+                app:unit=" dB"
+                app:precision="1"
+                app:allowDividerAbove="false"
+                app:updatesContinuously="true"
+                app:showSeekBarValue="true"
+                app:iconSpaceReserved="false" />
+
+            <me.timschneeberger.rootlessjamesdsp.preference.MaterialSeekbarPreference
+                android:key="@string/key_field_surround_hpf_q"
+                android:title="@string/field_surround_hpf_q"
+                android:defaultValue="0.72"
+                app:minValue="0.1"
+                app:maxValue="3.0"
+                app:precision="3"
+                app:allowDividerAbove="false"
+                app:updatesContinuously="true"
+                app:showSeekBarValue="true"
+                app:iconSpaceReserved="false" />
+
+            <me.timschneeberger.rootlessjamesdsp.preference.MaterialSeekbarPreference
+                android:key="@string/key_field_surround_branch_threshold"
+                android:title="@string/field_surround_branch_threshold"
+                android:defaultValue="500"
+                app:minValue="0"
+                app:maxValue="2000"
+                app:unit=" Hz"
+                app:allowDividerAbove="false"
+                app:updatesContinuously="true"
+                app:showSeekBarValue="true"
+                app:iconSpaceReserved="false" />
+
+            <me.timschneeberger.rootlessjamesdsp.preference.MaterialSeekbarPreference
+                android:key="@string/key_field_surround_gain_scale_db"
+                android:title="@string/field_surround_gain_scale_db"
+                android:defaultValue="10"
+                app:minValue="0"
+                app:maxValue="30"
+                app:unit=" dB"
+                app:allowDividerAbove="false"
+                app:updatesContinuously="true"
+                app:showSeekBarValue="true"
+                app:iconSpaceReserved="false" />
+
+            <me.timschneeberger.rootlessjamesdsp.preference.MaterialSeekbarPreference
+                android:key="@string/key_field_surround_gain_offset_db"
+                android:title="@string/field_surround_gain_offset_db"
+                android:defaultValue="-15"
+                app:minValue="-40"
+                app:maxValue="20"
+                app:unit=" dB"
+                app:allowDividerAbove="false"
+                app:updatesContinuously="true"
+                app:showSeekBarValue="true"
+                app:iconSpaceReserved="false" />
+
+            <me.timschneeberger.rootlessjamesdsp.preference.MaterialSeekbarPreference
+                android:key="@string/key_field_surround_gain_cap"
+                android:title="@string/field_surround_gain_cap"
+                android:defaultValue="1.0"
+                app:minValue="0.1"
+                app:maxValue="2.0"
+                app:precision="2"
+                app:allowDividerAbove="false"
+                app:updatesContinuously="true"
+                app:showSeekBarValue="true"
+                app:iconSpaceReserved="false" />
+
+            <me.timschneeberger.rootlessjamesdsp.preference.MaterialSeekbarPreference
+                android:key="@string/key_field_surround_stereo_floor"
+                android:title="@string/field_surround_stereo_floor"
+                android:defaultValue="2.0"
+                app:minValue="0.1"
+                app:maxValue="5.0"
+                app:precision="2"
+                app:allowDividerAbove="false"
+                app:updatesContinuously="true"
+                app:showSeekBarValue="true"
+                app:iconSpaceReserved="false" />
+
+            <me.timschneeberger.rootlessjamesdsp.preference.MaterialSeekbarPreference
+                android:key="@string/key_field_surround_stereo_fallback"
+                android:title="@string/field_surround_stereo_fallback"
+                android:defaultValue="0.5"
+                app:minValue="0.1"
+                app:maxValue="2.0"
+                app:precision="2"
+                app:allowDividerAbove="false"
+                app:updatesContinuously="true"
+                app:showSeekBarValue="true"
+                app:iconSpaceReserved="false" />
+        </PreferenceCategory>
+    </me.timschneeberger.rootlessjamesdsp.preference.SwitchPreferenceGroup>
+</PreferenceScreen>

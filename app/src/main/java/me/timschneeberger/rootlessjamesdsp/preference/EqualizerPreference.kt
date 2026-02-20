@@ -88,12 +88,14 @@ class EqualizerPreference : DialogPreference, SharedPreferences.OnSharedPreferen
 
     fun updateFilterType() {
         val type = PreferenceCache.uncachedGet(context, Constants.PREF_EQ, R.string.key_eq_filter_type, "0").toIntOrNull() ?: 0
+        equalizerView?.isViperOriginalMode = (type == 6)
         equalizerView?.mode = if(type == 0) EqualizerSurface.Mode.Fir else EqualizerSurface.Mode.Iir
         equalizerView?.iirOrder = when(type) {
             1 -> 4
             2 -> 6
             3 -> 8
             4 -> 10
+            6 -> 10
             else -> 12
         }
     }

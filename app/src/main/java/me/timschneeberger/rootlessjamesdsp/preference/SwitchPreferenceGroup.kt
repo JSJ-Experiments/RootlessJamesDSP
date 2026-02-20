@@ -8,13 +8,19 @@ import android.util.AttributeSet
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import androidx.preference.ListPreference
+import androidx.preference.EditTextPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceGroup
 import androidx.preference.PreferenceViewHolder
+import androidx.preference.SeekBarPreference
+import androidx.preference.SwitchPreferenceCompat
+import androidx.preference.TwoStatePreference
 import androidx.preference.children
 import com.google.android.material.materialswitch.MaterialSwitch
 import me.timschneeberger.rootlessjamesdsp.R
 import me.timschneeberger.rootlessjamesdsp.utils.extensions.animatedValueAs
+import timber.log.Timber
 
 
 @SuppressLint("PrivateResource")
@@ -24,6 +30,7 @@ class SwitchPreferenceGroup(context: Context, attrs: AttributeSet) : PreferenceG
 ) {
     private var childrenVisible = false
     private var switch: MaterialSwitch? = null
+    private var resetButton: View? = null
     private var itemView: View? = null
     private var bgAnimation: ValueAnimator? = null
     private var isIconVisible: Boolean = false
@@ -58,13 +65,21 @@ class SwitchPreferenceGroup(context: Context, attrs: AttributeSet) : PreferenceG
         animateHeaderState(state)
         setIsIconVisible(isIconVisible)
 
-        switch = (holder.findViewById(R.id.switchWidget) as MaterialSwitch).apply {
+        switch = holder.findViewById(R.id.switchWidget) as? MaterialSwitch
+        switch?.apply {
             // Apply initial state
             isChecked = state
             isVisible = isSelectable
 
             setOnCheckedChangeListener { _, isChecked ->
                 setValueInternal(isChecked, false)
+            }
+        }
+        resetButton = holder.findViewById(R.id.resetWidget)
+        resetButton?.apply {
+            isVisible = hasAnyChildDefaults()
+            setOnClickListener {
+                resetChildrenToDefaults()
             }
         }
 
@@ -112,6 +127,129 @@ class SwitchPreferenceGroup(context: Context, attrs: AttributeSet) : PreferenceG
 
     private fun setChildrenVisibility(visible: Boolean) {
         children.forEach { it.isVisible = visible }
+    }
+
+    private fun resetChildrenToDefaults() {
+        flattenChildren(this).forEach { child ->
+            if (!resetPreferenceToDefault(child) && !child.key.isNullOrEmpty()) {
+                preferenceManager.sharedPreferences?.edit()
+                    ?.remove(child.key)
+                    ?.apply()
+                forceNotifyChanged(child)
+            }
+        }
+    }
+
+    private fun flattenChildren(group: PreferenceGroup): List<Preference> {
+        val nodes = mutableListOf<Preference>()
+        group.children.forEach { child ->
+            nodes += child
+            if (child is PreferenceGroup) {
+                nodes += flattenChildren(child)
+            }
+        }
+        return nodes
+    }
+
+    private fun hasAnyChildDefaults(): Boolean {
+        return flattenChildren(this).any { resolveDefaultValue(it) != null }
+    }
+
+    private fun resetPreferenceToDefault(preference: Preference): Boolean {
+        val defaultValue = resolveDefaultValue(preference) ?: return false
+        return when (preference) {
+            is MaterialSeekbarPreference -> {
+                parseFloat(defaultValue)?.let {
+                    preference.setValue(it)
+                    true
+                } ?: false
+            }
+            is SeekBarPreference -> {
+                parseInt(defaultValue)?.let {
+                    preference.value = it
+                    true
+                } ?: false
+            }
+            is ListPreference -> {
+                val value = defaultValue.toString()
+                preference.value = value
+                true
+            }
+            is EditTextPreference -> {
+                preference.text = defaultValue.toString()
+                true
+            }
+            is SwitchPreferenceCompat -> {
+                parseBoolean(defaultValue)?.let {
+                    preference.isChecked = it
+                    true
+                } ?: false
+            }
+            is SwitchPreferenceGroup -> {
+                parseBoolean(defaultValue)?.let {
+                    preference.setValue(it)
+                    true
+                } ?: false
+            }
+            else -> false
+        }
+    }
+
+    private fun resolveDefaultValue(preference: Preference): Any? {
+        return try {
+            // Reflection note: this accesses Preference::class.java.getDeclaredField("mDefaultValue")
+            // (verified against androidx.preference 1.2.1). This is brittle across library upgrades
+            // and may break if internals change; failures are handled by returning null so reset is disabled,
+            // with details logged in the catch block via Timber.
+            // TODO: replace this with a public API or add compatibility handling if one becomes available.
+            val field = Preference::class.java.getDeclaredField("mDefaultValue")
+            field.isAccessible = true
+            field.get(preference)
+        } catch (ex: Exception) {
+            Timber.d(ex, "Failed to read default value for preference '${preference.key}'")
+            null
+        }
+    }
+
+    private fun forceNotifyChanged(preference: Preference) {
+        try {
+            val method = Preference::class.java.getDeclaredMethod("notifyChanged")
+            method.isAccessible = true
+            method.invoke(preference)
+        } catch (ex: Exception) {
+            Timber.d(ex, "Failed to notify preference change for '${preference.key}'")
+        }
+    }
+
+    private fun parseFloat(value: Any): Float? {
+        return when (value) {
+            is Float -> value
+            is Double -> value.toFloat()
+            is Int -> value.toFloat()
+            is Long -> value.toFloat()
+            is String -> value.toFloatOrNull()
+            else -> null
+        }
+    }
+
+    private fun parseInt(value: Any): Int? {
+        return when (value) {
+            is Int -> value
+            is Long -> value.toInt()
+            is Float -> value.toInt()
+            is Double -> value.toInt()
+            is String -> value.toIntOrNull()
+            else -> null
+        }
+    }
+
+    private fun parseBoolean(value: Any): Boolean? {
+        return when (value) {
+            is Boolean -> value
+            is String -> value.toBooleanStrictOrNull()
+            is Number -> value.toInt() != 0
+            else -> null
+        }
     }
 
     companion object {

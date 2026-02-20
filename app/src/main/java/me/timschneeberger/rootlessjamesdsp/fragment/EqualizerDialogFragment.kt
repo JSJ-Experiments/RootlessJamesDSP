@@ -10,6 +10,7 @@ import android.view.View
 import androidx.core.content.edit
 import androidx.preference.PreferenceDialogFragmentCompat
 import com.google.android.material.chip.Chip
+import me.timschneeberger.rootlessjamesdsp.MainApplication
 import me.timschneeberger.rootlessjamesdsp.R
 import me.timschneeberger.rootlessjamesdsp.databinding.PreferenceEqualizerDialogBinding
 import me.timschneeberger.rootlessjamesdsp.interop.PreferenceCache
@@ -31,6 +32,12 @@ class EqualizerDialogFragment : PreferenceDialogFragmentCompat() {
             try {
                 when (intent?.action) {
                     Constants.ACTION_PRESET_LOADED -> dismiss()
+                    Constants.ACTION_REPORT_SAMPLE_RATE -> {
+                        val sampleRate = intent.getFloatExtra(Constants.EXTRA_SAMPLE_RATE, 0f).toInt()
+                        if (sampleRate > 0) {
+                            equalizer?.sampleRate = sampleRate
+                        }
+                    }
                 }
             }
             catch(ex: IllegalStateException) {
@@ -55,7 +62,10 @@ class EqualizerDialogFragment : PreferenceDialogFragmentCompat() {
             .toDoubleArray()
             .copyOf(15)
 
-        requireContext().registerLocalReceiver(broadcastReceiver, IntentFilter(Constants.ACTION_PRESET_LOADED))
+        requireContext().registerLocalReceiver(broadcastReceiver, IntentFilter().apply {
+            addAction(Constants.ACTION_PRESET_LOADED)
+            addAction(Constants.ACTION_REPORT_SAMPLE_RATE)
+        })
     }
 
 
@@ -85,13 +95,20 @@ class EqualizerDialogFragment : PreferenceDialogFragmentCompat() {
         }
 
         val type = PreferenceCache.uncachedGet(requireContext(), Constants.PREF_EQ, R.string.key_eq_filter_type, "0").toIntOrNull() ?: 0
+        equalizer!!.isViperOriginalMode = (type == 6)
         equalizer!!.mode = if(type == 0) EqualizerSurface.Mode.Fir else EqualizerSurface.Mode.Iir
         equalizer!!.iirOrder = when(type) {
             1 -> 4
             2 -> 6
             3 -> 8
             4 -> 10
+            6 -> 10
             else -> 12
+        }
+        val app = requireActivity().application as? MainApplication
+        val runtimeSampleRate = app?.engineSampleRate?.toInt() ?: 0
+        if (runtimeSampleRate > 0) {
+            equalizer!!.sampleRate = runtimeSampleRate
         }
 
         mLevels.forEachIndexed(equalizer!!::setBand)
@@ -124,8 +141,7 @@ class EqualizerDialogFragment : PreferenceDialogFragmentCompat() {
 
     override fun onDialogClosed(positiveResult: Boolean) {
         if (positiveResult) {
-            val array = EqualizerSurface.SCALE + mLevels
-            val value = array.joinToString(";")
+            val value = buildCurrentSettingValue()
             if (preference.callChangeListener(value)) {
                 applySetting(value)
             }
@@ -135,7 +151,39 @@ class EqualizerDialogFragment : PreferenceDialogFragmentCompat() {
     }
 
     private fun applyCurrentSetting() {
-        applySetting((EqualizerSurface.SCALE + mLevels).joinToString(";"))
+        applySetting(buildCurrentSettingValue())
+    }
+
+    private fun buildCurrentSettingValue(): String {
+        val freqs = EqualizerSurface.SCALE.copyOf()
+        val gains = mLevels.copyOf()
+
+        if (equalizer?.isViperOriginalMode == true) {
+            val extraFreqs = doubleArrayOf(17000.0, 18000.0, 19000.0, 20000.0, 22000.0)
+            if (EqualizerSurface.SCALE.size != EqualizerSurface.VIPER_ORIGINAL_SCALE.size + extraFreqs.size ||
+                gains.size < EqualizerSurface.VIPER_ORIGINAL_SCALE.size ||
+                freqs.size != gains.size
+            ) {
+                Timber.e(
+                    "buildCurrentSettingValue: invalid scale invariant (scale=%d, viper=%d, extra=%d, gains=%d)",
+                    EqualizerSurface.SCALE.size,
+                    EqualizerSurface.VIPER_ORIGINAL_SCALE.size,
+                    extraFreqs.size,
+                    gains.size
+                )
+                return (freqs + gains).joinToString(";")
+            }
+            for (i in EqualizerSurface.VIPER_ORIGINAL_SCALE.indices) {
+                freqs[i] = EqualizerSurface.VIPER_ORIGINAL_SCALE[i]
+            }
+            val lastViperGain = gains[EqualizerSurface.VIPER_ORIGINAL_SCALE.lastIndex]
+            for ((offset, i) in (EqualizerSurface.VIPER_ORIGINAL_SCALE.size until gains.size).withIndex()) {
+                freqs[i] = extraFreqs[offset]
+                gains[i] = lastViperGain
+            }
+        }
+
+        return (freqs + gains).joinToString(";")
     }
 
     private fun applySetting(value: String) {

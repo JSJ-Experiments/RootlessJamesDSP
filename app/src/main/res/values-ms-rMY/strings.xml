@@ -533,7 +533,7 @@
     <!-- Slider widget -->
     <string name="slider_dialog_title">Edit nilai</string>
     <string name="slider_dialog_format_error">Format angka salah, perubahan tidak diterapkan.</string>
-    <string name="slider_dialog_step_error">Nilai harus kelipatan %1$d. Perubahan tidak diterapkan.</string>
+    <string name="slider_dialog_step_error">Nilai harus kelipatan %1$s. Perubahan tidak diterapkan.</string>
     <!-- Revert confirmation -->
     <string name="revert_confirmation_title">Apakah Anda yakin?</string>
     <string name="revert_confirmation">Anda ingin menyetel ulang preset JamesDSP saat ini ke nilai awal?</string>

@@ -533,7 +533,7 @@
     <!-- Slider widget -->
     <string name="slider_dialog_title">Chỉnh sửa giá trị</string>
     <string name="slider_dialog_format_error">Định dạng số không hợp lệ. Những thay đổi không được áp dụng.</string>
-    <string name="slider_dialog_step_error">Giá trị phải là bội số của %1$d. Những thay đổi không được áp dụng.</string>
+    <string name="slider_dialog_step_error">Giá trị phải là bội số của %1$s. Những thay đổi không được áp dụng.</string>
     <!-- Revert confirmation -->
     <string name="revert_confirmation_title">Bạn chắc chứ?</string>
     <string name="revert_confirmation">Bạn có muốn đặt lại cài đặt JamesDSP hiện tại của mình về giá trị mặc định không?</string>

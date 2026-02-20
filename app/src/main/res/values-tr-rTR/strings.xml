@@ -516,7 +516,7 @@
     <!-- Slider widget -->
     <string name="slider_dialog_title">Değeri düzenle</string>
     <string name="slider_dialog_format_error">Geçersiz sayı biçimi. Değişiklikler uygulanmadı.</string>
-    <string name="slider_dialog_step_error">Değer, %1$d\'nin katı olmalıdır. Değişiklikler uygulanmadı.</string>
+    <string name="slider_dialog_step_error">Değer, %1$s\'nin katı olmalıdır. Değişiklikler uygulanmadı.</string>
     <!-- Revert confirmation -->
     <string name="revert_confirmation_title">Emin misin?</string>
     <string name="revert_confirmation">Geçerli JamesDSP ön ayarınızı varsayılan değerlere sıfırlamak istiyor musunuz?</string>

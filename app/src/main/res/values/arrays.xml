@@ -116,6 +116,7 @@
         <item>@string/eq_filter_type_iir_8_order</item>
         <item>@string/eq_filter_type_iir_10_order</item>
         <item>@string/eq_filter_type_iir_12_order</item>
+        <item>@string/eq_filter_type_viper_original</item>
     </string-array>
 
     <string-array name="eq_filter_types_values" translatable="false">
@@ -125,6 +126,7 @@
         <item>3</item>
         <item>4</item>
         <item>5</item>
+        <item>6</item>
     </string-array>
 
     <string-array name="eq_interpolators" translatable="false">
@@ -179,6 +181,50 @@
         <item>0</item>
         <item>1</item>
         <item>2</item>
+    </string-array>
+
+    <string-array name="spectrum_strength_units" translatable="false">
+        <item>@string/strength_unit_percent</item>
+        <item>@string/strength_unit_db</item>
+    </string-array>
+
+    <string-array name="spectrum_strength_units_values" translatable="false">
+        <item>@string/strength_unit_value_percent</item>
+        <item>@string/strength_unit_value_db</item>
+    </string-array>
+
+    <string-array name="clarity_modes" translatable="false">
+        <item>@string/clarity_mode_natural</item>
+        <item>@string/clarity_mode_ozone</item>
+        <item>@string/clarity_mode_xhifi</item>
+    </string-array>
+
+    <string-array name="field_surround_output_modes" translatable="false">
+        <item>@string/field_surround_mode_normal</item>
+        <item>@string/field_surround_mode_pure_side_mono</item>
+        <item>@string/field_surround_mode_mid_only_mono</item>
+    </string-array>
+
+    <string-array name="field_surround_output_modes_values" translatable="false">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string-array name="clarity_modes_values" translatable="false">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string-array name="clarity_strength_units" translatable="false">
+        <item>@string/strength_unit_percent</item>
+        <item>@string/strength_unit_db</item>
+    </string-array>
+
+    <string-array name="clarity_strength_units_values" translatable="false">
+        <item>@string/strength_unit_value_percent</item>
+        <item>@string/strength_unit_value_db</item>
     </string-array>
 
     <string-array name="equalizer_preset_modes" translatable="false">

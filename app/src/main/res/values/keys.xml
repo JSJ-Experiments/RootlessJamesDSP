@@ -106,11 +106,62 @@
     <string name="key_reverb_enable" translatable="false">reverb_enable</string>
     <string name="key_reverb_preset" translatable="false">reverb_preset</string>
 
+    <string name="key_spectrum_ext_enable" translatable="false">spectrum_ext_enable</string>
+    <string name="key_spectrum_ext_strength_unit" translatable="false">spectrum_ext_strength_unit</string>
+    <string name="key_spectrum_ext_strength_percent" translatable="false">spectrum_ext_strength_percent</string>
+    <string name="key_spectrum_ext_strength_db" translatable="false">spectrum_ext_strength_db</string>
+    <string name="key_spectrum_ext_ref_freq" translatable="false">spectrum_ext_ref_freq</string>
+    <string name="key_spectrum_ext_wet_mix" translatable="false">spectrum_ext_wet_mix</string>
+    <string name="key_spectrum_ext_post_gain" translatable="false">spectrum_ext_post_gain</string>
+    <string name="key_spectrum_ext_safety" translatable="false">spectrum_ext_safety</string>
+    <string name="key_spectrum_ext_hp_q" translatable="false">spectrum_ext_hp_q</string>
+    <string name="key_spectrum_ext_lp_q" translatable="false">spectrum_ext_lp_q</string>
+    <string name="key_spectrum_ext_lp_offset" translatable="false">spectrum_ext_lp_offset</string>
+    <string name="key_spectrum_ext_harmonics" translatable="false">spectrum_ext_harmonics</string>
+
     <string name="key_stereowide_enable" translatable="false">stereowide_enable</string>
     <string name="key_stereowide_mode" translatable="false">stereowide_mode</string>
 
+    <string name="key_field_surround_enable" translatable="false">field_surround_enable</string>
+    <string name="key_field_surround_output_mode" translatable="false">field_surround_output_mode</string>
+    <string name="key_field_surround_widening" translatable="false">field_surround_widening</string>
+    <string name="key_field_surround_mid_image" translatable="false">field_surround_mid_image</string>
+    <string name="key_field_surround_depth" translatable="false">field_surround_depth</string>
+    <string name="key_field_surround_phase_offset" translatable="false">field_surround_phase_offset</string>
+    <string name="key_field_surround_mono_sum_mix" translatable="false">field_surround_mono_sum_mix</string>
+    <string name="key_field_surround_mono_sum_pan" translatable="false">field_surround_mono_sum_pan</string>
+    <string name="key_field_surround_delay_left_ms" translatable="false">field_surround_delay_left_ms</string>
+    <string name="key_field_surround_delay_right_ms" translatable="false">field_surround_delay_right_ms</string>
+    <string name="key_field_surround_hpf_frequency_hz" translatable="false">field_surround_hpf_frequency_hz</string>
+    <string name="key_field_surround_hpf_gain_db" translatable="false">field_surround_hpf_gain_db</string>
+    <string name="key_field_surround_hpf_q" translatable="false">field_surround_hpf_q</string>
+    <string name="key_field_surround_branch_threshold" translatable="false">field_surround_branch_threshold</string>
+    <string name="key_field_surround_gain_scale_db" translatable="false">field_surround_gain_scale_db</string>
+    <string name="key_field_surround_gain_offset_db" translatable="false">field_surround_gain_offset_db</string>
+    <string name="key_field_surround_gain_cap" translatable="false">field_surround_gain_cap</string>
+    <string name="key_field_surround_stereo_floor" translatable="false">field_surround_stereo_floor</string>
+    <string name="key_field_surround_stereo_fallback" translatable="false">field_surround_stereo_fallback</string>
+
     <string name="key_crossfeed_enable" translatable="false">bs2b_crossfeed_enable</string>
     <string name="key_crossfeed_mode" translatable="false">bs2b_crossfeed_mode</string>
+
+    <string name="key_clarity_enable" translatable="false">clarity_enable</string>
+    <string name="key_clarity_mode" translatable="false">clarity_mode</string>
+    <string name="key_clarity_strength_unit" translatable="false">clarity_strength_unit</string>
+    <string name="key_clarity_strength_percent" translatable="false">clarity_strength_percent</string>
+    <string name="key_clarity_strength_db" translatable="false">clarity_strength_db</string>
+    <string name="key_clarity_post_gain" translatable="false">clarity_post_gain</string>
+    <string name="key_clarity_safety" translatable="false">clarity_safety</string>
+    <string name="key_clarity_safety_threshold" translatable="false">clarity_safety_threshold</string>
+    <string name="key_clarity_safety_release" translatable="false">clarity_safety_release</string>
+    <string name="key_clarity_natural_lpf_offset" translatable="false">clarity_natural_lpf_offset</string>
+    <string name="key_clarity_ozone_frequency" translatable="false">clarity_ozone_frequency</string>
+    <string name="key_clarity_xhifi_low_cut" translatable="false">clarity_xhifi_low_cut</string>
+    <string name="key_clarity_xhifi_high_cut" translatable="false">clarity_xhifi_high_cut</string>
+    <string name="key_clarity_xhifi_hp_mix" translatable="false">clarity_xhifi_hp_mix</string>
+    <string name="key_clarity_xhifi_bp_mix" translatable="false">clarity_xhifi_bp_mix</string>
+    <string name="key_clarity_xhifi_bp_delay_divisor" translatable="false">clarity_xhifi_bp_delay_divisor</string>
+    <string name="key_clarity_xhifi_lp_delay_divisor" translatable="false">clarity_xhifi_lp_delay_divisor</string>
 
     <string name="key_convolver_enable" translatable="false">convolver_enable</string>
     <string name="key_convolver_file" translatable="false">convolver_file</string>

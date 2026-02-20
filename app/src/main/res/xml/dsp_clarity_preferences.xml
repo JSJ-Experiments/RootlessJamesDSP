@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <me.timschneeberger.rootlessjamesdsp.preference.SwitchPreferenceGroup
+        android:key="@string/key_clarity_enable"
+        android:disableDependentsState="false"
+        android:title="@string/clarity_enable"
+        android:icon="@drawable/ic_twotone_auto_fix_high_24"
+        app:iconSpaceReserved="false">
+
+        <ListPreference
+            android:key="@string/key_clarity_mode"
+            android:title="@string/clarity_mode"
+            android:defaultValue="0"
+            android:entries="@array/clarity_modes"
+            android:entryValues="@array/clarity_modes_values"
+            app:allowDividerAbove="false"
+            app:iconSpaceReserved="false" />
+
+        <ListPreference
+            android:key="@string/key_clarity_strength_unit"
+            android:title="@string/clarity_strength_unit"
+            android:defaultValue="@string/strength_unit_value_percent"
+            android:entries="@array/clarity_strength_units"
+            android:entryValues="@array/clarity_strength_units_values"
+            app:allowDividerAbove="false"
+            app:iconSpaceReserved="false" />
+
+        <me.timschneeberger.rootlessjamesdsp.preference.MaterialSeekbarPreference
+            android:key="@string/key_clarity_strength_percent"
+            android:title="@string/clarity_strength"
+            android:defaultValue="100"
+            app:minValue="0"
+            app:maxValue="631"
+            app:unit=" %"
+            app:allowDividerAbove="false"
+            app:updatesContinuously="true"
+            app:showSeekBarValue="true"
+            app:iconSpaceReserved="false" />
+
+        <me.timschneeberger.rootlessjamesdsp.preference.MaterialSeekbarPreference
+            android:key="@string/key_clarity_strength_db"
+            android:title="@string/clarity_strength"
+            android:defaultValue="0"
+            app:minValue="-40"
+            app:maxValue="16"
+            app:unit=" dB"
+            app:precision="1"
+            app:allowDividerAbove="false"
+            app:updatesContinuously="true"
+            app:showSeekBarValue="true"
+            app:iconSpaceReserved="false" />
+
+        <me.timschneeberger.rootlessjamesdsp.preference.MaterialSeekbarPreference
+            android:key="@string/key_clarity_post_gain"
+            android:title="@string/clarity_post_gain"
+            android:defaultValue="0"
+            app:minValue="-24"
+            app:maxValue="16"
+            app:unit=" dB"
+            app:allowDividerAbove="false"
+            app:updatesContinuously="true"
+            app:showSeekBarValue="true"
+            app:iconSpaceReserved="false" />
+
+        <SwitchPreferenceCompat
+            android:key="@string/key_clarity_safety"
+            android:title="@string/clarity_safety"
+            android:defaultValue="false"
+            app:allowDividerAbove="false"
+            app:iconSpaceReserved="false" />
+
+        <me.timschneeberger.rootlessjamesdsp.preference.MaterialSeekbarPreference
+            android:key="@string/key_clarity_safety_threshold"
+            android:title="@string/clarity_safety_threshold"
+            android:defaultValue="-0.8"
+            app:minValue="-12"
+            app:maxValue="0"
+            app:unit=" dB"
+            app:precision="1"
+            app:allowDividerAbove="false"
+            app:updatesContinuously="true"
+            app:showSeekBarValue="true"
+            app:iconSpaceReserved="false" />
+
+        <me.timschneeberger.rootlessjamesdsp.preference.MaterialSeekbarPreference
+            android:key="@string/key_clarity_safety_release"
+            android:title="@string/clarity_safety_release"
+            android:defaultValue="60"
+            app:minValue="1.5"
+            app:maxValue="500"
+            app:precision="1"
+            app:unit=" ms"
+            app:allowDividerAbove="false"
+            app:updatesContinuously="true"
+            app:showSeekBarValue="true"
+            app:iconSpaceReserved="false" />
+
+        <PreferenceCategory
+            app:title="@string/clarity_expert_header"
+            app:iconSpaceReserved="false">
+
+            <me.timschneeberger.rootlessjamesdsp.preference.MaterialSeekbarPreference
+                android:key="@string/key_clarity_natural_lpf_offset"
+                android:title="@string/clarity_natural_lpf_offset"
+                android:defaultValue="1000"
+                app:minValue="200"
+                app:maxValue="5000"
+                app:unit=" Hz"
+                app:allowDividerAbove="false"
+                app:updatesContinuously="true"
+                app:showSeekBarValue="true"
+                app:iconSpaceReserved="false" />
+
+            <me.timschneeberger.rootlessjamesdsp.preference.MaterialSeekbarPreference
+                android:key="@string/key_clarity_ozone_frequency"
+                android:title="@string/clarity_ozone_frequency"
+                android:defaultValue="8250"
+                app:minValue="2000"
+                app:maxValue="16000"
+                app:unit=" Hz"
+                app:allowDividerAbove="false"
+                app:updatesContinuously="true"
+                app:showSeekBarValue="true"
+                app:iconSpaceReserved="false" />
+
+            <me.timschneeberger.rootlessjamesdsp.preference.MaterialSeekbarPreference
+                android:key="@string/key_clarity_xhifi_low_cut"
+                android:title="@string/clarity_xhifi_low_cut"
+                android:defaultValue="120"
+                app:minValue="40"
+                app:maxValue="400"
+                app:unit=" Hz"
+                app:allowDividerAbove="false"
+                app:updatesContinuously="true"
+                app:showSeekBarValue="true"
+                app:iconSpaceReserved="false" />
+
+            <me.timschneeberger.rootlessjamesdsp.preference.MaterialSeekbarPreference
+                android:key="@string/key_clarity_xhifi_high_cut"
+                android:title="@string/clarity_xhifi_high_cut"
+                android:defaultValue="1200"
+                app:minValue="400"
+                app:maxValue="6000"
+                app:unit=" Hz"
+                app:allowDividerAbove="false"
+                app:updatesContinuously="true"
+                app:showSeekBarValue="true"
+                app:iconSpaceReserved="false" />
+
+            <me.timschneeberger.rootlessjamesdsp.preference.MaterialSeekbarPreference
+                android:key="@string/key_clarity_xhifi_hp_mix"
+                android:title="@string/clarity_xhifi_hp_mix"
+                android:defaultValue="1.2"
+                app:minValue="0"
+                app:maxValue="2.5"
+                app:precision="2"
+                app:allowDividerAbove="false"
+                app:updatesContinuously="true"
+                app:showSeekBarValue="true"
+                app:iconSpaceReserved="false" />
+
+            <me.timschneeberger.rootlessjamesdsp.preference.MaterialSeekbarPreference
+                android:key="@string/key_clarity_xhifi_bp_mix"
+                android:title="@string/clarity_xhifi_bp_mix"
+                android:defaultValue="1.0"
+                app:minValue="0"
+                app:maxValue="2.5"
+                app:precision="2"
+                app:allowDividerAbove="false"
+                app:updatesContinuously="true"
+                app:showSeekBarValue="true"
+                app:iconSpaceReserved="false" />
+
+            <me.timschneeberger.rootlessjamesdsp.preference.MaterialSeekbarPreference
+                android:key="@string/key_clarity_xhifi_bp_delay_divisor"
+                android:title="@string/clarity_xhifi_bp_delay_divisor"
+                android:defaultValue="400"
+                app:minValue="80"
+                app:maxValue="1200"
+                app:allowDividerAbove="false"
+                app:updatesContinuously="true"
+                app:showSeekBarValue="true"
+                app:iconSpaceReserved="false" />
+
+            <me.timschneeberger.rootlessjamesdsp.preference.MaterialSeekbarPreference
+                android:key="@string/key_clarity_xhifi_lp_delay_divisor"
+                android:title="@string/clarity_xhifi_lp_delay_divisor"
+                android:defaultValue="200"
+                app:minValue="80"
+                app:maxValue="1200"
+                app:allowDividerAbove="false"
+                app:updatesContinuously="true"
+                app:showSeekBarValue="true"
+                app:iconSpaceReserved="false" />
+        </PreferenceCategory>
+    </me.timschneeberger.rootlessjamesdsp.preference.SwitchPreferenceGroup>
+</PreferenceScreen>

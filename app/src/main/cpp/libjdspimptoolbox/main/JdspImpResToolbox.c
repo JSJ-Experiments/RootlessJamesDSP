@@ -621,27 +621,39 @@ double gain[NUMPTS + 2];
 JNIEXPORT jint JNICALL Java_me_timschneeberger_rootlessjamesdsp_interop_JdspImpResToolbox_ComputeEqResponse
 (JNIEnv *env, jobject obj, jint n, jdoubleArray jfreq, jdoubleArray jgain, jint interpolationMode, jint queryPts, jdoubleArray dispFreq, jfloatArray response)
 {
+	jsize freqLen = (*env)->GetArrayLength(env, jfreq);
+	jsize gainLen = (*env)->GetArrayLength(env, jgain);
+	int eqPts = n;
+	if (eqPts > NUMPTS)
+		eqPts = NUMPTS;
+	if (eqPts > freqLen)
+		eqPts = (int)freqLen;
+	if (eqPts > gainLen)
+		eqPts = (int)gainLen;
+	if (eqPts < 2)
+		return -1;
+
 	jdouble *javaFreqPtr = (jdouble*) (*env)->GetDoubleArrayElements(env, jfreq, 0);
 	jdouble *javaGainPtr = (jdouble*) (*env)->GetDoubleArrayElements(env, jgain, 0);
 	jdouble *javadispFreqPtr = (jdouble*) (*env)->GetDoubleArrayElements(env, dispFreq, 0);
 	jfloat *javaResponsePtr = (jfloat*) (*env)->GetFloatArrayElements(env, response, 0);
-	memcpy(freq + 1, javaFreqPtr, NUMPTS * sizeof(double));
-	memcpy(gain + 1, javaGainPtr, NUMPTS * sizeof(double));
+	memcpy(freq + 1, javaFreqPtr, eqPts * sizeof(double));
+	memcpy(gain + 1, javaGainPtr, eqPts * sizeof(double));
 	(*env)->ReleaseDoubleArrayElements(env, jfreq, javaFreqPtr, 0);
 	(*env)->ReleaseDoubleArrayElements(env, jgain, javaGainPtr, 0);
 	freq[0] = 0.0;
 	gain[0] = gain[1];
-	freq[NUMPTS + 1] = 24000.0;
-	gain[NUMPTS + 1] = gain[NUMPTS];
+	freq[eqPts + 1] = 24000.0;
+	gain[eqPts + 1] = gain[eqPts];
 	ierper *lerpPtr;
 	if (!interpolationMode)
 	{
-		pchip(&pch1, freq, gain, NUMPTS + 2, 1, 1);
+		pchip(&pch1, freq, gain, eqPts + 2, 1, 1);
 		lerpPtr = &pch1;
 	}
 	else
 	{
-		makima(&pch2, freq, gain, NUMPTS + 2, 1, 1);
+		makima(&pch2, freq, gain, eqPts + 2, 1, 1);
 		lerpPtr = &pch2;
 	}
 	for (int i = 0; i < queryPts; i++)
@@ -683,6 +695,14 @@ JNIEXPORT void JNICALL Java_me_timschneeberger_rootlessjamesdsp_interop_JdspImpR
 
 JNIEXPORT void JNICALL Java_me_timschneeberger_rootlessjamesdsp_interop_JdspImpResToolbox_ComputeIIREqualizerCplx(JNIEnv *env, jobject obj, jint srate, jint order, jdoubleArray jfreq, jdoubleArray jgain, jint nPts, jdoubleArray jdispFreq, jdoubleArray jcplxRe, jdoubleArray jcplxIm)
 {
+	jsize freqLen = (*env)->GetArrayLength(env, jfreq);
+	jsize gainLen = (*env)->GetArrayLength(env, jgain);
+	int eqPts = (int)freqLen < (int)gainLen ? (int)freqLen : (int)gainLen;
+	if (eqPts > NUMPTS)
+		eqPts = NUMPTS;
+	if (eqPts < 2)
+		return;
+
     jdouble *freqs = (jdouble*) (*env)->GetDoubleArrayElements(env, jfreq, 0);
     jdouble *gains = (jdouble*) (*env)->GetDoubleArrayElements(env, jgain, 0);
     jdouble *dispFreq = (jdouble*) (*env)->GetDoubleArrayElements(env, jdispFreq, 0);
@@ -695,7 +715,7 @@ JNIEXPORT void JNICALL Java_me_timschneeberger_rootlessjamesdsp_interop_JdspImpR
         cplxIm[i] = 0;
     }
 
-    for (int i = 0; i < NUMPTS - 1; i++)
+    for (int i = 0; i < eqPts - 1; i++)
     {
         double dB = gains[i + 1] - gains[i];
         double designFreq;
@@ -704,7 +724,7 @@ JNIEXPORT void JNICALL Java_me_timschneeberger_rootlessjamesdsp_interop_JdspImpR
         else
             designFreq = freqs[i];
         double overallGain = i == 0 ? gains[i] : 0.0;
-        HSHOResponse(48000.0, designFreq, (unsigned int)order, dB, overallGain, nPts, dispFreq, cplxRe, cplxIm);
+        HSHOResponse((double)srate, designFreq, (unsigned int)order, dB, overallGain, nPts, dispFreq, cplxRe, cplxIm);
     }
 
     (*env)->SetDoubleArrayRegion(env, jcplxRe, 0, nPts, cplxRe);

@@ -534,7 +534,7 @@ Graphic eq</string>
     <!-- Slider widget -->
     <string name="slider_dialog_title">Edytuj wartość</string>
     <string name="slider_dialog_format_error">Nieprawidłowy format numeru. Zmiany nie zostały zastosowane.</string>
-    <string name="slider_dialog_step_error">Wartość musi być wielokrotnością %1$d. Zmiany nie zostały zastosowane.</string>
+    <string name="slider_dialog_step_error">Wartość musi być wielokrotnością %1$s. Zmiany nie zostały zastosowane.</string>
     <!-- Revert confirmation -->
     <string name="revert_confirmation_title">Jesteś pewny?</string>
     <string name="revert_confirmation">Czy chcesz zresetować aktualne ustawienia JamesDSP do wartości domyślnych?</string>

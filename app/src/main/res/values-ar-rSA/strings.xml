@@ -533,7 +533,7 @@
     <!-- Slider widget -->
     <string name="slider_dialog_title">تعديل القيمة</string>
     <string name="slider_dialog_format_error">تنسيق رقم غير صالح. التغييرات غير مطبقة.</string>
-    <string name="slider_dialog_step_error">يجب أن تكون القيمة مضاعفا من %1$d. التغييرات غير مطبقة.</string>
+    <string name="slider_dialog_step_error">يجب أن تكون القيمة مضاعفا من %1$s. التغييرات غير مطبقة.</string>
     <!-- Revert confirmation -->
     <string name="revert_confirmation_title">هل أنت متأكد؟</string>
     <string name="revert_confirmation">هل تريد إعادة تعيين الـ JamesDSP الحالي الخاص بك إلى القيم الافتراضية؟</string>

@@ -11,6 +11,7 @@ import android.os.Parcelable
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.View
+import androidx.annotation.MainThread
 import androidx.core.content.withStyledAttributes
 import androidx.core.os.bundleOf
 import me.timschneeberger.rootlessjamesdsp.utils.extensions.CompatExtensions.getParcelableAs
@@ -32,6 +33,17 @@ abstract class BaseEqualizerSurface(
     val maxDb: Double,
     val horizLineInterval: Float
 ) : View(context, attrs) {
+
+    var visibleBands: Int = bandsNum
+        set(value) {
+            val clamped = value.coerceIn(1, bandsNum)
+            if (clamped == field) {
+                return
+            }
+            field = clamped
+            activeBandsDirty = true
+            postInvalidate()
+        }
 
     var areKnobsVisible = false
         set(value) {
@@ -56,6 +68,9 @@ abstract class BaseEqualizerSurface(
     private var response = FloatArray(nPts)
     private val precomputeCurveXAxis = MutableList(nPts) { 0.0f }
     private var precomputeFreqAxis = FloatArray(2)
+    private var activeScale = DoubleArray(visibleBands)
+    private var activeLevels = DoubleArray(visibleBands)
+    private var activeBandsDirty = true
 
     fun addElement(org: FloatArray, added: Float): FloatArray {
         val result = org.copyOf(org.size + 1)
@@ -111,6 +126,7 @@ abstract class BaseEqualizerSurface(
     override fun onRestoreInstanceState(state: Parcelable?) {
         super.onRestoreInstanceState((state as Bundle).getParcelableAs("super"))
         mLevels = state.getDoubleArray("levels") ?: DoubleArray(bandsNum)
+        activeBandsDirty = true
     }
 
     override fun onAttachedToWindow() {
@@ -142,30 +158,40 @@ abstract class BaseEqualizerSurface(
         freqResponse.rewind()
         freqResponseBg.rewind()
 
-        computeCurve(frequencyScale, mLevels, nPts, displayFreq, response)
+        refreshActiveBandBuffers()
+        computeCurve(activeScale, activeLevels, nPts, displayFreq, response)
 
         var x: Float
         var y: Float
+        var lastValidDb = minDb.toFloat()
         for (i in 0 until nPts) {
             /* Magnitude response, dB */
             x = precomputeCurveXAxis[i] * mWidth
-            y = projectY(response[i]) * mHeight
+            val rawDb = response[i]
+            val db = when {
+                rawDb.isFinite() -> {
+                    lastValidDb = rawDb.coerceIn(minDb.toFloat(), maxDb.toFloat())
+                    lastValidDb
+                }
+                else -> lastValidDb
+            }
+            y = (projectY(db) * mHeight).coerceIn(0f, mHeight)
             /* Set starting point at first point */
             if (i == 0) freqResponse.moveTo(x, y)
             else freqResponse.lineTo(x, y)
         }
 
-        for (i in mLevels.indices) {
-            x = projectX(frequencyScale[i]) * mWidth
-            y = projectY(mLevels[i].toFloat()) * mHeight
+        for (i in 0 until visibleBands) {
+            x = projectX(activeScale[i]) * mWidth
+            y = (projectY(activeLevels[i].toFloat()) * mHeight).coerceIn(0f, mHeight)
 
             canvas.drawLine(x, mHeight, x, y, mGridLines)
             if(areKnobsVisible)
             {
                 canvas.drawCircle(x, y, 16f, mControlBarKnob)
             }
-            canvas.drawText(frequencyScale[i].prettyNumberFormat(), x, mHeight - 16, mControlBarText)
-            val gainText = String.format(Locale.ROOT, "%.1f", mLevels[i])
+            canvas.drawText(activeScale[i].prettyNumberFormat(), x, mHeight - 16, mControlBarText)
+            val gainText = String.format(Locale.ROOT, "%.1f", activeLevels[i])
             canvas.drawText(gainText, x, mControlBarText.textSize + 8, mControlBarText)
         }
 
@@ -219,8 +245,9 @@ abstract class BaseEqualizerSurface(
     fun findClosest(px: Float): Int {
         var idx = 0
         var best = 1e8
-        for (i in mLevels.indices) {
-            val freq = frequencyScale[i]//15.625 * 1.6.pow((i + 1).toDouble())
+        refreshActiveBandBuffers()
+        for (i in 0 until visibleBands) {
+            val freq = activeScale[i]
             val cx = (projectX(freq) * mWidth).toDouble()
             val distance = abs(cx - px)
             if (distance < best) {
@@ -231,6 +258,7 @@ abstract class BaseEqualizerSurface(
         return idx
     }
 
+    @MainThread
     fun setBand(i: Int, value: Double) {
         if(i < 0 || i >= bandsNum) {
             Timber.e("setBand($i): $i is out of range")
@@ -238,6 +266,34 @@ abstract class BaseEqualizerSurface(
         }
 
         mLevels[i] = value
+        if (!activeBandsDirty && i < visibleBands) {
+            activeLevels[i] = value
+        }
         postInvalidate()
+    }
+
+    private fun refreshActiveBandBuffers() {
+        if (!activeBandsDirty && activeScale.size == visibleBands && activeLevels.size == visibleBands) {
+            return
+        }
+
+        if (activeScale.size != visibleBands) {
+            activeScale = DoubleArray(visibleBands)
+        }
+        if (activeLevels.size != visibleBands) {
+            activeLevels = DoubleArray(visibleBands)
+        }
+
+        val scale = frequencyScale
+        val safeLength = minOf(visibleBands, scale.size, mLevels.size)
+        for (i in 0 until safeLength) {
+            activeScale[i] = scale[i]
+            activeLevels[i] = mLevels[i]
+        }
+        for (i in safeLength until visibleBands) {
+            activeScale[i] = 0.0
+            activeLevels[i] = 0.0
+        }
+        activeBandsDirty = false
     }
 }
