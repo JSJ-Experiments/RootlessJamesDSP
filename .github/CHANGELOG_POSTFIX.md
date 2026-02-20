@@ -1,3 +1,10 @@
+## Highlights
+
+- Added **ViPER Clarity** (Natural, OZone+, XHiFi)
+- Added **Field Surround**
+- Added **Spectrum Extension**
+- Added **ViPER Original 10-band EQ mode**
+
 ________
 
 ## Available on Google Play & F-Droid

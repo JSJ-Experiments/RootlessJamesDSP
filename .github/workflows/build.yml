@@ -163,8 +163,9 @@ jobs:
           tag_name: ${{ env.VERSION_TAG }}
           name: RootlessJamesDSP ${{ env.VERSION_TAG }}
           body: "${{ steps.changelog.outputs.changelog }} &#x20; ${{ steps.changelog_post.outputs.contents }}"
-          #files: |
-          #   app/build/outputs/apk/rootlessFull/${{ env.BUILD_TYPE }}/*-signed.apk
+          files: |
+            app/build/outputs/apk/${{ steps.flavor.outputs.lowercase }}Full/${{ env.BUILD_TYPE }}/*-signed.apk
+          overwrite_files: true
           draft: true
           prerelease: false
         env:
