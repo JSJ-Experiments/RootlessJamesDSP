@@ -153,6 +153,7 @@
     <string name="spectrum_ext_wet_mix">Wet mix</string>
     <string name="spectrum_ext_post_gain">Post gain</string>
     <string name="spectrum_ext_safety">Safety limiter</string>
+    <string name="spectrum_ext_safety_summary">Disabled by default. Enable to reduce overload and clipping.</string>
     <string name="spectrum_ext_expert_header">Expert controls</string>
     <string name="spectrum_ext_hp_q">HP Q</string>
     <string name="spectrum_ext_lp_q">LP Q</string>

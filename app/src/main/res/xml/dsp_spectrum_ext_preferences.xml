@@ -82,6 +82,7 @@
             android:key="@string/key_spectrum_ext_safety"
             android:title="@string/spectrum_ext_safety"
             android:defaultValue="false"
+            android:summary="@string/spectrum_ext_safety_summary"
             app:allowDividerAbove="false"
             app:iconSpaceReserved="false" />
 

@@ -283,8 +283,9 @@ void ClarityProcessor::setEnabled(bool e) {
 }
 
 void ClarityProcessor::setMode(int m) {
-    if (mode != m) {
-        mode = m;
+    const Mode newMode = static_cast<Mode>(m);
+    if (mode != newMode) {
+        mode = newMode;
         reset();
     }
 }
@@ -294,7 +295,7 @@ void ClarityProcessor::setGainLinear(float linear) {
         return;
     }
     gain = linear;
-    if (mode == static_cast<int>(Mode::OZONE)) {
+    if (mode == Mode::OZONE) {
         reset();
     } else {
         syncFilterGain();
@@ -366,7 +367,7 @@ void ClarityProcessor::syncFilterGain() {
 }
 
 void ClarityProcessor::applyMode(float* samples, uint32_t frames) {
-    switch (static_cast<Mode>(mode)) {
+    switch (mode) {
         case Mode::NATURAL:
             natural.process(samples, frames);
             break;

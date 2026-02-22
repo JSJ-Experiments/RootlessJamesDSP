@@ -37,6 +37,7 @@ import me.timschneeberger.rootlessjamesdsp.utils.isRootless
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
+import java.util.Locale
 import kotlin.math.roundToInt
 import kotlin.math.log10
 import kotlin.math.pow
@@ -152,7 +153,7 @@ class PreferenceGroupFragment : PreferenceFragmentCompat(), KoinComponent {
                 }
 
                 customFeedPref?.valueLabelOverride = fun(it: Float): String {
-                    return String.format("%.1f dB", it / 10.0f)
+                    return String.format(Locale.getDefault(), "%.1f dB", it / 10.0f)
                 }
 
                 modePref?.setOnPreferenceChangeListener { _, newValue ->

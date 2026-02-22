@@ -36,6 +36,7 @@ abstract class JamesDspBaseEngine(val context: Context, val callbacks: JamesDspW
         private const val SPECTRUM_STRENGTH_PERCENT_MIN = 0.0f
         private const val SPECTRUM_STRENGTH_PERCENT_MAX = 100.0f
         private const val SPECTRUM_HARMONICS_DEFAULT_RAW = "0.02;0;0.02;0;0.02;0;0.02;0;0.02;0"
+        private const val MAX_EQ_INTERPOLATION_MODE = 1
         private val DEFAULT_SPECTRUM_HARMONICS = doubleArrayOf(0.02, 0.0, 0.02, 0.0, 0.02, 0.0, 0.02, 0.0, 0.02, 0.0)
     }
 
@@ -95,7 +96,8 @@ abstract class JamesDspBaseEngine(val context: Context, val callbacks: JamesDspW
             cache.select(Constants.PREF_EQ)
             val eqEnabled = cache.get(R.string.key_eq_enable, false)
             val eqFilterType = cache.get(R.string.key_eq_filter_type, "6").toIntOrNull() ?: 6
-            val eqInterpolationMode = cache.get(R.string.key_eq_interpolation, "0").toIntOrNull() ?: 0
+            val eqInterpolationMode = (cache.get(R.string.key_eq_interpolation, "0").toIntOrNull() ?: 0)
+                .coerceIn(0, MAX_EQ_INTERPOLATION_MODE)
             val eqBands = cache.get(R.string.key_eq_bands, Constants.DEFAULT_EQ)
 
             cache.select(Constants.PREF_GEQ)

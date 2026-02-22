@@ -777,6 +777,25 @@ JNIEXPORT void JNICALL Java_me_timschneeberger_rootlessjamesdsp_interop_JdspImpR
     jdouble *gains = (jdouble*) (*env)->GetDoubleArrayElements(env, jgain, 0);
     jdouble *dispFreq = (jdouble*) (*env)->GetDoubleArrayElements(env, jdispFreq, 0);
     jfloat *response = (jfloat*) (*env)->GetFloatArrayElements(env, jresponse, 0);
+    if (freqs == NULL || gains == NULL || dispFreq == NULL || response == NULL)
+    {
+        if (freqs != NULL)
+            (*env)->ReleaseDoubleArrayElements(env, jfreq, freqs, JNI_ABORT);
+        if (gains != NULL)
+            (*env)->ReleaseDoubleArrayElements(env, jgain, gains, JNI_ABORT);
+        if (dispFreq != NULL)
+            (*env)->ReleaseDoubleArrayElements(env, jdispFreq, dispFreq, JNI_ABORT);
+        if (response != NULL)
+            (*env)->ReleaseFloatArrayElements(env, jresponse, response, JNI_ABORT);
+
+        jclass oomCls = (*env)->FindClass(env, "java/lang/OutOfMemoryError");
+        if (oomCls != NULL)
+        {
+            (*env)->ThrowNew(env, oomCls, "Failed to access EQ preview arrays");
+            (*env)->DeleteLocalRef(env, oomCls);
+        }
+        return;
+    }
 
     double interpFreq[NUMPTS + 2];
     double interpGain[NUMPTS + 2];
@@ -848,9 +867,9 @@ JNIEXPORT void JNICALL Java_me_timschneeberger_rootlessjamesdsp_interop_JdspImpR
         response[i] = (float)(20.0 * log10(magnitude));
     }
 
-    (*env)->ReleaseDoubleArrayElements(env, jfreq, freqs, 0);
-    (*env)->ReleaseDoubleArrayElements(env, jgain, gains, 0);
-    (*env)->ReleaseDoubleArrayElements(env, jdispFreq, dispFreq, 0);
+    (*env)->ReleaseDoubleArrayElements(env, jfreq, freqs, JNI_ABORT);
+    (*env)->ReleaseDoubleArrayElements(env, jgain, gains, JNI_ABORT);
+    (*env)->ReleaseDoubleArrayElements(env, jdispFreq, dispFreq, JNI_ABORT);
     (*env)->ReleaseFloatArrayElements(env, jresponse, response, 0);
 }
 

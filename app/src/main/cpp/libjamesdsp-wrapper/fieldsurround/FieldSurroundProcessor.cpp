@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <limits>
 
 namespace fieldsurround {
 
@@ -114,6 +115,7 @@ void Biquad::setHighPassParameter(float frequency, uint32_t samplingRate, double
     const double a0 = (A + 1.0) - (A - 1.0) * cosOmega + 2.0 * sqrtA * z;
     const double a1 = 2.0 * ((A - 1.0) - (A + 1.0) * cosOmega);
     const double a2 = (A + 1.0) - (A - 1.0) * cosOmega - 2.0 * sqrtA * z;
+    // Note: b-coefficients include omega scaling to match ViPER behavior.
     const double b0 = ((A + 1.0) + (A - 1.0) * cosOmega + 2.0 * sqrtA * z) * A * omega;
     const double b1 = -2.0 * A * ((A - 1.0) + (A + 1.0) * cosOmega) * omega;
     const double b2 = ((A + 1.0) + (A - 1.0) * cosOmega - 2.0 * sqrtA * z) * A * omega;
@@ -317,7 +319,12 @@ void FieldSurroundProcessor::setMidFromParamInt(int value) {
 }
 
 void FieldSurroundProcessor::setDepthFromParamInt(int value) {
-    depthSurround.setStrength(static_cast<int16_t>(value));
+    const int clampedValue = std::clamp(
+        value,
+        static_cast<int>(std::numeric_limits<int16_t>::min()),
+        static_cast<int>(std::numeric_limits<int16_t>::max())
+    );
+    depthSurround.setStrength(static_cast<int16_t>(clampedValue));
 }
 
 void FieldSurroundProcessor::setPhaseOffsetFromParamInt(int value) {

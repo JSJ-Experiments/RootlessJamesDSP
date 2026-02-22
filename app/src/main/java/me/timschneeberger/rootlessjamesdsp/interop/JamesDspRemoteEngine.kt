@@ -360,14 +360,22 @@ class JamesDspRemoteEngine(
         }
 
         if (enable) {
-            val fallbackBands = normalizeMultiEqBands(EQ_FILTER_TYPE_FIR_MINIMUM, bands)
+            val fallbackBands = EqNormalization.normalizeMultiEqBands(
+                EQ_FILTER_TYPE_FIR_MINIMUM,
+                bands,
+                EQ_FILTER_TYPE_VIPER_ORIGINAL
+            )
             if (filterType == EQ_FILTER_TYPE_VIPER_ORIGINAL && isEqViperOriginalModeSupported == false) {
                 ret = applyMode(EQ_FILTER_TYPE_FIR_MINIMUM, fallbackBands)
                 if (ret) {
                     persistEqFallbackMode(fallbackBands)
                 }
             } else {
-                val requestedBands = normalizeMultiEqBands(filterType, bands)
+                val requestedBands = EqNormalization.normalizeMultiEqBands(
+                    filterType,
+                    bands,
+                    EQ_FILTER_TYPE_VIPER_ORIGINAL
+                )
                 ret = applyMode(filterType, requestedBands)
             }
 
@@ -384,31 +392,6 @@ class JamesDspRemoteEngine(
         }
 
         return ret and (effect.setParameter(1202, enable.toShort()) == AudioEffect.SUCCESS)
-    }
-
-    private fun normalizeMultiEqBands(filterType: Int, bands: DoubleArray): DoubleArray {
-        if (bands.size != EQ_FIELDS) {
-            return bands
-        }
-
-        val normalized = bands.copyOf()
-        when (filterType) {
-            EQ_FILTER_TYPE_VIPER_ORIGINAL -> {
-                VIPER_SCALE.forEachIndexed { index, freq ->
-                    normalized[index] = freq
-                }
-                VIPER_EXT_SCALE.forEachIndexed { offset, freq ->
-                    normalized[VIPER_SCALE.size + offset] = freq
-                }
-            }
-            else -> {
-                STANDARD_SCALE.forEachIndexed { index, freq ->
-                    normalized[index] = freq
-                }
-            }
-        }
-
-        return normalized
     }
 
     private fun persistEqFallbackMode(fallbackBands: DoubleArray) {
@@ -763,20 +746,10 @@ class JamesDspRemoteEngine(
         private const val PARAM_FIELD_SURROUND_WIDENING = 65554
         private const val PARAM_FIELD_SURROUND_MID_IMAGE = 65555
         private const val PARAM_FIELD_SURROUND_DEPTH = 65556
-        private const val EQ_FIELDS = 30
         private const val EQ_FILTER_TYPE_FIR_MINIMUM = 0
         private const val EQ_FILTER_TYPE_VIPER_ORIGINAL = 6
         private const val EXPECTED_SPECTRUM_HARMONICS_COUNT = 10
         private val DEFAULT_SPECTRUM_HARMONICS = doubleArrayOf(0.02, 0.0, 0.02, 0.0, 0.02, 0.0, 0.02, 0.0, 0.02, 0.0)
-        private val STANDARD_SCALE = doubleArrayOf(
-            25.0, 40.0, 63.0, 100.0, 160.0, 250.0, 400.0, 630.0, 1000.0, 1600.0, 2500.0, 4000.0, 6300.0, 10000.0, 16000.0
-        )
-        private val VIPER_SCALE = doubleArrayOf(
-            31.0, 62.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0, 16000.0
-        )
-        private val VIPER_EXT_SCALE = doubleArrayOf(
-            17000.0, 18000.0, 19000.0, 20000.0, 22000.0
-        )
 
         private val EFFECT_TYPE_CUSTOM = UUID.fromString("f98765f4-c321-5de6-9a45-123459495ab2")
         private val EFFECT_JAMESDSP = UUID.fromString("f27317f4-c984-4de6-9a90-545759495bf2")

@@ -156,7 +156,7 @@ private:
     HiFi xhifi;
 
     bool enabled = false;
-    int mode = static_cast<int>(Mode::NATURAL);
+    Mode mode = Mode::NATURAL;
     uint32_t samplingRate = DEFAULT_SR;
     float gain = 0.0f;
     int ozoneFreqHz = 8250;
