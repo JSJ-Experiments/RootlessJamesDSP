@@ -1,15 +1,14 @@
 #include "ClarityProcessor.h"
 
-#define TAG "ClarityProcessor_JNI"
-#include <Log.h>
-
 #include <algorithm>
+#include <android/log.h>
 #include <cmath>
 #include <limits>
 #include <cstring>
 
 namespace clarity {
 
+static constexpr const char* TAG = "ClarityProcessor_JNI";
 static constexpr double PI = 3.14159265358979323846;
 
 void IIR1::setLPF_BW(float frequency, uint32_t samplingRate) {
@@ -387,8 +386,12 @@ void ClarityProcessor::applyMode(float* samples, uint32_t frames) {
             xhifi.process(samples, frames);
             break;
         default:
-            LOGW("ClarityProcessor::applyMode: invalid mode=%d, falling back to NATURAL",
-                 static_cast<int>(mode));
+            __android_log_print(
+                ANDROID_LOG_WARN,
+                TAG,
+                "ClarityProcessor::applyMode: invalid mode=%d, falling back to NATURAL",
+                static_cast<int>(mode)
+            );
             mode = Mode::NATURAL;
             reset();
             natural.process(samples, frames);
