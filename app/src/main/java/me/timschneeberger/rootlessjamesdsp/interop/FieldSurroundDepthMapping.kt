@@ -12,7 +12,7 @@ object FieldSurroundDepthMapping {
      * Direct ViPER command-ID semantics (65556): raw short, no remap/clamp to 200..800.
      */
     fun toDirectDepthStrength(rawDepth: Int): Int {
-        return rawDepth.toShort().toInt()
+        return rawDepth.coerceIn(Short.MIN_VALUE.toInt(), Short.MAX_VALUE.toInt())
     }
 
     /**

@@ -247,9 +247,13 @@ void DepthSurround::refreshStrength() {
         return;
     }
 
+    const float safeGainCap = (std::isfinite(gainCap) && gainCap >= 0.0f) ? gainCap : 0.0f;
     float computedGain = std::pow(10.0f, (((static_cast<float>(strength) / 1000.0f) * gainScaleDb) + gainOffsetDb) / 20.0f);
+    if (!std::isfinite(computedGain)) {
+        computedGain = 0.0f;
+    }
     computedGain = std::max(0.0f, computedGain);
-    gain = std::max(0.0f, std::min(gainCap, computedGain));
+    gain = std::clamp(computedGain, 0.0f, safeGainCap);
 }
 
 void DepthSurround::process(float* samples, uint32_t frames) {

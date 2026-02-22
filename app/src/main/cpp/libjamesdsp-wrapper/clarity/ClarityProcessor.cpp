@@ -119,7 +119,7 @@ void NoiseSharpening::setNyquistOffset(float hz) {
 }
 
 void NoiseSharpening::reset() {
-    const float cutoff = static_cast<float>(samplingRate) * 0.5f - nyquistOffsetHz;
+    const float cutoff = std::max(0.0f, static_cast<float>(samplingRate) * 0.5f - nyquistOffsetHz);
     for (int i = 0; i < 2; ++i) {
         filters[i].setLPF_BW(cutoff, samplingRate);
         filters[i].mute();
@@ -283,7 +283,8 @@ void ClarityProcessor::setEnabled(bool e) {
 }
 
 void ClarityProcessor::setMode(int m) {
-    const Mode newMode = static_cast<Mode>(m);
+    const int clampedMode = std::clamp(m, static_cast<int>(Mode::NATURAL), static_cast<int>(Mode::XHIFI));
+    const Mode newMode = static_cast<Mode>(clampedMode);
     if (mode != newMode) {
         mode = newMode;
         reset();
@@ -379,6 +380,11 @@ void ClarityProcessor::applyMode(float* samples, uint32_t frames) {
             break;
         case Mode::XHIFI:
             xhifi.process(samples, frames);
+            break;
+        default:
+            mode = Mode::NATURAL;
+            reset();
+            natural.process(samples, frames);
             break;
     }
 }

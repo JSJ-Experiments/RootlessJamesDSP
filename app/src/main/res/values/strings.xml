@@ -231,6 +231,8 @@
     <string name="crossfeed_preset_custom">Custom</string>
     <string name="crossfeed_custom_fcut">Custom cutoff</string>
     <string name="crossfeed_custom_feed">Custom feed</string>
+    <string name="crossfeed_unavailable">Custom crossfeed is unavailable on this backend.</string>
+    <string name="crossfeed_unavailable_using_preset">Custom crossfeed is unavailable on this backend. Using preset mode.</string>
 
     <string name="clarity_enable">ViPER Clarity</string>
     <string name="clarity_mode">Mode</string>

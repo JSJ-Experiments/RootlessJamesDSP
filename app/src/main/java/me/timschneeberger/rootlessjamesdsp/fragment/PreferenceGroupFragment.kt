@@ -148,7 +148,7 @@ class PreferenceGroupFragment : PreferenceFragmentCompat(), KoinComponent {
 
                     if (modePref.value == CUSTOM_CROSSFEED_MODE_VALUE) {
                         modePref.value = CROSSFEED_MODE_DEFAULT_VALUE
-                        requireContext().toast("Custom crossfeed is unavailable on this backend. Using preset mode.", false)
+                        requireContext().toast(getString(R.string.crossfeed_unavailable_using_preset), false)
                     }
                 }
 
@@ -159,7 +159,7 @@ class PreferenceGroupFragment : PreferenceFragmentCompat(), KoinComponent {
                 modePref?.setOnPreferenceChangeListener { _, newValue ->
                     val selectedMode = newValue as? String
                     if (!supportsCustomCrossfeed && selectedMode == CUSTOM_CROSSFEED_MODE_VALUE) {
-                        requireContext().toast("Custom crossfeed is unavailable on this backend.", false)
+                        requireContext().toast(getString(R.string.crossfeed_unavailable), false)
                         false
                     } else {
                         updateCustomCrossfeedVisibility(selectedMode)
@@ -329,7 +329,7 @@ class PreferenceGroupFragment : PreferenceFragmentCompat(), KoinComponent {
         mapMinDbToZero: Boolean = false,
     ) {
         val maxLinear = dbToLinear(maxDb)
-        val minDb = -40.0f
+        val minDb = MIN_STRENGTH_DB
         val percentUnit = requireContext().getString(R.string.strength_unit_value_percent)
         val dbUnit = requireContext().getString(R.string.strength_unit_value_db)
         var internalUpdate = false
@@ -409,7 +409,7 @@ class PreferenceGroupFragment : PreferenceFragmentCompat(), KoinComponent {
         strengthDbPref?.isVisible = unit == dbUnit
     }
 
-    private fun linearToDb(linear: Float): Float = if (linear <= 0.0f) -40.0f else 20.0f * log10(linear)
+    private fun linearToDb(linear: Float): Float = if (linear <= 0.0f) MIN_STRENGTH_DB else 20.0f * log10(linear)
 
     private fun dbToLinear(db: Float): Float = 10.0.pow((db / 20.0f).toDouble()).toFloat()
 
@@ -459,6 +459,7 @@ class PreferenceGroupFragment : PreferenceFragmentCompat(), KoinComponent {
         private const val BUNDLE_XML_RES = "preferencesXmlRes"
         private const val CROSSFEED_MODE_DEFAULT_VALUE = "5"
         private const val CUSTOM_CROSSFEED_MODE_VALUE = "99"
+        private const val MIN_STRENGTH_DB = -40.0f
         private const val CLARITY_STRENGTH_LINEAR_MAX = 8.0f
         private val CLARITY_STRENGTH_DB_MAX = (20.0 * log10(CLARITY_STRENGTH_LINEAR_MAX.toDouble())).toFloat()
         // Semicolon-separated decimal numbers used by Spectrum Extension harmonics list.

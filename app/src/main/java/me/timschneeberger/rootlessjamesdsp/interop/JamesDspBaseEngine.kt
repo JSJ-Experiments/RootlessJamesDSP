@@ -77,6 +77,13 @@ abstract class JamesDspBaseEngine(val context: Context, val callbacks: JamesDspW
         Timber.d("Synchronizing with preferences... (forced: %s)", forceUpdateNamespaces?.joinToString(";") { it })
 
         syncMutex.withLock {
+            fun parseIntPref(raw: String, fallback: Int, label: String): Int {
+                return raw.toIntOrNull() ?: run {
+                    Timber.w("Invalid integer preference for %s: '%s'. Falling back to %d.", label, raw, fallback)
+                    fallback
+                }
+            }
+
             cache.select(Constants.PREF_OUTPUT)
             val outputPostGain = cache.get(R.string.key_output_postgain, 0f)
             val limiterThreshold = cache.get(R.string.key_limiter_threshold, -0.1f)
@@ -86,7 +93,11 @@ abstract class JamesDspBaseEngine(val context: Context, val callbacks: JamesDspW
             val compEnabled = cache.get(R.string.key_compander_enable, false)
             val compTimeConst = cache.get(R.string.key_compander_timeconstant, 0.22f)
             val compGranularity = cache.get(R.string.key_compander_granularity, 2f).toInt()
-            val compTfTransforms = cache.get(R.string.key_compander_tftransforms, "0").toInt()
+            val compTfTransforms = parseIntPref(
+                cache.get(R.string.key_compander_tftransforms, "0"),
+                0,
+                "compander_tftransforms"
+            )
             val compResponse = cache.get(R.string.key_compander_response, "95.0;200.0;400.0;800.0;1600.0;3400.0;7500.0;0;0;0;0;0;0;0")
 
             cache.select(Constants.PREF_BASS)
@@ -106,7 +117,11 @@ abstract class JamesDspBaseEngine(val context: Context, val callbacks: JamesDspW
 
             cache.select(Constants.PREF_REVERB)
             val reverbEnabled = cache.get(R.string.key_reverb_enable, false)
-            val reverbPreset = cache.get(R.string.key_reverb_preset, "15").toInt()
+            val reverbPreset = parseIntPref(
+                cache.get(R.string.key_reverb_preset, "15"),
+                15,
+                "reverb_preset"
+            )
 
             cache.select(Constants.PREF_SPECTRUM_EXT)
             val spectrumEnabled = cache.get(R.string.key_spectrum_ext_enable, false)
@@ -124,7 +139,11 @@ abstract class JamesDspBaseEngine(val context: Context, val callbacks: JamesDspW
 
             cache.select(Constants.PREF_CLARITY)
             val clarityEnabled = cache.get(R.string.key_clarity_enable, false)
-            val clarityMode = cache.get(R.string.key_clarity_mode, "0").toInt()
+            val clarityMode = parseIntPref(
+                cache.get(R.string.key_clarity_mode, "0"),
+                0,
+                "clarity_mode"
+            ).coerceIn(0, 2)
             val clarityStrengthUnit = cache.get(R.string.key_clarity_strength_unit, "percent")
             val clarityStrengthPercent = cache.get(R.string.key_clarity_strength_percent, 0f)
             val clarityStrengthDb = cache.get(R.string.key_clarity_strength_db, -40f)
@@ -143,7 +162,11 @@ abstract class JamesDspBaseEngine(val context: Context, val callbacks: JamesDspW
 
             cache.select(Constants.PREF_FIELD_SURROUND)
             val fieldSurroundEnabled = cache.get(R.string.key_field_surround_enable, false)
-            val fieldSurroundOutputMode = cache.get(R.string.key_field_surround_output_mode, "0").toInt()
+            val fieldSurroundOutputMode = parseIntPref(
+                cache.get(R.string.key_field_surround_output_mode, "0"),
+                0,
+                "field_surround_output_mode"
+            ).coerceIn(0, 2)
             val fieldSurroundWidening = cache.get(
                 R.string.key_field_surround_widening,
                 FieldSurroundDepthMapping.CONFIG_DEFAULT_WIDENING.toFloat()
@@ -177,7 +200,11 @@ abstract class JamesDspBaseEngine(val context: Context, val callbacks: JamesDspW
 
             cache.select(Constants.PREF_CROSSFEED)
             val crossfeedEnabled = cache.get(R.string.key_crossfeed_enable, false)
-            val crossfeedMode = cache.get(R.string.key_crossfeed_mode, CROSSFEED_MODE_DEFAULT.toString()).toInt()
+            val crossfeedMode = parseIntPref(
+                cache.get(R.string.key_crossfeed_mode, CROSSFEED_MODE_DEFAULT.toString()),
+                CROSSFEED_MODE_DEFAULT,
+                "crossfeed_mode"
+            )
             val crossfeedCustomFcut = cache.get(R.string.key_crossfeed_custom_fcut, 700f).roundToInt()
             val crossfeedCustomFeed = cache.get(R.string.key_crossfeed_custom_feed, 45f).roundToInt()
 
@@ -197,7 +224,11 @@ abstract class JamesDspBaseEngine(val context: Context, val callbacks: JamesDspW
             val convolverEnabled = cache.get(R.string.key_convolver_enable, false)
             val convolverFile = cache.get(R.string.key_convolver_file, "")
             val convolverAdvImp = cache.get(R.string.key_convolver_adv_imp, Constants.DEFAULT_CONVOLVER_ADVIMP)
-            val convolverMode = cache.get(R.string.key_convolver_mode, "0").toInt()
+            val convolverMode = parseIntPref(
+                cache.get(R.string.key_convolver_mode, "0"),
+                0,
+                "convolver_mode"
+            )
 
             val targets = cache.changedNamespaces.toTypedArray() + (forceUpdateNamespaces ?: arrayOf())
             targets.forEach {
@@ -315,6 +346,10 @@ abstract class JamesDspBaseEngine(val context: Context, val callbacks: JamesDspW
             val number = str.toDoubleOrNull()
             if(number == null) {
                 Timber.e("setMultiEqualizer: malformed EQ string")
+                return false
+            }
+            if (!number.isFinite()) {
+                Timber.e("setMultiEqualizer: non-finite value in EQ string at index $i")
                 return false
             }
             doubleArray[i] = number
@@ -662,12 +697,13 @@ abstract class JamesDspBaseEngine(val context: Context, val callbacks: JamesDspW
         stereoFloor: Float,
         stereoFallback: Float,
     ): Boolean {
+        val clampedDepthStrength = depthStrength.coerceIn(Short.MIN_VALUE.toInt(), Short.MAX_VALUE.toInt())
         return setFieldSurroundInternal(
             enable,
             outputMode.coerceIn(0, 2),
             widening.coerceIn(0, 800),
             midImage.coerceIn(0, 800),
-            depthStrength,
+            clampedDepthStrength,
             phaseOffset.coerceIn(-100, 100),
             monoSumMix.coerceIn(0, 100),
             monoSumPan.coerceIn(-100, 100),

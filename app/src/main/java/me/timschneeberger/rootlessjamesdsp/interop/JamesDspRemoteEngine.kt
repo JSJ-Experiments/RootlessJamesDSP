@@ -259,6 +259,7 @@ class JamesDspRemoteEngine(
 
         if (enable) {
             val fallbackToLegacy = {
+                val safeDepth = depth.coerceIn(Short.MIN_VALUE.toInt(), Short.MAX_VALUE.toInt()).toShort()
                 val widenResult = effect.setParameter(PARAM_FIELD_SURROUND_WIDENING, widening.toShort())
                 if (widenResult != AudioEffect.SUCCESS) {
                     markUnsupported(widenResult, true)
@@ -267,7 +268,7 @@ class JamesDspRemoteEngine(
                     if (midResult != AudioEffect.SUCCESS) {
                         markUnsupported(midResult, true)
                     } else {
-                        val depthResult = effect.setParameter(PARAM_FIELD_SURROUND_DEPTH, depth.toShort())
+                        val depthResult = effect.setParameter(PARAM_FIELD_SURROUND_DEPTH, safeDepth)
                         if (depthResult != AudioEffect.SUCCESS) {
                             markUnsupported(depthResult, true)
                         } else {

@@ -266,13 +266,28 @@ Java_me_timschneeberger_rootlessjamesdsp_interop_JamesDspWrapper_processInt16(JN
 {
     DECLARE_DSP_V
 
-    jsize inputLength;
-    if(size < 0)
-        inputLength = env->GetArrayLength(inputObj);
-    else
-        inputLength = size;
-    if(offset < 0)
-        offset = 0;
+    const jsize inputArrayLength = env->GetArrayLength(inputObj);
+    const jsize outputArrayLength = env->GetArrayLength(outputObj);
+    const jsize safeOffset = std::max<jsize>(0, static_cast<jsize>(offset));
+    const jsize availableInput = std::max<jsize>(0, inputArrayLength - safeOffset);
+
+    jsize inputLength = (size < 0)
+        ? availableInput
+        : std::min<jsize>(availableInput, static_cast<jsize>(size));
+    if (inputLength <= 0) {
+        return;
+    }
+    if (outputArrayLength < inputLength) {
+        LOGE("JamesDspWrapper::processInt16: output array too small (need=%d, have=%d)",
+             static_cast<int>(inputLength),
+             static_cast<int>(outputArrayLength));
+        return;
+    }
+
+    inputLength -= (inputLength % 2);
+    if (inputLength <= 0) {
+        return;
+    }
 
     auto input = env->GetShortArrayElements(inputObj, nullptr);
     auto output = env->GetShortArrayElements(outputObj, nullptr);
@@ -286,17 +301,17 @@ Java_me_timschneeberger_rootlessjamesdsp_interop_JamesDspWrapper_processInt16(JN
         auto* temp = getTempBuffer(wrapper, static_cast<size_t>(inputLength));
         if (temp == nullptr) {
             env->ReleaseShortArrayElements(inputObj, input, JNI_ABORT);
-            env->ReleaseShortArrayElements(outputObj, output, 0);
+            env->ReleaseShortArrayElements(outputObj, output, JNI_ABORT);
             return;
         }
-        for (int i = 0; i < inputLength; ++i) {
-            temp[i] = static_cast<float>(input[offset + i]) / 32768.0f;
+        for (jsize i = 0; i < inputLength; ++i) {
+            temp[i] = static_cast<float>(input[safeOffset + i]) / 32768.0f;
         }
         fieldSurround->process(temp, frames);
         dsp->processFloatMultiplexd(dsp, temp, temp, frames);
 
         constexpr float kScale = 32768.0f;
-        for (int i = 0; i < inputLength; ++i) {
+        for (jsize i = 0; i < inputLength; ++i) {
             const float sample = temp[i];
             if (sample <= -1.0f) {
                 output[i] = static_cast<jshort>(INT16_MIN);
@@ -308,7 +323,7 @@ Java_me_timschneeberger_rootlessjamesdsp_interop_JamesDspWrapper_processInt16(JN
             }
         }
     } else {
-        dsp->processInt16Multiplexd(dsp, input + offset, output, frames);
+        dsp->processInt16Multiplexd(dsp, input + safeOffset, output, frames);
     }
     env->ReleaseShortArrayElements(inputObj, input, JNI_ABORT);
     env->ReleaseShortArrayElements(outputObj, output, 0);
@@ -320,13 +335,28 @@ Java_me_timschneeberger_rootlessjamesdsp_interop_JamesDspWrapper_processInt32(JN
 {
     DECLARE_DSP_V
 
-    jsize inputLength;
-    if(size < 0)
-        inputLength = env->GetArrayLength(inputObj);
-    else
-        inputLength = size;
-    if(offset < 0)
-        offset = 0;
+    const jsize inputArrayLength = env->GetArrayLength(inputObj);
+    const jsize outputArrayLength = env->GetArrayLength(outputObj);
+    const jsize safeOffset = std::max<jsize>(0, static_cast<jsize>(offset));
+    const jsize availableInput = std::max<jsize>(0, inputArrayLength - safeOffset);
+
+    jsize inputLength = (size < 0)
+        ? availableInput
+        : std::min<jsize>(availableInput, static_cast<jsize>(size));
+    if (inputLength <= 0) {
+        return;
+    }
+    if (outputArrayLength < inputLength) {
+        LOGE("JamesDspWrapper::processInt32: output array too small (need=%d, have=%d)",
+             static_cast<int>(inputLength),
+             static_cast<int>(outputArrayLength));
+        return;
+    }
+
+    inputLength -= (inputLength % 2);
+    if (inputLength <= 0) {
+        return;
+    }
 
     auto input = env->GetIntArrayElements(inputObj, nullptr);
     auto output = env->GetIntArrayElements(outputObj, nullptr);
@@ -340,18 +370,18 @@ Java_me_timschneeberger_rootlessjamesdsp_interop_JamesDspWrapper_processInt32(JN
         auto* temp = getTempBuffer(wrapper, static_cast<size_t>(inputLength));
         if (temp == nullptr) {
             env->ReleaseIntArrayElements(inputObj, input, JNI_ABORT);
-            env->ReleaseIntArrayElements(outputObj, output, 0);
+            env->ReleaseIntArrayElements(outputObj, output, JNI_ABORT);
             return;
         }
         constexpr float kInputScaleInv = 1.0f / 2147483648.0f;
-        for (int i = 0; i < inputLength; ++i) {
-            temp[i] = static_cast<float>(static_cast<double>(input[offset + i]) * kInputScaleInv);
+        for (jsize i = 0; i < inputLength; ++i) {
+            temp[i] = static_cast<float>(static_cast<double>(input[safeOffset + i]) * kInputScaleInv);
         }
         fieldSurround->process(temp, frames);
         dsp->processFloatMultiplexd(dsp, temp, temp, frames);
 
         constexpr double kScale = 2147483648.0;
-        for (int i = 0; i < inputLength; ++i) {
+        for (jsize i = 0; i < inputLength; ++i) {
             const float sample = temp[i];
             if (sample <= -1.0f) {
                 output[i] = INT32_MIN;
@@ -363,7 +393,7 @@ Java_me_timschneeberger_rootlessjamesdsp_interop_JamesDspWrapper_processInt32(JN
             }
         }
     } else {
-        dsp->processInt32Multiplexd(dsp, input + offset, output, frames);
+        dsp->processInt32Multiplexd(dsp, input + safeOffset, output, frames);
     }
     env->ReleaseIntArrayElements(inputObj, input, JNI_ABORT);
     env->ReleaseIntArrayElements(outputObj, output, 0);
@@ -480,13 +510,28 @@ Java_me_timschneeberger_rootlessjamesdsp_interop_JamesDspWrapper_processFloat(JN
 {
     DECLARE_DSP_V
 
-    jsize inputLength;
-    if(size < 0)
-        inputLength = env->GetArrayLength(inputObj);
-    else
-        inputLength = size;
-    if(offset < 0)
-        offset = 0;
+    const jsize inputArrayLength = env->GetArrayLength(inputObj);
+    const jsize outputArrayLength = env->GetArrayLength(outputObj);
+    const jsize safeOffset = std::max<jsize>(0, static_cast<jsize>(offset));
+    const jsize availableInput = std::max<jsize>(0, inputArrayLength - safeOffset);
+
+    jsize inputLength = (size < 0)
+        ? availableInput
+        : std::min<jsize>(availableInput, static_cast<jsize>(size));
+    if (inputLength <= 0) {
+        return;
+    }
+    if (outputArrayLength < inputLength) {
+        LOGE("JamesDspWrapper::processFloat: output array too small (need=%d, have=%d)",
+             static_cast<int>(inputLength),
+             static_cast<int>(outputArrayLength));
+        return;
+    }
+
+    inputLength -= (inputLength % 2);
+    if (inputLength <= 0) {
+        return;
+    }
 
     auto input = env->GetFloatArrayElements(inputObj, nullptr);
     auto output = env->GetFloatArrayElements(outputObj, nullptr);
@@ -498,16 +543,16 @@ Java_me_timschneeberger_rootlessjamesdsp_interop_JamesDspWrapper_processFloat(JN
         auto* temp = getTempBuffer(wrapper, static_cast<size_t>(inputLength));
         if (temp == nullptr) {
             env->ReleaseFloatArrayElements(inputObj, input, JNI_ABORT);
-            env->ReleaseFloatArrayElements(outputObj, output, 0);
+            env->ReleaseFloatArrayElements(outputObj, output, JNI_ABORT);
             return;
         }
-        for (int i = 0; i < inputLength; ++i) {
-            temp[i] = input[offset + i];
+        for (jsize i = 0; i < inputLength; ++i) {
+            temp[i] = input[safeOffset + i];
         }
         fieldSurround->process(temp, frames);
         dsp->processFloatMultiplexd(dsp, temp, output, frames);
     } else {
-        dsp->processFloatMultiplexd(dsp, input + offset, output, frames);
+        dsp->processFloatMultiplexd(dsp, input + safeOffset, output, frames);
     }
 
     env->ReleaseFloatArrayElements(inputObj, input, JNI_ABORT);
@@ -869,7 +914,7 @@ Java_me_timschneeberger_rootlessjamesdsp_interop_JamesDspWrapper_setFieldSurroun
     fieldSurround->setOutputModeFromParamInt(outputMode);
     fieldSurround->setWidenFromParamInt(widening);
     fieldSurround->setMidFromParamInt(midImage);
-    fieldSurround->setDepthFromParamInt(static_cast<short>(depth));
+    fieldSurround->setDepthFromParamInt(depth);
     fieldSurround->setPhaseOffsetFromParamInt(phaseOffset);
     fieldSurround->setMonoSumMixFromParamInt(monoSumMix);
     fieldSurround->setMonoSumPanFromParamInt(monoSumPan);
