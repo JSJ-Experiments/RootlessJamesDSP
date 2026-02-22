@@ -122,7 +122,9 @@ void NoiseSharpening::setNyquistOffset(float hz) {
 }
 
 void NoiseSharpening::reset() {
-    const float cutoff = std::max(0.0f, static_cast<float>(samplingRate) * 0.5f - nyquistOffsetHz);
+    const float rawCutoff = static_cast<float>(samplingRate) * 0.5f - nyquistOffsetHz;
+    constexpr float kMinCutoffHz = 1.0e-3f;
+    const float cutoff = std::max(kMinCutoffHz, rawCutoff);
     for (int i = 0; i < 2; ++i) {
         filters[i].setLPF_BW(cutoff, samplingRate);
         filters[i].mute();
