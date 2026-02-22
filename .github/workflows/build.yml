@@ -197,26 +197,19 @@ jobs:
             echo
             echo "## Downloads"
             echo
-            echo "| Variant | Architecture | Download | Asset |"
-            echo "| --- | --- | --- | --- |"
+            echo "| Variant | Architecture | Download |"
+            echo "| --- | --- | --- |"
 
-            for variant in rootless root; do
-              if [ "$variant" = "rootless" ]; then
-                variant_label="RootlessJamesDSP"
+            variant_label="RootlessJamesDSP"
+            for arch in universal arm64-v8a armeabi-v7a x86_64 x86; do
+              asset_name="$(jq -r --arg arch "$arch" '.assets[] | select(.name | test("-rootless-full-" + $arch + "-release-signed\\.apk$")) | .name' assets.json | head -n 1)"
+
+              if [ -n "$asset_name" ] && [ "$asset_name" != "null" ]; then
+                download_url="https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}/${asset_name}"
+                echo "| ${variant_label} | ${arch} | [Download](${download_url}) |"
               else
-                variant_label="JamesDSP (root)"
+                echo "| ${variant_label} | ${arch} | N/A |"
               fi
-
-              for arch in universal arm64-v8a armeabi-v7a x86_64 x86; do
-                url="$(jq -r --arg variant "$variant" --arg arch "$arch" '.assets[] | select(.name | test("-" + $variant + "-full-" + $arch + "-release-signed\\.apk$")) | .url' assets.json | head -n 1)"
-
-                if [ -n "$url" ] && [ "$url" != "null" ]; then
-                  asset_name="${url##*/}"
-                  echo "| ${variant_label} | ${arch} | [Download](${url}) | \`${asset_name}\` |"
-                else
-                  echo "| ${variant_label} | ${arch} | N/A | - |"
-                fi
-              done
             done
           } > release_downloads.md
 
