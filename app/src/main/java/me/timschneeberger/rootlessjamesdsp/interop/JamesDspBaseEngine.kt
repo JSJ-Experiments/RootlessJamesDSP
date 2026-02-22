@@ -22,6 +22,24 @@ import kotlin.math.roundToInt
 import kotlin.math.pow
 
 abstract class JamesDspBaseEngine(val context: Context, val callbacks: JamesDspWrapper.JamesDspCallbacks? = null) : AutoCloseable {
+    companion object {
+        private const val CROSSFEED_MODE_DEFAULT = 5
+        private const val CROSSFEED_MODE_CUSTOM = 99
+        private const val CROSSFEED_FCUT_MIN = 300
+        private const val CROSSFEED_FCUT_MAX = 2000
+        private const val CROSSFEED_FEED_MIN = 10
+        private const val CROSSFEED_FEED_MAX = 150
+        private const val SPECTRUM_STRENGTH_UNIT_PERCENT = "percent"
+        private const val SPECTRUM_STRENGTH_UNIT_DB = "db"
+        private const val SPECTRUM_STRENGTH_DB_MIN = -40.0f
+        private const val SPECTRUM_STRENGTH_DB_MAX = 0.0f
+        private const val SPECTRUM_STRENGTH_PERCENT_MIN = 0.0f
+        private const val SPECTRUM_STRENGTH_PERCENT_MAX = 100.0f
+        private const val SPECTRUM_HARMONICS_DEFAULT_RAW = "0.02;0;0.02;0;0.02;0;0.02;0;0.02;0"
+        private const val MAX_EQ_INTERPOLATION_MODE = 1
+        private val DEFAULT_SPECTRUM_HARMONICS = doubleArrayOf(0.02, 0.0, 0.02, 0.0, 0.02, 0.0, 0.02, 0.0, 0.02, 0.0)
+    }
+
     abstract var enabled: Boolean
     open var sampleRate: Float = 0.0f
         set(value) {
@@ -59,6 +77,13 @@ abstract class JamesDspBaseEngine(val context: Context, val callbacks: JamesDspW
         Timber.d("Synchronizing with preferences... (forced: %s)", forceUpdateNamespaces?.joinToString(";") { it })
 
         syncMutex.withLock {
+            fun parseIntPref(raw: String, fallback: Int, label: String): Int {
+                return raw.toIntOrNull() ?: run {
+                    Timber.w("Invalid integer preference for %s: '%s'. Falling back to %d.", label, raw, fallback)
+                    fallback
+                }
+            }
+
             cache.select(Constants.PREF_OUTPUT)
             val outputPostGain = cache.get(R.string.key_output_postgain, 0f)
             val limiterThreshold = cache.get(R.string.key_limiter_threshold, -0.1f)
@@ -68,7 +93,11 @@ abstract class JamesDspBaseEngine(val context: Context, val callbacks: JamesDspW
             val compEnabled = cache.get(R.string.key_compander_enable, false)
             val compTimeConst = cache.get(R.string.key_compander_timeconstant, 0.22f)
             val compGranularity = cache.get(R.string.key_compander_granularity, 2f).toInt()
-            val compTfTransforms = cache.get(R.string.key_compander_tftransforms, "0").toInt()
+            val compTfTransforms = parseIntPref(
+                cache.get(R.string.key_compander_tftransforms, "0"),
+                0,
+                "compander_tftransforms"
+            )
             val compResponse = cache.get(R.string.key_compander_response, "95.0;200.0;400.0;800.0;1600.0;3400.0;7500.0;0;0;0;0;0;0;0")
 
             cache.select(Constants.PREF_BASS)
@@ -77,8 +106,9 @@ abstract class JamesDspBaseEngine(val context: Context, val callbacks: JamesDspW
 
             cache.select(Constants.PREF_EQ)
             val eqEnabled = cache.get(R.string.key_eq_enable, false)
-            val eqFilterType = cache.get(R.string.key_eq_filter_type, "0").toInt()
-            val eqInterpolationMode = cache.get(R.string.key_eq_interpolation, "0").toInt()
+            val eqFilterType = cache.get(R.string.key_eq_filter_type, "6").toIntOrNull() ?: 6
+            val eqInterpolationMode = (cache.get(R.string.key_eq_interpolation, "0").toIntOrNull() ?: 0)
+                .coerceIn(0, MAX_EQ_INTERPOLATION_MODE)
             val eqBands = cache.get(R.string.key_eq_bands, Constants.DEFAULT_EQ)
 
             cache.select(Constants.PREF_GEQ)
@@ -87,28 +117,36 @@ abstract class JamesDspBaseEngine(val context: Context, val callbacks: JamesDspW
 
             cache.select(Constants.PREF_REVERB)
             val reverbEnabled = cache.get(R.string.key_reverb_enable, false)
-            val reverbPreset = cache.get(R.string.key_reverb_preset, "0").toInt()
+            val reverbPreset = parseIntPref(
+                cache.get(R.string.key_reverb_preset, "15"),
+                15,
+                "reverb_preset"
+            )
 
             cache.select(Constants.PREF_SPECTRUM_EXT)
             val spectrumEnabled = cache.get(R.string.key_spectrum_ext_enable, false)
-            val spectrumStrengthUnit = cache.get(R.string.key_spectrum_ext_strength_unit, "percent")
-            val spectrumStrengthPercent = cache.get(R.string.key_spectrum_ext_strength_percent, 100f)
-            val spectrumStrengthDb = cache.get(R.string.key_spectrum_ext_strength_db, 0f)
+            val spectrumStrengthUnit = cache.get(R.string.key_spectrum_ext_strength_unit, SPECTRUM_STRENGTH_UNIT_PERCENT)
+            val spectrumStrengthPercent = cache.get(R.string.key_spectrum_ext_strength_percent, 10f)
+            val spectrumStrengthDb = cache.get(R.string.key_spectrum_ext_strength_db, -20f)
             val spectrumRefFreq = cache.get(R.string.key_spectrum_ext_ref_freq, 7600f).toInt()
             val spectrumWetMix = cache.get(R.string.key_spectrum_ext_wet_mix, 100f)
             val spectrumPostGain = cache.get(R.string.key_spectrum_ext_post_gain, 0f)
-            val spectrumSafety = cache.get(R.string.key_spectrum_ext_safety, true)
+            val spectrumSafety = cache.get(R.string.key_spectrum_ext_safety, false)
             val spectrumHpQ = cache.get(R.string.key_spectrum_ext_hp_q, 0.717f)
             val spectrumLpQ = cache.get(R.string.key_spectrum_ext_lp_q, 0.717f)
             val spectrumLpOffset = cache.get(R.string.key_spectrum_ext_lp_offset, 2000f).toInt()
-            val spectrumHarmonics = cache.get(R.string.key_spectrum_ext_harmonics, "0.02;0;0.02;0;0.02;0;0.02;0;0.02;0")
+            val spectrumHarmonics = cache.get(R.string.key_spectrum_ext_harmonics, SPECTRUM_HARMONICS_DEFAULT_RAW)
 
             cache.select(Constants.PREF_CLARITY)
             val clarityEnabled = cache.get(R.string.key_clarity_enable, false)
-            val clarityMode = cache.get(R.string.key_clarity_mode, "0").toInt()
+            val clarityMode = parseIntPref(
+                cache.get(R.string.key_clarity_mode, "0"),
+                0,
+                "clarity_mode"
+            ).coerceIn(0, 2)
             val clarityStrengthUnit = cache.get(R.string.key_clarity_strength_unit, "percent")
-            val clarityStrengthPercent = cache.get(R.string.key_clarity_strength_percent, 100f)
-            val clarityStrengthDb = cache.get(R.string.key_clarity_strength_db, 0f)
+            val clarityStrengthPercent = cache.get(R.string.key_clarity_strength_percent, 0f)
+            val clarityStrengthDb = cache.get(R.string.key_clarity_strength_db, -40f)
             val clarityPostGain = cache.get(R.string.key_clarity_post_gain, 0f)
             val claritySafety = cache.get(R.string.key_clarity_safety, false)
             val claritySafetyThreshold = cache.get(R.string.key_clarity_safety_threshold, -0.8f)
@@ -124,10 +162,23 @@ abstract class JamesDspBaseEngine(val context: Context, val callbacks: JamesDspW
 
             cache.select(Constants.PREF_FIELD_SURROUND)
             val fieldSurroundEnabled = cache.get(R.string.key_field_surround_enable, false)
-            val fieldSurroundOutputMode = cache.get(R.string.key_field_surround_output_mode, "0").toInt()
-            val fieldSurroundWidening = cache.get(R.string.key_field_surround_widening, 100f).roundToInt()
-            val fieldSurroundMidImage = cache.get(R.string.key_field_surround_mid_image, 100f).roundToInt()
-            val fieldSurroundDepth = cache.get(R.string.key_field_surround_depth, 100f).roundToInt()
+            val fieldSurroundOutputMode = parseIntPref(
+                cache.get(R.string.key_field_surround_output_mode, "0"),
+                0,
+                "field_surround_output_mode"
+            ).coerceIn(0, 2)
+            val fieldSurroundWidening = cache.get(
+                R.string.key_field_surround_widening,
+                FieldSurroundDepthMapping.CONFIG_DEFAULT_WIDENING.toFloat()
+            ).roundToInt()
+            val fieldSurroundMidImage = cache.get(
+                R.string.key_field_surround_mid_image,
+                FieldSurroundDepthMapping.CONFIG_DEFAULT_MID_IMAGE.toFloat()
+            ).roundToInt()
+            val fieldSurroundDepth = cache.get(
+                R.string.key_field_surround_depth,
+                FieldSurroundDepthMapping.CONFIG_DEFAULT_DEPTH.toFloat()
+            ).roundToInt()
             val fieldSurroundPhaseOffset = cache.get(R.string.key_field_surround_phase_offset, 0f).roundToInt()
             val fieldSurroundMonoSumMix = cache.get(R.string.key_field_surround_mono_sum_mix, 0f).roundToInt()
             val fieldSurroundMonoSumPan = cache.get(R.string.key_field_surround_mono_sum_pan, 0f).roundToInt()
@@ -149,7 +200,13 @@ abstract class JamesDspBaseEngine(val context: Context, val callbacks: JamesDspW
 
             cache.select(Constants.PREF_CROSSFEED)
             val crossfeedEnabled = cache.get(R.string.key_crossfeed_enable, false)
-            val crossfeedMode = cache.get(R.string.key_crossfeed_mode, "0").toInt()
+            val crossfeedMode = parseIntPref(
+                cache.get(R.string.key_crossfeed_mode, CROSSFEED_MODE_DEFAULT.toString()),
+                CROSSFEED_MODE_DEFAULT,
+                "crossfeed_mode"
+            )
+            val crossfeedCustomFcut = cache.get(R.string.key_crossfeed_custom_fcut, 700f).roundToInt()
+            val crossfeedCustomFeed = cache.get(R.string.key_crossfeed_custom_feed, 45f).roundToInt()
 
             cache.select(Constants.PREF_TUBE)
             val tubeEnabled = cache.get(R.string.key_tube_enable, false)
@@ -167,7 +224,11 @@ abstract class JamesDspBaseEngine(val context: Context, val callbacks: JamesDspW
             val convolverEnabled = cache.get(R.string.key_convolver_enable, false)
             val convolverFile = cache.get(R.string.key_convolver_file, "")
             val convolverAdvImp = cache.get(R.string.key_convolver_adv_imp, Constants.DEFAULT_CONVOLVER_ADVIMP)
-            val convolverMode = cache.get(R.string.key_convolver_mode, "0").toInt()
+            val convolverMode = parseIntPref(
+                cache.get(R.string.key_convolver_mode, "0"),
+                0,
+                "convolver_mode"
+            )
 
             val targets = cache.changedNamespaces.toTypedArray() + (forceUpdateNamespaces ?: arrayOf())
             targets.forEach {
@@ -235,7 +296,22 @@ abstract class JamesDspBaseEngine(val context: Context, val callbacks: JamesDspW
                         fieldSurroundStereoFallback
                     )
                     Constants.PREF_STEREOWIDE -> setStereoEnhancement(swEnabled, swMode)
-                    Constants.PREF_CROSSFEED -> setCrossfeed(crossfeedEnabled, crossfeedMode)
+                    Constants.PREF_CROSSFEED -> {
+                        if (crossfeedMode == CROSSFEED_MODE_CUSTOM && supportsCustomCrossfeed()) {
+                            setCrossfeedCustom(
+                                crossfeedEnabled,
+                                crossfeedCustomFcut.coerceIn(CROSSFEED_FCUT_MIN, CROSSFEED_FCUT_MAX),
+                                crossfeedCustomFeed.coerceIn(CROSSFEED_FEED_MIN, CROSSFEED_FEED_MAX)
+                            )
+                        } else {
+                            val safeMode = if (crossfeedMode == CROSSFEED_MODE_CUSTOM) {
+                                CROSSFEED_MODE_DEFAULT
+                            } else {
+                                crossfeedMode
+                            }
+                            setCrossfeed(crossfeedEnabled, safeMode)
+                        }
+                    }
                     Constants.PREF_TUBE -> setVacuumTube(tubeEnabled, tubeDrive)
                     Constants.PREF_DDC -> setVdc(ddcEnabled, ddcFile)
                     Constants.PREF_LIVEPROG -> setLiveprog(liveProgEnabled, liveprogFile)
@@ -255,18 +331,25 @@ abstract class JamesDspBaseEngine(val context: Context, val callbacks: JamesDspW
 
     fun setMultiEqualizer(enable: Boolean, filterType: Int, interpolationMode: Int, bands: String): Boolean
     {
+        // Transport divergence note:
+        // ViPER-compatible remotes may expose 65551/65552 discrete writes, while the local path
+        // applies the equivalent EQ state via a single JNI payload call.
         val doubleArray = DoubleArray(30)
         val array = bands.split(";")
         if (array.size != doubleArray.size)
         {
-            Timber.e("setFirEqualizer: malformed EQ string, expected ${doubleArray.size} fields but got ${array.size}")
+            Timber.e("setMultiEqualizer: malformed EQ string, expected ${doubleArray.size} fields but got ${array.size}")
             return false
         }
         for((i, str) in array.withIndex())
         {
             val number = str.toDoubleOrNull()
             if(number == null) {
-                Timber.e("setFirEqualizer: malformed EQ string")
+                Timber.e("setMultiEqualizer: malformed EQ string")
+                return false
+            }
+            if (!number.isFinite()) {
+                Timber.e("setMultiEqualizer: non-finite value in EQ string at index $i")
                 return false
             }
             doubleArray[i] = number
@@ -417,34 +500,35 @@ abstract class JamesDspBaseEngine(val context: Context, val callbacks: JamesDspW
         lpCutoffOffsetHz: Int,
         harmonicsRaw: String,
     ): Boolean {
-        val maxLinear = 10.0.pow((12.0f / 20.0f).toDouble()).toFloat()
-        val minLinear = 0.01f
-
-        val linearStrength = (if (strengthUnit == "db") {
-            10.0.pow((strengthDb.coerceIn(-40f, 12f) / 20.0f).toDouble()).toFloat()
+        val uiStrength = if (strengthUnit == SPECTRUM_STRENGTH_UNIT_DB) {
+            val clampedDb = strengthDb.coerceIn(SPECTRUM_STRENGTH_DB_MIN, SPECTRUM_STRENGTH_DB_MAX)
+            // Map the minimum db value to full-off for stable round-tripping with percent mode.
+            if (clampedDb <= SPECTRUM_STRENGTH_DB_MIN) {
+                0.0f
+            } else {
+                10.0.pow((clampedDb / 20.0f).toDouble()).toFloat() * SPECTRUM_STRENGTH_PERCENT_MAX
+            }
         } else {
-            (strengthPercent.coerceIn(1f, 400f) / 100.0f)
-        }).coerceIn(minLinear, maxLinear)
+            strengthPercent
+        }.coerceIn(SPECTRUM_STRENGTH_PERCENT_MIN, SPECTRUM_STRENGTH_PERCENT_MAX)
 
-        val harmonics = harmonicsRaw
-            .split(";")
-            .mapNotNull { it.trim().toDoubleOrNull() }
-            .toDoubleArray()
-        if (harmonics.size != 10) {
-            Timber.e("setSpectrumExtension: malformed harmonics string, expected 10 entries")
-            return false
-        }
+        // Stock ViPER mapping: param65550 = trunc(strength * 5.6), core uses /100.
+        // The local JNI path applies Spectrum params as a single native call instead of discrete
+        // 65549/65550 transport commands, so we preserve the same strength math here for parity.
+        val barkReconstruct = (uiStrength * 5.6f).toInt()
+        val exciter = barkReconstruct / 100.0f
+        val harmonics = parseSpectrumHarmonics(harmonicsRaw)
 
         return setSpectrumExtensionInternal(
             enable,
-            linearStrength,
-            referenceFreq.coerceIn(800, 20000),
+            exciter,
+            referenceFreq,
             wetMixPercent.coerceIn(0f, 100f) / 100.0f,
-            postGainDb.coerceIn(-15f, 15f),
+            postGainDb.coerceIn(-24f, 24f),
             safetyEnabled,
-            hpQ.coerceIn(0.2f, 2.0f),
-            lpQ.coerceIn(0.2f, 2.0f),
-            lpCutoffOffsetHz.coerceIn(0, 12000),
+            hpQ.coerceIn(0.1f, 3.0f),
+            lpQ.coerceIn(0.1f, 3.0f),
+            lpCutoffOffsetHz.coerceAtLeast(0),
             harmonics
         )
     }
@@ -468,18 +552,25 @@ abstract class JamesDspBaseEngine(val context: Context, val callbacks: JamesDspW
         xhifiBpDelayDivisor: Int,
         xhifiLpDelayDivisor: Int,
     ): Boolean {
-        val maxLinear = 10.0.pow((16.0f / 20.0f).toDouble()).toFloat()
-        val minLinear = 0.0f
-        val linearStrength = (if (strengthUnit == "db") {
-            10.0.pow((strengthDb.coerceIn(-40f, 16f) / 20.0f).toDouble()).toFloat()
+        val linearStrength = if (strengthUnit == "db") {
+            if (strengthDb.isFinite()) {
+                10.0.pow((strengthDb / 20.0f).toDouble()).toFloat()
+            } else {
+                0.0f
+            }
         } else {
-            strengthPercent.coerceIn(0f, 631f) / 100.0f
-        }).coerceIn(minLinear, maxLinear)
+            if (strengthPercent.isFinite()) {
+                strengthPercent / 100.0f
+            } else {
+                0.0f
+            }
+        }
+        val safeLinearStrength = if (linearStrength.isFinite()) linearStrength else 0.0f
 
         return setClarityInternal(
             enable,
-            mode.coerceIn(0, 2),
-            linearStrength,
+            mode,
+            safeLinearStrength,
             postGainDb.coerceIn(-24f, 16f),
             safetyEnabled,
             safetyThresholdDb.coerceIn(-12f, 0f),
@@ -516,12 +607,103 @@ abstract class JamesDspBaseEngine(val context: Context, val callbacks: JamesDspW
         stereoFloor: Float,
         stereoFallback: Float,
     ): Boolean {
+        val depthStrength = FieldSurroundDepthMapping.toDirectDepthStrength(depth)
+        return setFieldSurroundMappedDepth(
+            enable,
+            outputMode,
+            widening,
+            midImage,
+            depthStrength,
+            phaseOffset,
+            monoSumMix,
+            monoSumPan,
+            delayLeftMs,
+            delayRightMs,
+            hpfFrequencyHz,
+            hpfGainDb,
+            hpfQ,
+            branchThreshold,
+            gainScaleDb,
+            gainOffsetDb,
+            gainCap,
+            stereoFloor,
+            stereoFallback
+        )
+    }
+
+    fun setFieldSurroundWrapperCompat(
+        enable: Boolean,
+        outputMode: Int,
+        widening: Int,
+        midImage: Int,
+        depthRaw: Int,
+        phaseOffset: Int,
+        monoSumMix: Int,
+        monoSumPan: Int,
+        delayLeftMs: Float,
+        delayRightMs: Float,
+        hpfFrequencyHz: Float,
+        hpfGainDb: Float,
+        hpfQ: Float,
+        branchThreshold: Int,
+        gainScaleDb: Float,
+        gainOffsetDb: Float,
+        gainCap: Float,
+        stereoFloor: Float,
+        stereoFallback: Float,
+    ): Boolean {
+        val depthStrength = FieldSurroundDepthMapping.toWrapperCompatDepthStrength(depthRaw)
+        return setFieldSurroundMappedDepth(
+            enable,
+            outputMode,
+            widening,
+            midImage,
+            depthStrength,
+            phaseOffset,
+            monoSumMix,
+            monoSumPan,
+            delayLeftMs,
+            delayRightMs,
+            hpfFrequencyHz,
+            hpfGainDb,
+            hpfQ,
+            branchThreshold,
+            gainScaleDb,
+            gainOffsetDb,
+            gainCap,
+            stereoFloor,
+            stereoFallback
+        )
+    }
+
+    private fun setFieldSurroundMappedDepth(
+        enable: Boolean,
+        outputMode: Int,
+        widening: Int,
+        midImage: Int,
+        depthStrength: Int,
+        phaseOffset: Int,
+        monoSumMix: Int,
+        monoSumPan: Int,
+        delayLeftMs: Float,
+        delayRightMs: Float,
+        hpfFrequencyHz: Float,
+        hpfGainDb: Float,
+        hpfQ: Float,
+        branchThreshold: Int,
+        gainScaleDb: Float,
+        gainOffsetDb: Float,
+        gainCap: Float,
+        stereoFloor: Float,
+        stereoFallback: Float,
+    ): Boolean {
+        val clampedDepthStrength = depthStrength.coerceIn(Short.MIN_VALUE.toInt(), Short.MAX_VALUE.toInt())
         return setFieldSurroundInternal(
             enable,
             outputMode.coerceIn(0, 2),
             widening.coerceIn(0, 800),
             midImage.coerceIn(0, 800),
-            depth.coerceIn(0, 800),
+            clampedDepthStrength,
             phaseOffset.coerceIn(-100, 100),
             monoSumMix.coerceIn(0, 100),
             monoSumPan.coerceIn(-100, 100),
@@ -537,6 +719,26 @@ abstract class JamesDspBaseEngine(val context: Context, val callbacks: JamesDspW
             stereoFloor.coerceIn(0.1f, 5.0f),
             stereoFallback.coerceIn(0.1f, 2.0f)
         )
+    }
+
+    private fun parseSpectrumHarmonics(raw: String): DoubleArray {
+        val parts = raw.split(";")
+        if (parts.size != DEFAULT_SPECTRUM_HARMONICS.size) {
+            Timber.w("setSpectrumExtension: malformed harmonics string, expected ${DEFAULT_SPECTRUM_HARMONICS.size} entries")
+            return DEFAULT_SPECTRUM_HARMONICS.copyOf()
+        }
+
+        val parsed = DoubleArray(DEFAULT_SPECTRUM_HARMONICS.size)
+        for (i in parts.indices) {
+            val value = parts[i].trim().toDoubleOrNull()
+            if (value == null || !value.isFinite()) {
+                Timber.w("setSpectrumExtension: malformed harmonics string, using defaults")
+                return DEFAULT_SPECTRUM_HARMONICS.copyOf()
+            }
+            parsed[i] = value
+        }
+
+        return parsed
     }
 
     private fun safeFileReader(path: String) =

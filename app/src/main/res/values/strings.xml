@@ -153,6 +153,7 @@
     <string name="spectrum_ext_wet_mix">Wet mix</string>
     <string name="spectrum_ext_post_gain">Post gain</string>
     <string name="spectrum_ext_safety">Safety limiter</string>
+    <string name="spectrum_ext_safety_summary">Disabled by default. Enable to reduce overload and clipping.</string>
     <string name="spectrum_ext_expert_header">Expert controls</string>
     <string name="spectrum_ext_hp_q">HP Q</string>
     <string name="spectrum_ext_lp_q">LP Q</string>
@@ -227,6 +228,11 @@
     <string name="crossfeed_preset_surround1">Surround 1</string>
     <string name="crossfeed_preset_surround2">Surround 2</string>
     <string name="crossfeed_preset_realistic_surround">Joe0Bloggs Realistic surround</string>
+    <string name="crossfeed_preset_custom">Custom</string>
+    <string name="crossfeed_custom_fcut">Custom cutoff</string>
+    <string name="crossfeed_custom_feed">Custom feed</string>
+    <string name="crossfeed_unavailable">Custom crossfeed is unavailable on this backend.</string>
+    <string name="crossfeed_unavailable_using_preset">Custom crossfeed is unavailable on this backend. Using preset mode.</string>
 
     <string name="clarity_enable">ViPER Clarity</string>
     <string name="clarity_mode">Mode</string>

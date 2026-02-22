@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <limits>
 
 namespace fieldsurround {
 
@@ -12,7 +13,7 @@ void TimeConstDelay::setParameters(uint32_t samplingRate, float delaySeconds) {
     const float safeDelay = std::isfinite(delaySeconds) ? delaySeconds : 0.0f;
     const float clampedDelay = std::clamp(safeDelay, 0.0f, kMaxDelaySeconds);
 
-    uint32_t sampleCount = 1;
+    sampleCount = 1;
     if (samplingRate > 0) {
         sampleCount = static_cast<uint32_t>(static_cast<double>(samplingRate) * static_cast<double>(clampedDelay));
         if (sampleCount == 0) {
@@ -28,13 +29,25 @@ float TimeConstDelay::processSample(float sample) {
     if (samples.empty()) {
         return sample;
     }
-    if (offset >= samples.size()) {
+
+    uint32_t wrapCount = sampleCount;
+    if (wrapCount == 0 || wrapCount > samples.size()) {
+        wrapCount = static_cast<uint32_t>(samples.size());
+    }
+    if (wrapCount == 0) {
+        return sample;
+    }
+
+    if (offset >= wrapCount) {
         offset = 0;
     }
 
     const float out = samples[offset];
     samples[offset] = sample;
-    offset = (offset + 1) % static_cast<uint32_t>(samples.size());
+    ++offset;
+    if (offset >= wrapCount) {
+        offset = 0;
+    }
     return out;
 }
 
@@ -102,9 +115,10 @@ void Biquad::setHighPassParameter(float frequency, uint32_t samplingRate, double
     const double a0 = (A + 1.0) - (A - 1.0) * cosOmega + 2.0 * sqrtA * z;
     const double a1 = 2.0 * ((A - 1.0) - (A + 1.0) * cosOmega);
     const double a2 = (A + 1.0) - (A - 1.0) * cosOmega - 2.0 * sqrtA * z;
-    const double b0 = ((A + 1.0) + (A - 1.0) * cosOmega + 2.0 * sqrtA * z) * A;
-    const double b1 = -2.0 * A * ((A - 1.0) + (A + 1.0) * cosOmega);
-    const double b2 = ((A + 1.0) + (A - 1.0) * cosOmega - 2.0 * sqrtA * z) * A;
+    // Note: b-coefficients include omega scaling to match ViPER behavior.
+    const double b0 = ((A + 1.0) + (A - 1.0) * cosOmega + 2.0 * sqrtA * z) * A * omega;
+    const double b1 = -2.0 * A * ((A - 1.0) + (A + 1.0) * cosOmega) * omega;
+    const double b2 = ((A + 1.0) + (A - 1.0) * cosOmega - 2.0 * sqrtA * z) * A * omega;
 
     setCoeffs(a0, a1, a2, b0, b1, b2);
 }
@@ -170,18 +184,24 @@ void DepthSurround::setSamplingRate(uint32_t sr) {
     configureFilters();
 }
 
-void DepthSurround::setStrength(int value) {
+void DepthSurround::setStrength(int16_t value) {
     strength = value;
     refreshStrength();
 }
 
 void DepthSurround::setDelayMs(float leftMs, float rightMs) {
+    if (delayLeftMs == leftMs && delayRightMs == rightMs) {
+        return;
+    }
     delayLeftMs = leftMs;
     delayRightMs = rightMs;
     configureFilters();
 }
 
 void DepthSurround::setHighPass(float frequencyHz, float gainDb, float qFactor) {
+    if (highpassFrequencyHz == frequencyHz && highpassGainDb == gainDb && highpassQ == qFactor) {
+        return;
+    }
     highpassFrequencyHz = frequencyHz;
     highpassGainDb = gainDb;
     highpassQ = qFactor;
@@ -189,11 +209,17 @@ void DepthSurround::setHighPass(float frequencyHz, float gainDb, float qFactor) 
 }
 
 void DepthSurround::setBranchThreshold(int threshold) {
+    if (branchThreshold == threshold) {
+        return;
+    }
     branchThreshold = threshold;
     refreshStrength();
 }
 
 void DepthSurround::setGainModel(float scaleDb, float offsetDb, float cap) {
+    if (gainScaleDb == scaleDb && gainOffsetDb == offsetDb && gainCap == cap) {
+        return;
+    }
     gainScaleDb = scaleDb;
     gainOffsetDb = offsetDb;
     gainCap = cap;
@@ -221,9 +247,13 @@ void DepthSurround::refreshStrength() {
         return;
     }
 
+    const float safeGainCap = (std::isfinite(gainCap) && gainCap >= 0.0f) ? gainCap : 0.0f;
     float computedGain = std::pow(10.0f, (((static_cast<float>(strength) / 1000.0f) * gainScaleDb) + gainOffsetDb) / 20.0f);
+    if (!std::isfinite(computedGain)) {
+        computedGain = 0.0f;
+    }
     computedGain = std::max(0.0f, computedGain);
-    gain = std::min(std::min(gainCap, computedGain), 0.999f);
+    gain = std::clamp(computedGain, 0.0f, safeGainCap);
 }
 
 void DepthSurround::process(float* samples, uint32_t frames) {
@@ -257,8 +287,10 @@ void DepthSurround::process(float* samples, uint32_t frames) {
 }
 
 void FieldSurroundProcessor::setSamplingRate(uint32_t sr) {
-    samplingRate = sr;
-    depthSurround.setSamplingRate(samplingRate);
+    if (samplingRate != sr) {
+        samplingRate = sr;
+        depthSurround.setSamplingRate(samplingRate);
+    }
 }
 
 void FieldSurroundProcessor::configurePhaseShifters() {
@@ -283,17 +315,20 @@ void FieldSurroundProcessor::setOutputModeFromParamInt(int value) {
 }
 
 void FieldSurroundProcessor::setWidenFromParamInt(int value) {
-    const int clamped = std::clamp(value, 0, 800);
-    stereo3dSurround.setStereoWiden(static_cast<float>(clamped) / 100.0f);
+    stereo3dSurround.setStereoWiden(static_cast<float>(value) / 100.0f);
 }
 
 void FieldSurroundProcessor::setMidFromParamInt(int value) {
-    const int clamped = std::clamp(value, 0, 800);
-    stereo3dSurround.setMiddleImage(static_cast<float>(clamped) / 100.0f);
+    stereo3dSurround.setMiddleImage(static_cast<float>(value) / 100.0f);
 }
 
 void FieldSurroundProcessor::setDepthFromParamInt(int value) {
-    depthSurround.setStrength(value);
+    const int clampedValue = std::clamp(
+        value,
+        static_cast<int>(std::numeric_limits<int16_t>::min()),
+        static_cast<int>(std::numeric_limits<int16_t>::max())
+    );
+    depthSurround.setStrength(static_cast<int16_t>(clampedValue));
 }
 
 void FieldSurroundProcessor::setPhaseOffsetFromParamInt(int value) {

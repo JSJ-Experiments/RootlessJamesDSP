@@ -1,11 +1,14 @@
 #include "ClarityProcessor.h"
 
 #include <algorithm>
+#include <android/log.h>
 #include <cmath>
+#include <limits>
 #include <cstring>
 
 namespace clarity {
 
+static constexpr const char* TAG = "ClarityProcessor_JNI";
 static constexpr double PI = 3.14159265358979323846;
 
 void IIR1::setLPF_BW(float frequency, uint32_t samplingRate) {
@@ -103,19 +106,25 @@ void WaveBuffer::popSamples(uint32_t frames) {
 }
 
 void NoiseSharpening::setSamplingRate(uint32_t sr) {
-    samplingRate = sr;
-    reset();
+    if (samplingRate != sr) {
+        samplingRate = sr;
+        reset();
+    }
 }
 
 void NoiseSharpening::setGain(float g) { gain = g; }
 
 void NoiseSharpening::setNyquistOffset(float hz) {
-    nyquistOffsetHz = hz;
-    reset();
+    if (nyquistOffsetHz != hz) {
+        nyquistOffsetHz = hz;
+        reset();
+    }
 }
 
 void NoiseSharpening::reset() {
-    const float cutoff = std::max(40.0f, static_cast<float>(samplingRate) * 0.5f - nyquistOffsetHz);
+    const float rawCutoff = static_cast<float>(samplingRate) * 0.5f - nyquistOffsetHz;
+    constexpr float kMinCutoffHz = 1.0e-3f;
+    const float cutoff = std::max(kMinCutoffHz, rawCutoff);
     for (int i = 0; i < 2; ++i) {
         filters[i].setLPF_BW(cutoff, samplingRate);
         filters[i].mute();
@@ -130,14 +139,19 @@ void NoiseSharpening::process(float* buffer, uint32_t frames) {
             const float sample = buffer[idx];
             const float prev = prevIn[ch];
             prevIn[ch] = sample;
-            const float boosted = sample + (sample - prev) * gain;
-            buffer[idx] = filters[ch].process(boosted);
+            const float xIn = sample + (sample - prev) * gain;
+            IIR1& filter = filters[ch];
+            const float hist = xIn * filter.b1;
+            const float out = filter.prevSample + xIn * filter.b0;
+            filter.prevSample = xIn * filter.a1 + hist;
+            buffer[idx] = out;
         }
     }
 }
 
 void HighShelf::setGainLinear(float gain) {
-    gainDb = 20.0 * std::log10(std::max(0.000001f, gain));
+    const float safeGain = std::max(gain, std::numeric_limits<float>::min());
+    gainDb = 20.0 * std::log10(static_cast<double>(safeGain));
 }
 
 void HighShelf::setSamplingRate(uint32_t samplingRate) {
@@ -175,14 +189,41 @@ float HighShelf::process(float sample) {
 
 HiFi::HiFi() : bpBuffer(2, 0x800), lpBuffer(2, 0x800) {}
 
-void HiFi::setSamplingRate(uint32_t sr) { samplingRate = sr; reset(); }
+void HiFi::setSamplingRate(uint32_t sr) {
+    if (samplingRate != sr) {
+        samplingRate = sr;
+        reset();
+    }
+}
 void HiFi::setGainLinear(float g) { gain = g; }
-void HiFi::setLowCutHz(float hz) { lowCutHz = hz; reset(); }
-void HiFi::setHighCutHz(float hz) { highCutHz = hz; reset(); }
+void HiFi::setLowCutHz(float hz) {
+    if (lowCutHz != hz) {
+        lowCutHz = hz;
+        reset();
+    }
+}
+void HiFi::setHighCutHz(float hz) {
+    if (highCutHz != hz) {
+        highCutHz = hz;
+        reset();
+    }
+}
 void HiFi::setHpMix(float mix) { hpMix = mix; }
 void HiFi::setBpMix(float mix) { bpMix = mix; }
-void HiFi::setBpDelayDivisor(int divisor) { bpDelayDivisor = std::max(1, divisor); reset(); }
-void HiFi::setLpDelayDivisor(int divisor) { lpDelayDivisor = std::max(1, divisor); reset(); }
+void HiFi::setBpDelayDivisor(int divisor) {
+    const int safeDivisor = std::max(1, divisor);
+    if (bpDelayDivisor != safeDivisor) {
+        bpDelayDivisor = safeDivisor;
+        reset();
+    }
+}
+void HiFi::setLpDelayDivisor(int divisor) {
+    const int safeDivisor = std::max(1, divisor);
+    if (lpDelayDivisor != safeDivisor) {
+        lpDelayDivisor = safeDivisor;
+        reset();
+    }
+}
 
 void HiFi::reset() {
     for (int i = 0; i < 2; ++i) {
@@ -231,34 +272,61 @@ void HiFi::process(float* samples, uint32_t frames) {
 }
 
 void ClarityProcessor::setSamplingRate(uint32_t sr) {
-    samplingRate = sr;
-    reset();
+    if (samplingRate != sr) {
+        samplingRate = sr;
+        updateSafetyReleaseCoef();
+        reset();
+    }
 }
 
-void ClarityProcessor::setEnabled(bool e) { enabled = e; }
+void ClarityProcessor::setEnabled(bool e) {
+    if (enabled != e) {
+        if (e) {
+            reset();
+        }
+        enabled = e;
+    }
+}
 
 void ClarityProcessor::setMode(int m) {
-    const auto newMode = static_cast<Mode>(std::clamp(m, 0, 2));
-    if (newMode != mode) {
+    const int clampedMode = std::clamp(m, static_cast<int>(Mode::NATURAL), static_cast<int>(Mode::XHIFI));
+    const Mode newMode = static_cast<Mode>(clampedMode);
+    if (mode != newMode) {
         mode = newMode;
         reset();
     }
 }
 
 void ClarityProcessor::setGainLinear(float linear) {
-    gain = std::max(0.0f, linear);
-    syncFilterGain();
+    if (gain == linear) {
+        return;
+    }
+    gain = linear;
+    if (mode == Mode::OZONE) {
+        reset();
+    } else {
+        syncFilterGain();
+    }
 }
 
 void ClarityProcessor::setPostGainDb(float db) {
     postGainLinear = std::pow(10.0f, db / 20.0f);
 }
 
-void ClarityProcessor::setSafety(bool enabled_, float thresholdDb, float releaseMs) {
-    safetyEnabled = enabled_;
-    safetyThreshold = std::pow(10.0f, thresholdDb / 20.0f);
-    const float t = std::max(0.001f, releaseMs / 1000.0f);
-    safetyReleaseCoef = std::exp(-1.0f / (t * static_cast<float>(samplingRate)));
+void ClarityProcessor::setSafety(bool enabled, float thresholdDb, float releaseMs) {
+    const float newThresholdLinear = std::pow(10.0f, thresholdDb / 20.0f);
+    const bool changed = (safetyEnabled != enabled)
+        || (safetyThresholdLinear != newThresholdLinear)
+        || (safetyReleaseMs != releaseMs);
+    if (!changed) {
+        return;
+    }
+
+    safetyEnabled = enabled;
+    safetyThresholdLinear = newThresholdLinear;
+    safetyReleaseMs = releaseMs;
+    safetyEnv = 0.0f;
+    updateSafetyReleaseCoef();
 }
 
 void ClarityProcessor::setNaturalLpfOffsetHz(int hz) {
@@ -266,8 +334,14 @@ void ClarityProcessor::setNaturalLpfOffsetHz(int hz) {
 }
 
 void ClarityProcessor::setOzoneFreqHz(int hz) {
-    for (auto& s : shelf) s.setFrequency(static_cast<float>(hz));
-    for (auto& s : shelf) s.setSamplingRate(samplingRate);
+    if (ozoneFreqHz == hz) {
+        return;
+    }
+    ozoneFreqHz = hz;
+    for (auto& s : shelf) {
+        s.setFrequency(static_cast<float>(hz));
+        s.setSamplingRate(samplingRate);
+    }
 }
 
 void ClarityProcessor::setXhifiParams(int lowCutHz, int highCutHz, float hpMix, float bpMix, int bpDelayDivisor, int lpDelayDivisor) {
@@ -284,6 +358,7 @@ void ClarityProcessor::reset() {
     natural.reset();
     syncFilterGain();
     for (auto& s : shelf) {
+        s.setFrequency(static_cast<float>(ozoneFreqHz));
         s.setSamplingRate(samplingRate);
     }
     xhifi.setSamplingRate(samplingRate);
@@ -312,22 +387,44 @@ void ClarityProcessor::applyMode(float* samples, uint32_t frames) {
         case Mode::XHIFI:
             xhifi.process(samples, frames);
             break;
+        default:
+            __android_log_print(
+                ANDROID_LOG_WARN,
+                TAG,
+                "ClarityProcessor::applyMode: invalid mode=%d, falling back to NATURAL",
+                static_cast<int>(mode)
+            );
+            mode = Mode::NATURAL;
+            reset();
+            natural.process(samples, frames);
+            break;
     }
 }
 
 void ClarityProcessor::applyPostGainAndSafety(float* samples, uint32_t frames) {
-    const uint32_t count = frames * 2;
-    for (uint32_t i = 0; i < count; ++i) {
-        float x = samples[i] * postGainLinear;
+    const bool applyPostGain = std::fabs(postGainLinear - 1.0f) > 1e-7f;
+    if (!applyPostGain && !safetyEnabled) {
+        return;
+    }
+
+    for (uint32_t i = 0; i < frames * 2; ++i) {
+        float x = applyPostGain ? (samples[i] * postGainLinear) : samples[i];
         if (safetyEnabled) {
             const float absx = std::fabs(x);
             safetyEnv = std::max(absx, safetyEnv * safetyReleaseCoef);
-            const float denom = std::max(safetyThreshold, 1e-6f);
-            const float ratio = safetyEnv > denom ? (denom / safetyEnv) : 1.0f;
-            x *= ratio;
+            const float threshold = std::max(1e-6f, safetyThresholdLinear);
+            if (safetyEnv > threshold) {
+                x *= threshold / safetyEnv;
+            }
         }
         samples[i] = x;
     }
+}
+
+void ClarityProcessor::updateSafetyReleaseCoef() {
+    const float releaseSeconds = std::max(0.001f, safetyReleaseMs / 1000.0f);
+    const float sr = std::max(1.0f, static_cast<float>(samplingRate));
+    safetyReleaseCoef = std::exp(-1.0f / (releaseSeconds * sr));
 }
 
 void ClarityProcessor::process(float* samples, uint32_t frames) {

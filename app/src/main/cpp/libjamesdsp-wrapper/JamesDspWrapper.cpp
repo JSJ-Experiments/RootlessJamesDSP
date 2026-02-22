@@ -1,5 +1,6 @@
 #include <android/log.h>
 #include <algorithm>
+#include <climits>
 #include <cmath>
 #include <cstdint>
 #include <mutex>
@@ -14,7 +15,6 @@
 #include "JamesDspWrapper.h"
 #include "JArrayList.h"
 #include "EelVmVariable.h"
-#include "clarity/ClarityProcessor.h"
 #include "fieldsurround/FieldSurroundProcessor.h"
 
 extern "C" {
@@ -47,6 +47,20 @@ inline float* getTempBuffer(JamesDspWrapper* wrapper, size_t sampleCount) {
         wrapper->tempBuffer.resize(sampleCount);
     }
     return wrapper->tempBuffer.data();
+}
+
+inline int32_t clamp24FromFloat(float sample) {
+    static constexpr float kScale = static_cast<float>(1 << 23);
+    static constexpr float kLimPos = 0x7fffff / kScale;
+    static constexpr float kLimNeg = -0x800000 / kScale;
+    if (sample <= kLimNeg) {
+        return -0x800000;
+    }
+    if (sample >= kLimPos) {
+        return 0x7fffff;
+    }
+    const float scaled = sample * kScale;
+    return static_cast<int32_t>(scaled > 0.0f ? scaled + 0.5f : scaled - 0.5f);
 }
 
 #define RETURN_IF_NULL(name, retval) \
@@ -160,11 +174,6 @@ Java_me_timschneeberger_rootlessjamesdsp_interop_JamesDspWrapper_alloc(JNIEnv *e
     if (fieldSurround != nullptr) {
         fieldSurround->setSamplingRate(static_cast<uint32_t>(_dsp->fs));
     }
-    self->clarity = new clarity::ClarityProcessor();
-    auto* clarity = self->clarity;
-    if (clarity != nullptr) {
-        clarity->setSamplingRate(static_cast<uint32_t>(_dsp->fs));
-    }
 
     LOGD("JamesDspWrapper::ctor: memory allocated at %lx", (long)self);
     return (long)self;
@@ -184,8 +193,6 @@ Java_me_timschneeberger_rootlessjamesdsp_interop_JamesDspWrapper_free(JNIEnv *en
     wrapper->dsp = nullptr;
     delete wrapper->fieldSurround;
     wrapper->fieldSurround = nullptr;
-    delete wrapper->clarity;
-    wrapper->clarity = nullptr;
 
     JamesDSPGlobalMemoryDeallocation();
 
@@ -243,10 +250,6 @@ Java_me_timschneeberger_rootlessjamesdsp_interop_JamesDspWrapper_setSamplingRate
     if (fieldSurround != nullptr) {
         fieldSurround->setSamplingRate((uint32_t)sample_rate);
     }
-    auto* clarity = wrapper->clarity;
-    if (clarity != nullptr) {
-        clarity->setSamplingRate((uint32_t)sample_rate);
-    }
 }
 
 
@@ -263,41 +266,66 @@ Java_me_timschneeberger_rootlessjamesdsp_interop_JamesDspWrapper_processInt16(JN
 {
     DECLARE_DSP_V
 
-    jsize inputLength;
-    if(size < 0)
-        inputLength = env->GetArrayLength(inputObj);
-    else
-        inputLength = size;
-    if(offset < 0)
-        offset = 0;
+    const jsize inputArrayLength = env->GetArrayLength(inputObj);
+    const jsize outputArrayLength = env->GetArrayLength(outputObj);
+    const jsize safeOffset = std::max<jsize>(0, static_cast<jsize>(offset));
+    const jsize availableInput = std::max<jsize>(0, inputArrayLength - safeOffset);
+
+    jsize inputLength = (size < 0)
+        ? availableInput
+        : std::min<jsize>(availableInput, static_cast<jsize>(size));
+    if (inputLength <= 0) {
+        return;
+    }
+    if (outputArrayLength < inputLength) {
+        LOGE("JamesDspWrapper::processInt16: output array too small (need=%d, have=%d)",
+             static_cast<int>(inputLength),
+             static_cast<int>(outputArrayLength));
+        return;
+    }
+
+    inputLength -= (inputLength % 2);
+    if (inputLength <= 0) {
+        return;
+    }
 
     auto input = env->GetShortArrayElements(inputObj, nullptr);
     auto output = env->GetShortArrayElements(outputObj, nullptr);
-    dsp->processInt16Multiplexd(dsp, input + offset, output, inputLength / 2);
+
     auto* fieldSurround = wrapper->fieldSurround;
-    auto* clarity = wrapper->clarity;
     const bool applyFieldSurround = fieldSurround != nullptr && fieldSurround->isEnabled();
-    const bool applyClarity = clarity != nullptr && clarity->isEnabled();
-    if (applyFieldSurround || applyClarity) {
+    const uint32_t frames = static_cast<uint32_t>(inputLength / 2);
+
+    if (applyFieldSurround) {
         std::lock_guard<std::mutex> lock(wrapper->tempBufferMutex);
-        const uint32_t frames = inputLength / 2;
         auto* temp = getTempBuffer(wrapper, static_cast<size_t>(inputLength));
         if (temp == nullptr) {
             env->ReleaseShortArrayElements(inputObj, input, JNI_ABORT);
-            env->ReleaseShortArrayElements(outputObj, output, 0);
+            env->ReleaseShortArrayElements(outputObj, output, JNI_ABORT);
             return;
         }
-        for (int i = 0; i < inputLength; i++) temp[i] = output[i] / 32768.0f;
-        if (applyFieldSurround) {
-            fieldSurround->process(temp, frames);
+        for (jsize i = 0; i < inputLength; ++i) {
+            temp[i] = static_cast<float>(input[safeOffset + i]) / 32768.0f;
         }
-        if (applyClarity) {
-            clarity->process(temp, frames);
+        fieldSurround->process(temp, frames);
+        dsp->processFloatMultiplexd(dsp, temp, temp, frames);
+
+        constexpr float kScale = 32768.0f;
+        for (jsize i = 0; i < inputLength; ++i) {
+            const float sample = temp[i];
+            if (sample <= -1.0f) {
+                output[i] = static_cast<jshort>(INT16_MIN);
+            } else if (sample >= 1.0f) {
+                output[i] = static_cast<jshort>(INT16_MAX);
+            } else {
+                const float scaled = sample * kScale;
+                const int rounded = static_cast<int>(scaled > 0.0f ? scaled + 0.5f : scaled - 0.5f);
+                const int clamped = std::clamp(rounded, static_cast<int>(INT16_MIN), static_cast<int>(INT16_MAX));
+                output[i] = static_cast<jshort>(clamped);
+            }
         }
-        for (int i = 0; i < inputLength; i++) {
-            const float s = std::fmax(-1.0f, std::fmin(1.0f, temp[i]));
-            output[i] = (short)std::lrintf(s * 32767.0f);
-        }
+    } else {
+        dsp->processInt16Multiplexd(dsp, input + safeOffset, output, frames);
     }
     env->ReleaseShortArrayElements(inputObj, input, JNI_ABORT);
     env->ReleaseShortArrayElements(outputObj, output, 0);
@@ -309,46 +337,65 @@ Java_me_timschneeberger_rootlessjamesdsp_interop_JamesDspWrapper_processInt32(JN
 {
     DECLARE_DSP_V
 
-    jsize inputLength;
-    if(size < 0)
-        inputLength = env->GetArrayLength(inputObj);
-    else
-        inputLength = size;
-    if(offset < 0)
-        offset = 0;
+    const jsize inputArrayLength = env->GetArrayLength(inputObj);
+    const jsize outputArrayLength = env->GetArrayLength(outputObj);
+    const jsize safeOffset = std::max<jsize>(0, static_cast<jsize>(offset));
+    const jsize availableInput = std::max<jsize>(0, inputArrayLength - safeOffset);
+
+    jsize inputLength = (size < 0)
+        ? availableInput
+        : std::min<jsize>(availableInput, static_cast<jsize>(size));
+    if (inputLength <= 0) {
+        return;
+    }
+    if (outputArrayLength < inputLength) {
+        LOGE("JamesDspWrapper::processInt32: output array too small (need=%d, have=%d)",
+             static_cast<int>(inputLength),
+             static_cast<int>(outputArrayLength));
+        return;
+    }
+
+    inputLength -= (inputLength % 2);
+    if (inputLength <= 0) {
+        return;
+    }
 
     auto input = env->GetIntArrayElements(inputObj, nullptr);
     auto output = env->GetIntArrayElements(outputObj, nullptr);
-    dsp->processInt32Multiplexd(dsp, input + offset, output, inputLength / 2);
+
     auto* fieldSurround = wrapper->fieldSurround;
-    auto* clarity = wrapper->clarity;
     const bool applyFieldSurround = fieldSurround != nullptr && fieldSurround->isEnabled();
-    const bool applyClarity = clarity != nullptr && clarity->isEnabled();
-    if (applyFieldSurround || applyClarity) {
+    const uint32_t frames = static_cast<uint32_t>(inputLength / 2);
+
+    if (applyFieldSurround) {
         std::lock_guard<std::mutex> lock(wrapper->tempBufferMutex);
-        const uint32_t frames = inputLength / 2;
         auto* temp = getTempBuffer(wrapper, static_cast<size_t>(inputLength));
         if (temp == nullptr) {
             env->ReleaseIntArrayElements(inputObj, input, JNI_ABORT);
-            env->ReleaseIntArrayElements(outputObj, output, 0);
+            env->ReleaseIntArrayElements(outputObj, output, JNI_ABORT);
             return;
         }
-        for (int i = 0; i < inputLength; i++) temp[i] = output[i] / 2147483648.0f;
-        if (applyFieldSurround) {
-            fieldSurround->process(temp, frames);
+        constexpr float kInputScaleInv = 1.0f / 2147483648.0f;
+        for (jsize i = 0; i < inputLength; ++i) {
+            temp[i] = static_cast<float>(static_cast<double>(input[safeOffset + i]) * kInputScaleInv);
         }
-        if (applyClarity) {
-            clarity->process(temp, frames);
+        fieldSurround->process(temp, frames);
+        dsp->processFloatMultiplexd(dsp, temp, temp, frames);
+
+        constexpr double kScale = 2147483648.0;
+        for (jsize i = 0; i < inputLength; ++i) {
+            const float sample = temp[i];
+            if (sample <= -1.0f) {
+                output[i] = INT32_MIN;
+            } else if (sample >= 1.0f) {
+                output[i] = INT32_MAX;
+            } else {
+                const double scaled = static_cast<double>(sample) * kScale;
+                output[i] = static_cast<jint>(scaled > 0.0 ? scaled + 0.5 : scaled - 0.5);
+            }
         }
-        constexpr long long kInt32Max = static_cast<long long>(INT32_MAX);
-        constexpr long long kInt32Min = static_cast<long long>(INT32_MIN);
-        for (int i = 0; i < inputLength; i++) {
-            const float s = std::fmax(-1.0f, std::fmin(1.0f, temp[i]));
-            long long rounded = static_cast<long long>(std::llrint(static_cast<double>(s) * 2147483647.0));
-            if (rounded > kInt32Max) rounded = kInt32Max;
-            if (rounded < kInt32Min) rounded = kInt32Min;
-            output[i] = static_cast<jint>(rounded);
-        }
+    } else {
+        dsp->processInt32Multiplexd(dsp, input + safeOffset, output, frames);
     }
     env->ReleaseIntArrayElements(inputObj, input, JNI_ABORT);
     env->ReleaseIntArrayElements(outputObj, output, 0);
@@ -368,17 +415,11 @@ Java_me_timschneeberger_rootlessjamesdsp_interop_JamesDspWrapper_processInt24Pac
 
     auto input = env->GetBooleanArrayElements(inputObj, nullptr);
     auto output = env->GetBooleanArrayElements(outputObj, nullptr);
-    dsp->processInt24PackedMultiplexd(dsp, input, output, inputLength / 2);
+
     auto* fieldSurround = wrapper->fieldSurround;
-    auto* clarity = wrapper->clarity;
     const bool applyFieldSurround = fieldSurround != nullptr && fieldSurround->isEnabled();
-    const bool applyClarity = clarity != nullptr && clarity->isEnabled();
-    if (applyFieldSurround || applyClarity) {
+    if (applyFieldSurround) {
         std::lock_guard<std::mutex> lock(wrapper->tempBufferMutex);
-        constexpr float kInt24ScaleInv = 1.0f / 8388608.0f;
-        constexpr float kInt24Scale = 8388608.0f;
-        constexpr float kInt24Max = 8388607.0f;
-        constexpr float kInt24Min = -8388608.0f;
         const int sampleCount = static_cast<int>(inputLength / 3);
         const uint32_t frames = static_cast<uint32_t>(sampleCount / 2);
         auto* temp = getTempBuffer(wrapper, static_cast<size_t>(sampleCount));
@@ -387,28 +428,27 @@ Java_me_timschneeberger_rootlessjamesdsp_interop_JamesDspWrapper_processInt24Pac
             env->ReleaseBooleanArrayElements(outputObj, output, 0);
             return outputObj;
         }
+        auto* inputBytes = reinterpret_cast<uint8_t*>(input);
+        auto* outputBytes = reinterpret_cast<uint8_t*>(output);
+        constexpr float kInputScaleInv = 1.0f / 2147483648.0f;
         for (int i = 0; i < sampleCount; ++i) {
             temp[i] = static_cast<float>(dsp->i32_from_p24(
-                reinterpret_cast<uint8_t*>(output) + static_cast<size_t>(i) * 3u
-            )) * kInt24ScaleInv;
+                inputBytes + static_cast<size_t>(i) * 3u
+            )) * kInputScaleInv;
         }
-        if (applyFieldSurround) {
-            fieldSurround->process(temp, frames);
-        }
-        if (applyClarity) {
-            clarity->process(temp, frames);
-        }
+        fieldSurround->process(temp, frames);
+        dsp->processFloatMultiplexd(dsp, temp, temp, frames);
+
         for (int i = 0; i < sampleCount; ++i) {
-            const float s = std::fmax(-1.0f, std::fmin(1.0f, temp[i]));
-            float scaled = s * kInt24Scale;
-            if (scaled > kInt24Max) {
-                scaled = kInt24Max;
-            } else if (scaled < kInt24Min) {
-                scaled = kInt24Min;
-            }
-            const int32_t sample24 = static_cast<int32_t>(scaled > 0.0f ? scaled + 0.5f : scaled - 0.5f);
-            dsp->p24_from_i32(sample24, reinterpret_cast<uint8_t*>(output) + static_cast<size_t>(i) * 3u);
+            dsp->p24_from_i32(clamp24FromFloat(temp[i]), outputBytes + static_cast<size_t>(i) * 3u);
         }
+    } else {
+        dsp->processInt24PackedMultiplexd(
+            dsp,
+            reinterpret_cast<uint8_t*>(input),
+            reinterpret_cast<uint8_t*>(output),
+            static_cast<size_t>(inputLength / 6)
+        );
     }
     env->ReleaseBooleanArrayElements(inputObj, input, JNI_ABORT);
     env->ReleaseBooleanArrayElements(outputObj, output, 0);
@@ -427,12 +467,10 @@ Java_me_timschneeberger_rootlessjamesdsp_interop_JamesDspWrapper_processInt8U24(
 
     auto input = env->GetIntArrayElements(inputObj, nullptr);
     auto output = env->GetIntArrayElements(outputObj, nullptr);
-    dsp->processInt8_24Multiplexd(dsp, input, output, inputLength / 2);
+
     auto* fieldSurround = wrapper->fieldSurround;
-    auto* clarity = wrapper->clarity;
     const bool applyFieldSurround = fieldSurround != nullptr && fieldSurround->isEnabled();
-    const bool applyClarity = clarity != nullptr && clarity->isEnabled();
-    if (applyFieldSurround || applyClarity) {
+    if (applyFieldSurround) {
         std::lock_guard<std::mutex> lock(wrapper->tempBufferMutex);
         constexpr float kInt24ScaleInv = 1.0f / 8388608.0f;
         constexpr float kInt24Scale = 8388608.0f;
@@ -445,18 +483,23 @@ Java_me_timschneeberger_rootlessjamesdsp_interop_JamesDspWrapper_processInt8U24(
             env->ReleaseIntArrayElements(outputObj, output, 0);
             return outputObj;
         }
-        for (int i = 0; i < inputLength; ++i) temp[i] = output[i] * kInt24ScaleInv;
-        if (applyFieldSurround) {
-            fieldSurround->process(temp, frames);
-        }
-        if (applyClarity) {
-            clarity->process(temp, frames);
-        }
         for (int i = 0; i < inputLength; ++i) {
-            const float s = std::fmax(-1.0f, std::fmin(1.0f, temp[i]));
-            const float scaled = std::clamp(s * kInt24Scale, kInt24Min, kInt24Max);
-            output[i] = static_cast<int>(std::lrintf(scaled));
+            temp[i] = static_cast<float>(input[i]) * kInt24ScaleInv;
         }
+        fieldSurround->process(temp, frames);
+        dsp->processFloatMultiplexd(dsp, temp, temp, frames);
+
+        for (int i = 0; i < inputLength; ++i) {
+            float scaled = temp[i] * kInt24Scale;
+            if (scaled > kInt24Max) {
+                scaled = kInt24Max;
+            } else if (scaled < kInt24Min) {
+                scaled = kInt24Min;
+            }
+            output[i] = static_cast<jint>(scaled > 0.0f ? scaled + 0.5f : scaled - 0.5f);
+        }
+    } else {
+        dsp->processInt8_24Multiplexd(dsp, input, output, static_cast<size_t>(inputLength / 2));
     }
     env->ReleaseIntArrayElements(inputObj, input, JNI_ABORT);
     env->ReleaseIntArrayElements(outputObj, output, 0);
@@ -469,25 +512,49 @@ Java_me_timschneeberger_rootlessjamesdsp_interop_JamesDspWrapper_processFloat(JN
 {
     DECLARE_DSP_V
 
-    jsize inputLength;
-    if(size < 0)
-        inputLength = env->GetArrayLength(inputObj);
-    else
-        inputLength = size;
-    if(offset < 0)
-        offset = 0;
+    const jsize inputArrayLength = env->GetArrayLength(inputObj);
+    const jsize outputArrayLength = env->GetArrayLength(outputObj);
+    const jsize safeOffset = std::max<jsize>(0, static_cast<jsize>(offset));
+    const jsize availableInput = std::max<jsize>(0, inputArrayLength - safeOffset);
+
+    jsize inputLength = (size < 0)
+        ? availableInput
+        : std::min<jsize>(availableInput, static_cast<jsize>(size));
+    if (inputLength <= 0) {
+        return;
+    }
+    if (outputArrayLength < inputLength) {
+        LOGE("JamesDspWrapper::processFloat: output array too small (need=%d, have=%d)",
+             static_cast<int>(inputLength),
+             static_cast<int>(outputArrayLength));
+        return;
+    }
+
+    inputLength -= (inputLength % 2);
+    if (inputLength <= 0) {
+        return;
+    }
 
     auto input = env->GetFloatArrayElements(inputObj, nullptr);
     auto output = env->GetFloatArrayElements(outputObj, nullptr);
-
-    dsp->processFloatMultiplexd(dsp, input + offset, output, inputLength / 2);
     auto* fieldSurround = wrapper->fieldSurround;
-    if (fieldSurround != nullptr && fieldSurround->isEnabled()) {
-        fieldSurround->process(output, inputLength / 2);
-    }
-    auto* clarity = wrapper->clarity;
-    if (clarity != nullptr && clarity->isEnabled()) {
-        clarity->process(output, inputLength / 2);
+    const bool applyFieldSurround = fieldSurround != nullptr && fieldSurround->isEnabled();
+    const uint32_t frames = static_cast<uint32_t>(inputLength / 2);
+    if (applyFieldSurround) {
+        std::lock_guard<std::mutex> lock(wrapper->tempBufferMutex);
+        auto* temp = getTempBuffer(wrapper, static_cast<size_t>(inputLength));
+        if (temp == nullptr) {
+            env->ReleaseFloatArrayElements(inputObj, input, JNI_ABORT);
+            env->ReleaseFloatArrayElements(outputObj, output, JNI_ABORT);
+            return;
+        }
+        for (jsize i = 0; i < inputLength; ++i) {
+            temp[i] = input[safeOffset + i];
+        }
+        fieldSurround->process(temp, frames);
+        dsp->processFloatMultiplexd(dsp, temp, output, frames);
+    } else {
+        dsp->processFloatMultiplexd(dsp, input + safeOffset, output, frames);
     }
 
     env->ReleaseFloatArrayElements(inputObj, input, JNI_ABORT);
@@ -523,28 +590,32 @@ Java_me_timschneeberger_rootlessjamesdsp_interop_JamesDspWrapper_setClarity(
     jint xhifiBpDelayDivisor,
     jint xhifiLpDelayDivisor)
 {
-    DECLARE_WRAPPER_B
-    auto* clarity = wrapper->clarity;
-    RETURN_IF_NULL(clarity, false)
+    DECLARE_DSP_B
 
     auto sanitize = [](float value, float fallback) {
         return std::isfinite(value) ? value : fallback;
     };
 
-    const float safeGain = sanitize(gain, 1.0f);
+    // Keep the local bridge behavior aligned with ViPER core dispatch:
+    // mode and gain are forwarded as-is (except non-finite sanitization).
+    const int safeMode = static_cast<int>(mode);
+    const float safeGain = sanitize(gain, 0.0f);
     const float safePostGainDb = sanitize(postGainDb, 0.0f);
     const float safeSafetyThresholdDb = sanitize(safetyThresholdDb, -0.8f);
     const float safeSafetyReleaseMs = sanitize(safetyReleaseMs, 60.0f);
     const float safeXhifiHpMix = sanitize(xhifiHpMix, 1.2f);
     const float safeXhifiBpMix = sanitize(xhifiBpMix, 1.0f);
 
-    clarity->setMode(mode);
-    clarity->setGainLinear(safeGain);
-    clarity->setPostGainDb(safePostGainDb);
-    clarity->setSafety(safetyEnabled, safeSafetyThresholdDb, safeSafetyReleaseMs);
-    clarity->setNaturalLpfOffsetHz(naturalLpfOffsetHz);
-    clarity->setOzoneFreqHz(ozoneFreqHz);
-    clarity->setXhifiParams(
+    ClaritySetParam(
+        dsp,
+        safeMode,
+        safeGain,
+        safePostGainDb,
+        safetyEnabled ? 1 : 0,
+        safeSafetyThresholdDb,
+        safeSafetyReleaseMs,
+        naturalLpfOffsetHz,
+        ozoneFreqHz,
         xhifiLowCutHz,
         xhifiHighCutHz,
         safeXhifiHpMix,
@@ -552,7 +623,11 @@ Java_me_timschneeberger_rootlessjamesdsp_interop_JamesDspWrapper_setClarity(
         xhifiBpDelayDivisor,
         xhifiLpDelayDivisor
     );
-    clarity->setEnabled(enable);
+    if (enable) {
+        ClarityEnable(dsp);
+    } else {
+        ClarityDisable(dsp);
+    }
 
     return true;
 }
@@ -913,24 +988,40 @@ Java_me_timschneeberger_rootlessjamesdsp_interop_JamesDspWrapper_setSpectrumExte
     auto sanitize = [](float value, float fallback) {
         return std::isfinite(value) ? value : fallback;
     };
+    static const double kSpectrumDefaultHarmonics[10] = {
+        0.02, 0.0, 0.02, 0.0, 0.02,
+        0.0, 0.02, 0.0, 0.02, 0.0
+    };
 
-    float safeStrength = sanitize(strengthLinear, 1.0f);
+    double safeHarmonics[10];
+    for (int i = 0; i < 10; i++) {
+        safeHarmonics[i] = std::isfinite(harmonicsData[i]) ? harmonicsData[i] : kSpectrumDefaultHarmonics[i];
+    }
+
+    float safeStrength = sanitize(strengthLinear, 0.0f);
+    int safeReferenceFreq = referenceFreq;
     float safeWetMix = sanitize(wetMix, 1.0f);
-    float safePostGain = sanitize(postGainDb, 0.0f);
+    float safePostGainDb = sanitize(postGainDb, 0.0f);
+    int safeLpCutoffOffsetHz = lpCutoffOffsetHz;
     float safeHpQ = sanitize(hpQ, 0.717f);
     float safeLpQ = sanitize(lpQ, 0.717f);
+    if (safeHpQ <= 0.0f)
+        safeHpQ = 0.717f;
+    if (safeLpQ <= 0.0f)
+        safeLpQ = 0.717f;
 
     SpectrumExtensionSetParam(
         dsp,
         safeStrength,
-        referenceFreq,
+        safeReferenceFreq,
         safeWetMix,
-        safePostGain,
+        safePostGainDb,
         safetyEnabled ? 1 : 0,
         safeHpQ,
         safeLpQ,
-        lpCutoffOffsetHz,
-        harmonicsData);
+        safeLpCutoffOffsetHz,
+        safeHarmonics
+    );
 
     env->ReleaseDoubleArrayElements(harmonics, harmonicsData, JNI_ABORT);
 

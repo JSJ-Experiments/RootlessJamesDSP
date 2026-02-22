@@ -1,0 +1,1021 @@
+Run gradle/gradle-command-action@v2
+  with:
+    arguments: assembleRootlessFullPreview
+    cache-disabled: false
+    cache-read-only: true
+    cache-write-only: false
+    cache-overwrite-existing: false
+    gradle-home-cache-includes: caches
+  notifications
+  
+    gradle-home-cache-cleanup: false
+    generate-job-summary: true
+    dependency-graph: disabled
+    gradle-home-cache-strict-match: false
+    workflow-job-context: {
+    "flavor": "Rootless"
+  }
+    github-token: ***
+  env:
+    JAVA_HOME: /opt/hostedtoolcache/Java_Adopt_jdk/17.0.18-8/x64
+    JAVA_HOME_17_X64: /opt/hostedtoolcache/Java_Adopt_jdk/17.0.18-8/x64
+Restore Gradle state from cache
+  Warning: Failed to restore v8-gradle|Linux|build signed app-build[0606f649d48d7ec9333e4e4d64e3376d]-c964e062f6aaaeb8a9c11bb6771fe501cc72ccad: Error: Cache service responded with 400
+  Gradle User Home cache not found. Will initialize empty.
+/home/runner/work/RootlessJamesDSP/RootlessJamesDSP/gradlew assembleRootlessFullPreview
+Downloading https://services.gradle.org/distributions/gradle-8.10.2-bin.zip
+.............10%.............20%.............30%.............40%.............50%.............60%.............70%.............80%.............90%.............100%
+
+Welcome to Gradle 8.10.2!
+
+Here are the highlights of this release:
+ - Support for Java 23
+ - Faster configuration cache
+ - Better configuration cache reports
+
+For more details see https://docs.gradle.org/8.10.2/release-notes.html
+
+Starting a Gradle Daemon (subsequent builds will be faster)
+> Task :buildSrc:checkKotlinGradlePluginConfigurationErrors
+> Task :buildSrc:pluginDescriptors
+> Task :buildSrc:processResources NO-SOURCE
+> Task :buildSrc:compileKotlin
+> Task :buildSrc:compileJava NO-SOURCE
+> Task :buildSrc:compileGroovy NO-SOURCE
+> Task :buildSrc:classes UP-TO-DATE
+
+> Task :buildSrc:jar
+:jar: No valid plugin descriptors were found in META-INF/gradle-plugins
+
+> Configure project :
+w: file:///home/runner/work/RootlessJamesDSP/RootlessJamesDSP/build.gradle.kts:24:24: 'getter for buildDir: File!' is deprecated. Deprecated in Java
+
+> Configure project :app
+WARNING: The option setting 'android.defaults.buildfeatures.buildconfig=true' is deprecated.
+The current default is 'false'.
+It will be removed in version 9.0 of the Android Gradle plugin.
+To keep using this feature, add the following to your module-level build.gradle files:
+    android.buildFeatures.buildConfig = true
+or from Android Studio, click: `Refactor` > `Migrate BuildConfig to Gradle Build Files`.
+Checking the license for package NDK (Side by side) 27.0.12077973 in /usr/local/lib/android/sdk/licenses
+License for package NDK (Side by side) 27.0.12077973 accepted.
+Preparing "Install NDK (Side by side) 27.0.12077973 v.27.0.12077973".
+"Install NDK (Side by side) 27.0.12077973 v.27.0.12077973" ready.
+Installing NDK (Side by side) 27.0.12077973 in /usr/local/lib/android/sdk/ndk/27.0.12077973
+"Install NDK (Side by side) 27.0.12077973 v.27.0.12077973" complete.
+"Install NDK (Side by side) 27.0.12077973 v.27.0.12077973" finished.
+Checking the license for package Android SDK Platform 33 in /usr/local/lib/android/sdk/licenses
+License for package Android SDK Platform 33 accepted.
+Preparing "Install Android SDK Platform 33 (revision 3)".
+"Install Android SDK Platform 33 (revision 3)" ready.
+Installing Android SDK Platform 33 in /usr/local/lib/android/sdk/platforms/android-33
+"Install Android SDK Platform 33 (revision 3)" complete.
+"Install Android SDK Platform 33 (revision 3)" finished.
+
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preRootlessFullPreviewBuild UP-TO-DATE
+
+> Task :app:configureCMakeRelWithDebInfo[arm64-v8a]
+Checking the license for package CMake 3.22.1 in /usr/local/lib/android/sdk/licenses
+License for package CMake 3.22.1 accepted.
+Preparing "Install CMake 3.22.1 v.3.22.1".
+"Install CMake 3.22.1 v.3.22.1" ready.
+Installing CMake 3.22.1 in /usr/local/lib/android/sdk/cmake/3.22.1
+"Install CMake 3.22.1 v.3.22.1" complete.
+"Install CMake 3.22.1 v.3.22.1" finished.
+C/C++: CMake Warning:
+C/C++:   Manually-specified variables were not used by the project:
+C/C++:     NO_CRASHLYTICS
+
+> Task :app:buildCMakeRelWithDebInfo[arm64-v8a]
+C/C++: ninja: Entering directory `/home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/.cxx/RelWithDebInfo/2r275p33/arm64-v8a'
+C/C++: In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/arbEqConv.c:6:
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+C/C++:   472 |         void(*process)(struct dspsys *, size_t);
+C/C++:       |                               ^
+C/C++: 1 warning generated.
+C/C++: In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/bs2b.c:2:
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+C/C++:   472 |         void(*process)(struct dspsys *, size_t);
+C/C++:       |                               ^
+C/C++: 1 warning generated.
+C/C++: In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/convolver1D.c:6:
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+C/C++:   472 |         void(*process)(struct dspsys *, size_t);
+C/C++:       |                               ^
+C/C++: 1 warning generated.
+C/C++: In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/crossfeed.c:6:
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+C/C++:   472 |         void(*process)(struct dspsys *, size_t);
+C/C++:       |                               ^
+C/C++: 1 warning generated.
+C/C++: In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/dbb.c:6:
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+C/C++:   472 |         void(*process)(struct dspsys *, size_t);
+C/C++:       |                               ^
+C/C++: 1 warning generated.
+C/C++: In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/dynamic.c:8:
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+C/C++:   472 |         void(*process)(struct dspsys *, size_t);
+C/C++:       |                               ^
+C/C++: 1 warning generated.
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/FilterDesign/cos_fib_paraunitary.c:522:26: warning: result of comparison of constant -2 with expression of type 'char' is always false [-Wtautological-constant-out-of-range-compare]
+C/C++:   522 |                                         if (U0l[j * Lh + i] == -2)
+C/C++:       |                                             ~~~~~~~~~~~~~~~ ^  ~~
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/FilterDesign/cos_fib_paraunitary.c:524:31: warning: result of comparison of constant -1 with expression of type 'char' is always false [-Wtautological-constant-out-of-range-compare]
+C/C++:   524 |                                         else if (U0l[j * Lh + i] == -1)
+C/C++:       |                                                  ~~~~~~~~~~~~~~~ ^  ~~
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/FilterDesign/cos_fib_paraunitary.c:539:25: warning: result of comparison of constant -2 with expression of type 'char' is always false [-Wtautological-constant-out-of-range-compare]
+C/C++:   539 |                                         if (QQ[j * Lh + i] == -2)
+C/C++:       |                                             ~~~~~~~~~~~~~~ ^  ~~
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/FilterDesign/cos_fib_paraunitary.c:541:30: warning: result of comparison of constant -1 with expression of type 'char' is always false [-Wtautological-constant-out-of-range-compare]
+C/C++:   541 |                                         else if (QQ[j * Lh + i] == -1)
+C/C++:       |                                                  ~~~~~~~~~~~~~~ ^  ~~
+C/C++: 4 warnings generated.
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/FilterDesign/polyphaseFilterbank.c:55:1: warning: non-void function does not return a value in all control paths [-Wreturn-type]
+C/C++:    55 | }
+C/C++:       | ^
+C/C++: 1 warning generated.
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/FFTConvolver.c:886:27: warning: expression result unused [-Wunused-value]
+C/C++:   886 |                 conv2->_segmentsLLIRRe[1];
+C/C++:       |                 ~~~~~~~~~~~~~~~~~~~~~~ ~^
+C/C++: 1 warning generated.
+C/C++: In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/liveprogWrapper.c:3:
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+C/C++:   472 |         void(*process)(struct dspsys *, size_t);
+C/C++:       |                               ^
+C/C++: 1 warning generated.
+C/C++: In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/multimodalEQ.c:6:
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+C/C++:   472 |         void(*process)(struct dspsys *, size_t);
+C/C++:       |                               ^
+C/C++: 1 warning generated.
+C/C++: In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/spectrumExtension.c:4:
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+C/C++:   472 |         void(*process)(struct dspsys *, size_t);
+C/C++:       |                               ^
+C/C++: 1 warning generated.
+C/C++: In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/stereoEnhancement.c:4:
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+C/C++:   472 |         void(*process)(struct dspsys *, size_t);
+C/C++:       |                               ^
+C/C++: 1 warning generated.
+C/C++: In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/vacuumTube.c:6:
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+C/C++:   472 |         void(*process)(struct dspsys *, size_t);
+C/C++:       |                               ^
+C/C++: 1 warning generated.
+C/C++: In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/vdc.c:6:
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+C/C++:   472 |         void(*process)(struct dspsys *, size_t);
+C/C++:       |                               ^
+C/C++: 1 warning generated.
+C/C++: In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/generalDSP/ArbFIRGen.c:5:
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/generalDSP/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+C/C++:   472 |         void(*process)(struct dspsys *, size_t);
+C/C++:       |                               ^
+C/C++: 1 warning generated.
+C/C++: In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjdspimptoolbox/main/JdspImpResToolbox.c:7:
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+C/C++:   472 |         void(*process)(struct dspsys *, size_t);
+C/C++:       |                               ^
+C/C++: 1 warning generated.
+C/C++: In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/reverb.c:10:
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+C/C++:   472 |         void(*process)(struct dspsys *, size_t);
+C/C++:       |                               ^
+C/C++: 1 warning generated.
+C/C++: In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/binaryBlobs.c:1:
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+C/C++:   472 |         void(*process)(struct dspsys *, size_t);
+C/C++:       |                               ^
+C/C++: 1 warning generated.
+C/C++: In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/generalDSP/interpolation.c:4:
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/generalDSP/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+C/C++:   472 |         void(*process)(struct dspsys *, size_t);
+C/C++:       |                               ^
+C/C++: 1 warning generated.
+C/C++: In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/jdspController.c:9:
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+C/C++:   472 |         void(*process)(struct dspsys *, size_t);
+C/C++:       |                               ^
+C/C++: 1 warning generated.
+C/C++: /usr/local/lib/android/sdk/ndk/27.0.12077973/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++ --target=aarch64-none-linux-android29 --sysroot=/usr/local/lib/android/sdk/ndk/27.0.12077973/toolchains/llvm/prebuilt/linux-x86_64/sysroot -Djamesdsp_EXPORTS -I/home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp -I/home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp-wrapper/clarity -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O2 -g -DNDEBUG -fPIC -O2 -std=c++17 -MD -MT CMakeFiles/jamesdsp.dir/libjamesdsp-wrapper/clarity/ClarityProcessor.cpp.o -MF CMakeFiles/jamesdsp.dir/libjamesdsp-wrapper/clarity/ClarityProcessor.cpp.o.d -o CMakeFiles/jamesdsp.dir/libjamesdsp-wrapper/clarity/ClarityProcessor.cpp.o -c /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp-wrapper/clarity/ClarityProcessor.cpp
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp-wrapper/clarity/ClarityProcessor.cpp:4:10: fatal error: 'Log.h' file not found
+C/C++:     4 | #include <Log.h>
+C/C++:       |          ^~~~~~~
+C/C++: 1 error generated.
+C/C++: In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/generalDSP/TwoStageFFTConvolver.c:7:
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/generalDSP/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+C/C++:   472 |         void(*process)(struct dspsys *, size_t);
+C/C++:       |                               ^
+C/C++: 1 warning generated.
+C/C++: In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/nseel-compiler.c:30:
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/eel_matrix.h:94:38: warning: passing 'int32_t[2]' (aka 'int[2]') to parameter of type 'unsigned int *' converts between pointers to integer types with different sign [-Wpointer-sign]
+C/C++:    94 |         geninv(matIn, rows1, cols1, matOut, size);
+C/C++:       |                                             ^~~~
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/quadprog.h:25:82: note: passing argument to parameter 'size' here
+C/C++:    25 | void geninv(double *G, unsigned int m1, unsigned int n1, double *Y, unsigned int size[2]);
+C/C++:       |                                                                                  ^
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/nseel-compiler.c:2596:8: warning: assigning to 'const unsigned char *' from 'const char *' converts between pointers to integer types where one is of the unique plain 'char' type and the other is not [-Wpointer-sign]
+C/C++:  2596 |                         end = src + len;
+C/C++:       |                             ^ ~~~~~~~~~
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/nseel-compiler.c:2597:7: warning: assigning to 'const unsigned char *' from 'const char *' converts between pointers to integer types where one is of the unique plain 'char' type and the other is not [-Wpointer-sign]
+C/C++:  2597 |                         in = src;
+C/C++:       |                            ^ ~~~
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/nseel-compiler.c:2633:36: warning: passing 'unsigned char *' to parameter of type 'const char *' converts between pointers to integer types where one is of the unique plain 'char' type and the other is not [-Wpointer-sign]
+C/C++:  2633 |                         *dest = s_str_create_from_c_str(out);
+C/C++:       |                                                         ^~~
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/s_str.h:61:49: note: passing argument to parameter 'c_str_ptr' here
+C/C++:    61 | s_str s_str_create_from_c_str(const char *const c_str_ptr);
+C/C++:       |                                                 ^
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/nseel-compiler.c:2747:41: warning: passing 'unsigned char *' to parameter of type 'const char *' converts between pointers to integer types where one is of the unique plain 'char' type and the other is not [-Wpointer-sign]
+C/C++:  2747 |                         *dest = s_str_create_from_c_str_0Inc(out, out_len);
+C/C++:       |                                                              ^~~
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/s_str.h:62:54: note: passing argument to parameter 'c_str_ptr' here
+C/C++:    62 | s_str s_str_create_from_c_str_0Inc(const char *const c_str_ptr, const size_t length);
+C/C++:       |                                                      ^
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/nseel-compiler.c:4367:34: warning: passing 'unsigned char *' to parameter of type 'const char *' converts between pointers to integer types where one is of the unique plain 'char' type and the other is not [-Wpointer-sign]
+C/C++:  4367 |         *dest = s_str_create_from_c_str(base64String);
+C/C++:       |                                         ^~~~~~~~~~~~
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/s_str.h:61:49: note: passing argument to parameter 'c_str_ptr' here
+C/C++:    61 | s_str s_str_create_from_c_str(const char *const c_str_ptr);
+C/C++:       |                                                 ^
+C/C++: 6 warnings generated.
+
+> Task :app:buildCMakeRelWithDebInfo[arm64-v8a] FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:buildCMakeRelWithDebInfo[arm64-v8a]'.
+> com.android.ide.common.process.ProcessException: ninja: Entering directory `/home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/.cxx/RelWithDebInfo/2r275p33/arm64-v8a'
+  [0/2] Re-checking globbed directories...
+  [1/103] Building C object CMakeFiles/jdspimprestoolbox.dir/libjdspimptoolbox/libsamplerate/samplerate.c.o
+  [2/103] Building C object CMakeFiles/jdspimprestoolbox.dir/libjdspimptoolbox/libsamplerate/src_linear.c.o
+  [3/103] Building C object CMakeFiles/jdspimprestoolbox.dir/libjdspimptoolbox/main/cpthread.c.o
+  [4/103] Building C object CMakeFiles/jdspimprestoolbox.dir/libjdspimptoolbox/libsamplerate/src_sinc.c.o
+  [5/103] Building CXX object CMakeFiles/jamesdsp-wrapper.dir/libjamesdsp-wrapper/EelVmVariable.cpp.o
+  [6/103] Building CXX object CMakeFiles/crashlytics-connector.dir/libcrashlytics-connector/Log.cpp.o
+  [7/103] Building CXX object CMakeFiles/jamesdsp-wrapper.dir/libjamesdsp-wrapper/JArrayList.cpp.o
+  [8/103] Linking CXX shared library /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/build/intermediates/cxx/RelWithDebInfo/2r275p33/obj/arm64-v8a/libcrashlytics-connector.so
+  [9/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/arbEqConv.c.o
+  In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/arbEqConv.c:6:
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+    472 |         void(*process)(struct dspsys *, size_t);
+        |                               ^
+  1 warning generated.
+  [10/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/bs2b.c.o
+  In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/bs2b.c:2:
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+    472 |         void(*process)(struct dspsys *, size_t);
+        |                               ^
+  1 warning generated.
+  [11/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/convolver1D.c.o
+  In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/convolver1D.c:6:
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+    472 |         void(*process)(struct dspsys *, size_t);
+        |                               ^
+  1 warning generated.
+  [12/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/crossfeed.c.o
+  In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/crossfeed.c:6:
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+    472 |         void(*process)(struct dspsys *, size_t);
+        |                               ^
+  1 warning generated.
+  [13/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/dbb.c.o
+  In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/dbb.c:6:
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+    472 |         void(*process)(struct dspsys *, size_t);
+        |                               ^
+  1 warning generated.
+  [14/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/cpthread.c.o
+  [15/103] Building CXX object CMakeFiles/jamesdsp-wrapper.dir/libjamesdsp-wrapper/clarity/ClarityProcessor.cpp.o
+  [16/103] Building CXX object CMakeFiles/jamesdsp-wrapper.dir/libjamesdsp-wrapper/JamesDspWrapper.cpp.o
+  [17/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/nseel-ram.c.o
+  [18/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/fft.c.o
+  [19/103] Building CXX object CMakeFiles/jamesdsp-wrapper.dir/libjamesdsp-wrapper/fieldsurround/FieldSurroundProcessor.cpp.o
+  [20/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/FilterDesign/eqnerror.c.o
+  [21/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/FilterDesign/firls.c.o
+  [22/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/dynamic.c.o
+  In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/dynamic.c:8:
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+    472 |         void(*process)(struct dspsys *, size_t);
+        |                               ^
+  1 warning generated.
+  [23/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/FilterDesign/cos_fib_paraunitary.c.o
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/FilterDesign/cos_fib_paraunitary.c:522:26: warning: result of comparison of constant -2 with expression of type 'char' is always false [-Wtautological-constant-out-of-range-compare]
+    522 |                                         if (U0l[j * Lh + i] == -2)
+        |                                             ~~~~~~~~~~~~~~~ ^  ~~
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/FilterDesign/cos_fib_paraunitary.c:524:31: warning: result of comparison of constant -1 with expression of type 'char' is always false [-Wtautological-constant-out-of-range-compare]
+    524 |                                         else if (U0l[j * Lh + i] == -1)
+        |                                                  ~~~~~~~~~~~~~~~ ^  ~~
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/FilterDesign/cos_fib_paraunitary.c:539:25: warning: result of comparison of constant -2 with expression of type 'char' is always false [-Wtautological-constant-out-of-range-compare]
+    539 |                                         if (QQ[j * Lh + i] == -2)
+        |                                             ~~~~~~~~~~~~~~ ^  ~~
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/FilterDesign/cos_fib_paraunitary.c:541:30: warning: result of comparison of constant -1 with expression of type 'char' is always false [-Wtautological-constant-out-of-range-compare]
+    541 |                                         else if (QQ[j * Lh + i] == -1)
+        |                                                  ~~~~~~~~~~~~~~ ^  ~~
+  4 warnings generated.
+  [24/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/FilterDesign/polyphaseASRC.c.o
+  [25/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/atox.c.o
+  [26/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/FilterDesign/generalFdesign.c.o
+  [27/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/constant.c.o
+  [28/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/FilterDesign/polyphaseFilterbank.c.o
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/FilterDesign/polyphaseFilterbank.c:55:1: warning: non-void function does not return a value in all control paths [-Wreturn-type]
+     55 | }
+        | ^
+  1 warning generated.
+  [29/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/cxaop.c.o
+  [30/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/cxconstant.c.o
+  [31/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/cxbasic.c.o
+  [32/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/cxconvf.c.o
+  [33/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/FFTConvolver.c.o
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/FFTConvolver.c:886:27: warning: expression result unused [-Wunused-value]
+    886 |                 conv2->_segmentsLLIRRe[1];
+        |                 ~~~~~~~~~~~~~~~~~~~~~~ ~^
+  1 warning generated.
+  [34/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/cxexp.c.o
+  [35/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/cxhypb.c.o
+  [36/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/cxpow.c.o
+  [37/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/cxprcmp.c.o
+  [38/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/cxidiv.c.o
+  [39/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/hpaconf.c.o
+  [40/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/print.c.o
+  [41/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/prcxpr.c.o
+  [42/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/sfmod.c.o
+  [43/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/cxtrig.c.o
+  [44/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/xchcof.c.o
+  [45/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/xdiv.c.o
+  [46/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/shift.c.o
+  [47/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/xadd.c.o
+  [48/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/xevtch.c.o
+  [49/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/xexp.c.o
+  [50/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/xfmod.c.o
+  [51/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/prxpr.c.o
+  [52/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/xfrac.c.o
+  [53/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/xivhypb.c.o
+  [54/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/xhypb.c.o
+  [55/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/xmul.c.o
+  [56/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/xneg.c.o
+  [57/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/xivtrg.c.o
+  [58/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/xlog.c.o
+  [59/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/xprcmp.c.o
+  [60/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/xsigerr.c.o
+  [61/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/xpwr.c.o
+  [62/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/xtoflt.c.o
+  [63/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/xtodbl.c.o
+  [64/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/xsqrt.c.o
+  [65/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/MersenneTwister.c.o
+  [66/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/xtrig.c.o
+  [67/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/SolveLinearSystem/inv.c.o
+  [68/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/SolveLinearSystem/mldivide.c.o
+  [69/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/SolveLinearSystem/pinv.c.o
+  [70/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/SolveLinearSystem/mrdivide.c.o
+  [71/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/libsamplerate/samplerate.c.o
+  [72/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/SolveLinearSystem/qr_fact.c.o
+  [73/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/libsamplerate/src_linear.c.o
+  [74/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/libsamplerate/src_sinc.c.o
+  [75/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/cpoly.c.o
+  [76/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/s_str.c.o
+  [77/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/quadprog.c.o
+  [78/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/liveprogWrapper.c.o
+  In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/liveprogWrapper.c:3:
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+    472 |         void(*process)(struct dspsys *, size_t);
+        |                               ^
+  1 warning generated.
+  [79/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/multimodalEQ.c.o
+  In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/multimodalEQ.c:6:
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+    472 |         void(*process)(struct dspsys *, size_t);
+        |                               ^
+  1 warning generated.
+  [80/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/y.tab.c.o
+  [81/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/spectrumExtension.c.o
+  In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/spectrumExtension.c:4:
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+    472 |         void(*process)(struct dspsys *, size_t);
+        |                               ^
+  1 warning generated.
+  [82/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/stereoEnhancement.c.o
+  In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/stereoEnhancement.c:4:
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+    472 |         void(*process)(struct dspsys *, size_t);
+        |                               ^
+  1 warning generated.
+  [83/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/solvopt.c.o
+  [84/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/vacuumTube.c.o
+  In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/vacuumTube.c:6:
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+    472 |         void(*process)(struct dspsys *, size_t);
+        |                               ^
+  1 warning generated.
+  [85/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/vdc.c.o
+  In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/vdc.c:6:
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+    472 |         void(*process)(struct dspsys *, size_t);
+        |                               ^
+  1 warning generated.
+  [86/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/generalDSP/ArbFIRGen.c.o
+  In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/generalDSP/ArbFIRGen.c:5:
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/generalDSP/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+    472 |         void(*process)(struct dspsys *, size_t);
+        |                               ^
+  1 warning generated.
+  [87/103] Building C object CMakeFiles/jdspimprestoolbox.dir/libjdspimptoolbox/main/JdspImpResToolbox.c.o
+  In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjdspimptoolbox/main/JdspImpResToolbox.c:7:
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+    472 |         void(*process)(struct dspsys *, size_t);
+        |                               ^
+  1 warning generated.
+  [88/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/reverb.c.o
+  In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/reverb.c:10:
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+    472 |         void(*process)(struct dspsys *, size_t);
+        |                               ^
+  1 warning generated.
+  [89/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/binaryBlobs.c.o
+  In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/binaryBlobs.c:1:
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+    472 |         void(*process)(struct dspsys *, size_t);
+        |                               ^
+  1 warning generated.
+  [90/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/generalDSP/digitalFilters.c.o
+  [91/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/generalDSP/generalProg.c.o
+  [92/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/generalDSP/spectralInterpolatorFloat.c.o
+  [93/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/generalDSP/interpolation.c.o
+  In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/generalDSP/interpolation.c:4:
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/generalDSP/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+    472 |         void(*process)(struct dspsys *, size_t);
+        |                               ^
+  1 warning generated.
+  [94/103] Building C object CMakeFiles/jamesdsp.dir/EELStdOutExtension.c.o
+  [95/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/codelet.c.o
+  [96/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/jdspController.c.o
+  In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/jdspController.c:9:
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+    472 |         void(*process)(struct dspsys *, size_t);
+        |                               ^
+  1 warning generated.
+  [97/103] Building CXX object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/clarity_adapter.cpp.o
+  [98/103] Building CXX object CMakeFiles/jamesdsp.dir/libjamesdsp-wrapper/clarity/ClarityProcessor.cpp.o
+  FAILED: CMakeFiles/jamesdsp.dir/libjamesdsp-wrapper/clarity/ClarityProcessor.cpp.o 
+  /usr/local/lib/android/sdk/ndk/27.0.12077973/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++ --target=aarch64-none-linux-android29 --sysroot=/usr/local/lib/android/sdk/ndk/27.0.12077973/toolchains/llvm/prebuilt/linux-x86_64/sysroot -Djamesdsp_EXPORTS -I/home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp -I/home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp-wrapper/clarity -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O2 -g -DNDEBUG -fPIC -O2 -std=c++17 -MD -MT CMakeFiles/jamesdsp.dir/libjamesdsp-wrapper/clarity/ClarityProcessor.cpp.o -MF CMakeFiles/jamesdsp.dir/libjamesdsp-wrapper/clarity/ClarityProcessor.cpp.o.d -o CMakeFiles/jamesdsp.dir/libjamesdsp-wrapper/clarity/ClarityProcessor.cpp.o -c /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp-wrapper/clarity/ClarityProcessor.cpp
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp-wrapper/clarity/ClarityProcessor.cpp:4:10: fatal error: 'Log.h' file not found
+      4 | #include <Log.h>
+        |          ^~~~~~~
+  1 error generated.
+  [99/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/generalDSP/TwoStageFFTConvolver.c.o
+  In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/generalDSP/TwoStageFFTConvolver.c:7:
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/generalDSP/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+    472 |         void(*process)(struct dspsys *, size_t);
+        |                               ^
+  1 warning generated.
+  [100/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/nseel-compiler.c.o
+  In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/nseel-compiler.c:30:
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/eel_matrix.h:94:38: warning: passing 'int32_t[2]' (aka 'int[2]') to parameter of type 'unsigned int *' converts between pointers to integer types with different sign [-Wpointer-sign]
+     94 |         geninv(matIn, rows1, cols1, matOut, size);
+        |                                             ^~~~
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/quadprog.h:25:82: note: passing argument to parameter 'size' here
+     25 | void geninv(double *G, unsigned int m1, unsigned int n1, double *Y, unsigned int size[2]);
+        |                                                                                  ^
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/nseel-compiler.c:2596:8: warning: assigning to 'const unsigned char *' from 'const char *' converts between pointers to integer types where one is of the unique plain 'char' type and the other is not [-Wpointer-sign]
+   2596 |                         end = src + len;Run gradle/gradle-command-action@v2
+  with:
+    arguments: assembleRootlessFullPreview
+    cache-disabled: false
+    cache-read-only: true
+    cache-write-only: false
+    cache-overwrite-existing: false
+    gradle-home-cache-includes: caches
+  notifications
+  
+    gradle-home-cache-cleanup: false
+    generate-job-summary: true
+    dependency-graph: disabled
+    gradle-home-cache-strict-match: false
+    workflow-job-context: {
+    "flavor": "Rootless"
+  }
+    github-token: ***
+  env:
+    JAVA_HOME: /opt/hostedtoolcache/Java_Adopt_jdk/17.0.18-8/x64
+    JAVA_HOME_17_X64: /opt/hostedtoolcache/Java_Adopt_jdk/17.0.18-8/x64
+Restore Gradle state from cache
+  Warning: Failed to restore v8-gradle|Linux|build signed app-build[0606f649d48d7ec9333e4e4d64e3376d]-c964e062f6aaaeb8a9c11bb6771fe501cc72ccad: Error: Cache service responded with 400
+  Gradle User Home cache not found. Will initialize empty.
+/home/runner/work/RootlessJamesDSP/RootlessJamesDSP/gradlew assembleRootlessFullPreview
+Downloading https://services.gradle.org/distributions/gradle-8.10.2-bin.zip
+.............10%.............20%.............30%.............40%.............50%.............60%.............70%.............80%.............90%.............100%
+
+Welcome to Gradle 8.10.2!
+
+Here are the highlights of this release:
+ - Support for Java 23
+ - Faster configuration cache
+ - Better configuration cache reports
+
+For more details see https://docs.gradle.org/8.10.2/release-notes.html
+
+Starting a Gradle Daemon (subsequent builds will be faster)
+> Task :buildSrc:checkKotlinGradlePluginConfigurationErrors
+> Task :buildSrc:pluginDescriptors
+> Task :buildSrc:processResources NO-SOURCE
+> Task :buildSrc:compileKotlin
+> Task :buildSrc:compileJava NO-SOURCE
+> Task :buildSrc:compileGroovy NO-SOURCE
+> Task :buildSrc:classes UP-TO-DATE
+
+> Task :buildSrc:jar
+:jar: No valid plugin descriptors were found in META-INF/gradle-plugins
+
+> Configure project :
+w: file:///home/runner/work/RootlessJamesDSP/RootlessJamesDSP/build.gradle.kts:24:24: 'getter for buildDir: File!' is deprecated. Deprecated in Java
+
+> Configure project :app
+WARNING: The option setting 'android.defaults.buildfeatures.buildconfig=true' is deprecated.
+The current default is 'false'.
+It will be removed in version 9.0 of the Android Gradle plugin.
+To keep using this feature, add the following to your module-level build.gradle files:
+    android.buildFeatures.buildConfig = true
+or from Android Studio, click: `Refactor` > `Migrate BuildConfig to Gradle Build Files`.
+Checking the license for package NDK (Side by side) 27.0.12077973 in /usr/local/lib/android/sdk/licenses
+License for package NDK (Side by side) 27.0.12077973 accepted.
+Preparing "Install NDK (Side by side) 27.0.12077973 v.27.0.12077973".
+"Install NDK (Side by side) 27.0.12077973 v.27.0.12077973" ready.
+Installing NDK (Side by side) 27.0.12077973 in /usr/local/lib/android/sdk/ndk/27.0.12077973
+"Install NDK (Side by side) 27.0.12077973 v.27.0.12077973" complete.
+"Install NDK (Side by side) 27.0.12077973 v.27.0.12077973" finished.
+Checking the license for package Android SDK Platform 33 in /usr/local/lib/android/sdk/licenses
+License for package Android SDK Platform 33 accepted.
+Preparing "Install Android SDK Platform 33 (revision 3)".
+"Install Android SDK Platform 33 (revision 3)" ready.
+Installing Android SDK Platform 33 in /usr/local/lib/android/sdk/platforms/android-33
+"Install Android SDK Platform 33 (revision 3)" complete.
+"Install Android SDK Platform 33 (revision 3)" finished.
+
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preRootlessFullPreviewBuild UP-TO-DATE
+
+> Task :app:configureCMakeRelWithDebInfo[arm64-v8a]
+Checking the license for package CMake 3.22.1 in /usr/local/lib/android/sdk/licenses
+License for package CMake 3.22.1 accepted.
+Preparing "Install CMake 3.22.1 v.3.22.1".
+"Install CMake 3.22.1 v.3.22.1" ready.
+Installing CMake 3.22.1 in /usr/local/lib/android/sdk/cmake/3.22.1
+"Install CMake 3.22.1 v.3.22.1" complete.
+"Install CMake 3.22.1 v.3.22.1" finished.
+C/C++: CMake Warning:
+C/C++:   Manually-specified variables were not used by the project:
+C/C++:     NO_CRASHLYTICS
+
+> Task :app:buildCMakeRelWithDebInfo[arm64-v8a]
+C/C++: ninja: Entering directory `/home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/.cxx/RelWithDebInfo/2r275p33/arm64-v8a'
+C/C++: In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/arbEqConv.c:6:
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+C/C++:   472 |         void(*process)(struct dspsys *, size_t);
+C/C++:       |                               ^
+C/C++: 1 warning generated.
+C/C++: In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/bs2b.c:2:
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+C/C++:   472 |         void(*process)(struct dspsys *, size_t);
+C/C++:       |                               ^
+C/C++: 1 warning generated.
+C/C++: In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/convolver1D.c:6:
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+C/C++:   472 |         void(*process)(struct dspsys *, size_t);
+C/C++:       |                               ^
+C/C++: 1 warning generated.
+C/C++: In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/crossfeed.c:6:
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+C/C++:   472 |         void(*process)(struct dspsys *, size_t);
+C/C++:       |                               ^
+C/C++: 1 warning generated.
+C/C++: In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/dbb.c:6:
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+C/C++:   472 |         void(*process)(struct dspsys *, size_t);
+C/C++:       |                               ^
+C/C++: 1 warning generated.
+C/C++: In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/dynamic.c:8:
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+C/C++:   472 |         void(*process)(struct dspsys *, size_t);
+C/C++:       |                               ^
+C/C++: 1 warning generated.
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/FilterDesign/cos_fib_paraunitary.c:522:26: warning: result of comparison of constant -2 with expression of type 'char' is always false [-Wtautological-constant-out-of-range-compare]
+C/C++:   522 |                                         if (U0l[j * Lh + i] == -2)
+C/C++:       |                                             ~~~~~~~~~~~~~~~ ^  ~~
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/FilterDesign/cos_fib_paraunitary.c:524:31: warning: result of comparison of constant -1 with expression of type 'char' is always false [-Wtautological-constant-out-of-range-compare]
+C/C++:   524 |                                         else if (U0l[j * Lh + i] == -1)
+C/C++:       |                                                  ~~~~~~~~~~~~~~~ ^  ~~
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/FilterDesign/cos_fib_paraunitary.c:539:25: warning: result of comparison of constant -2 with expression of type 'char' is always false [-Wtautological-constant-out-of-range-compare]
+C/C++:   539 |                                         if (QQ[j * Lh + i] == -2)
+C/C++:       |                                             ~~~~~~~~~~~~~~ ^  ~~
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/FilterDesign/cos_fib_paraunitary.c:541:30: warning: result of comparison of constant -1 with expression of type 'char' is always false [-Wtautological-constant-out-of-range-compare]
+C/C++:   541 |                                         else if (QQ[j * Lh + i] == -1)
+C/C++:       |                                                  ~~~~~~~~~~~~~~ ^  ~~
+C/C++: 4 warnings generated.
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/FilterDesign/polyphaseFilterbank.c:55:1: warning: non-void function does not return a value in all control paths [-Wreturn-type]
+C/C++:    55 | }
+C/C++:       | ^
+C/C++: 1 warning generated.
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/FFTConvolver.c:886:27: warning: expression result unused [-Wunused-value]
+C/C++:   886 |                 conv2->_segmentsLLIRRe[1];
+C/C++:       |                 ~~~~~~~~~~~~~~~~~~~~~~ ~^
+C/C++: 1 warning generated.
+C/C++: In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/liveprogWrapper.c:3:
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+C/C++:   472 |         void(*process)(struct dspsys *, size_t);
+C/C++:       |                               ^
+C/C++: 1 warning generated.
+C/C++: In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/multimodalEQ.c:6:
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+C/C++:   472 |         void(*process)(struct dspsys *, size_t);
+C/C++:       |                               ^
+C/C++: 1 warning generated.
+C/C++: In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/spectrumExtension.c:4:
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+C/C++:   472 |         void(*process)(struct dspsys *, size_t);
+C/C++:       |                               ^
+C/C++: 1 warning generated.
+C/C++: In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/stereoEnhancement.c:4:
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+C/C++:   472 |         void(*process)(struct dspsys *, size_t);
+C/C++:       |                               ^
+C/C++: 1 warning generated.
+C/C++: In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/vacuumTube.c:6:
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+C/C++:   472 |         void(*process)(struct dspsys *, size_t);
+C/C++:       |                               ^
+C/C++: 1 warning generated.
+C/C++: In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/vdc.c:6:
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+C/C++:   472 |         void(*process)(struct dspsys *, size_t);
+C/C++:       |                               ^
+C/C++: 1 warning generated.
+C/C++: In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/generalDSP/ArbFIRGen.c:5:
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/generalDSP/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+C/C++:   472 |         void(*process)(struct dspsys *, size_t);
+C/C++:       |                               ^
+C/C++: 1 warning generated.
+C/C++: In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjdspimptoolbox/main/JdspImpResToolbox.c:7:
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+C/C++:   472 |         void(*process)(struct dspsys *, size_t);
+C/C++:       |                               ^
+C/C++: 1 warning generated.
+C/C++: In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/reverb.c:10:
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+C/C++:   472 |         void(*process)(struct dspsys *, size_t);
+C/C++:       |                               ^
+C/C++: 1 warning generated.
+C/C++: In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/binaryBlobs.c:1:
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+C/C++:   472 |         void(*process)(struct dspsys *, size_t);
+C/C++:       |                               ^
+C/C++: 1 warning generated.
+C/C++: In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/generalDSP/interpolation.c:4:
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/generalDSP/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+C/C++:   472 |         void(*process)(struct dspsys *, size_t);
+C/C++:       |                               ^
+C/C++: 1 warning generated.
+C/C++: In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/jdspController.c:9:
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+C/C++:   472 |         void(*process)(struct dspsys *, size_t);
+C/C++:       |                               ^
+C/C++: 1 warning generated.
+C/C++: /usr/local/lib/android/sdk/ndk/27.0.12077973/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++ --target=aarch64-none-linux-android29 --sysroot=/usr/local/lib/android/sdk/ndk/27.0.12077973/toolchains/llvm/prebuilt/linux-x86_64/sysroot -Djamesdsp_EXPORTS -I/home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp -I/home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp-wrapper/clarity -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O2 -g -DNDEBUG -fPIC -O2 -std=c++17 -MD -MT CMakeFiles/jamesdsp.dir/libjamesdsp-wrapper/clarity/ClarityProcessor.cpp.o -MF CMakeFiles/jamesdsp.dir/libjamesdsp-wrapper/clarity/ClarityProcessor.cpp.o.d -o CMakeFiles/jamesdsp.dir/libjamesdsp-wrapper/clarity/ClarityProcessor.cpp.o -c /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp-wrapper/clarity/ClarityProcessor.cpp
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp-wrapper/clarity/ClarityProcessor.cpp:4:10: fatal error: 'Log.h' file not found
+C/C++:     4 | #include <Log.h>
+C/C++:       |          ^~~~~~~
+C/C++: 1 error generated.
+C/C++: In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/generalDSP/TwoStageFFTConvolver.c:7:
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/generalDSP/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+C/C++:   472 |         void(*process)(struct dspsys *, size_t);
+C/C++:       |                               ^
+C/C++: 1 warning generated.
+C/C++: In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/nseel-compiler.c:30:
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/eel_matrix.h:94:38: warning: passing 'int32_t[2]' (aka 'int[2]') to parameter of type 'unsigned int *' converts between pointers to integer types with different sign [-Wpointer-sign]
+C/C++:    94 |         geninv(matIn, rows1, cols1, matOut, size);
+C/C++:       |                                             ^~~~
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/quadprog.h:25:82: note: passing argument to parameter 'size' here
+C/C++:    25 | void geninv(double *G, unsigned int m1, unsigned int n1, double *Y, unsigned int size[2]);
+C/C++:       |                                                                                  ^
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/nseel-compiler.c:2596:8: warning: assigning to 'const unsigned char *' from 'const char *' converts between pointers to integer types where one is of the unique plain 'char' type and the other is not [-Wpointer-sign]
+C/C++:  2596 |                         end = src + len;
+C/C++:       |                             ^ ~~~~~~~~~
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/nseel-compiler.c:2597:7: warning: assigning to 'const unsigned char *' from 'const char *' converts between pointers to integer types where one is of the unique plain 'char' type and the other is not [-Wpointer-sign]
+C/C++:  2597 |                         in = src;
+C/C++:       |                            ^ ~~~
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/nseel-compiler.c:2633:36: warning: passing 'unsigned char *' to parameter of type 'const char *' converts between pointers to integer types where one is of the unique plain 'char' type and the other is not [-Wpointer-sign]
+C/C++:  2633 |                         *dest = s_str_create_from_c_str(out);
+C/C++:       |                                                         ^~~
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/s_str.h:61:49: note: passing argument to parameter 'c_str_ptr' here
+C/C++:    61 | s_str s_str_create_from_c_str(const char *const c_str_ptr);
+C/C++:       |                                                 ^
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/nseel-compiler.c:2747:41: warning: passing 'unsigned char *' to parameter of type 'const char *' converts between pointers to integer types where one is of the unique plain 'char' type and the other is not [-Wpointer-sign]
+C/C++:  2747 |                         *dest = s_str_create_from_c_str_0Inc(out, out_len);
+C/C++:       |                                                              ^~~
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/s_str.h:62:54: note: passing argument to parameter 'c_str_ptr' here
+C/C++:    62 | s_str s_str_create_from_c_str_0Inc(const char *const c_str_ptr, const size_t length);
+C/C++:       |                                                      ^
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/nseel-compiler.c:4367:34: warning: passing 'unsigned char *' to parameter of type 'const char *' converts between pointers to integer types where one is of the unique plain 'char' type and the other is not [-Wpointer-sign]
+C/C++:  4367 |         *dest = s_str_create_from_c_str(base64String);
+C/C++:       |                                         ^~~~~~~~~~~~
+C/C++: /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/s_str.h:61:49: note: passing argument to parameter 'c_str_ptr' here
+C/C++:    61 | s_str s_str_create_from_c_str(const char *const c_str_ptr);
+C/C++:       |                                                 ^
+C/C++: 6 warnings generated.
+
+> Task :app:buildCMakeRelWithDebInfo[arm64-v8a] FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:buildCMakeRelWithDebInfo[arm64-v8a]'.
+> com.android.ide.common.process.ProcessException: ninja: Entering directory `/home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/.cxx/RelWithDebInfo/2r275p33/arm64-v8a'
+  [0/2] Re-checking globbed directories...
+  [1/103] Building C object CMakeFiles/jdspimprestoolbox.dir/libjdspimptoolbox/libsamplerate/samplerate.c.o
+  [2/103] Building C object CMakeFiles/jdspimprestoolbox.dir/libjdspimptoolbox/libsamplerate/src_linear.c.o
+  [3/103] Building C object CMakeFiles/jdspimprestoolbox.dir/libjdspimptoolbox/main/cpthread.c.o
+  [4/103] Building C object CMakeFiles/jdspimprestoolbox.dir/libjdspimptoolbox/libsamplerate/src_sinc.c.o
+  [5/103] Building CXX object CMakeFiles/jamesdsp-wrapper.dir/libjamesdsp-wrapper/EelVmVariable.cpp.o
+  [6/103] Building CXX object CMakeFiles/crashlytics-connector.dir/libcrashlytics-connector/Log.cpp.o
+  [7/103] Building CXX object CMakeFiles/jamesdsp-wrapper.dir/libjamesdsp-wrapper/JArrayList.cpp.o
+  [8/103] Linking CXX shared library /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/build/intermediates/cxx/RelWithDebInfo/2r275p33/obj/arm64-v8a/libcrashlytics-connector.so
+  [9/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/arbEqConv.c.o
+  In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/arbEqConv.c:6:
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+    472 |         void(*process)(struct dspsys *, size_t);
+        |                               ^
+  1 warning generated.
+  [10/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/bs2b.c.o
+  In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/bs2b.c:2:
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+    472 |         void(*process)(struct dspsys *, size_t);
+        |                               ^
+  1 warning generated.
+  [11/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/convolver1D.c.o
+  In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/convolver1D.c:6:
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+    472 |         void(*process)(struct dspsys *, size_t);
+        |                               ^
+  1 warning generated.
+  [12/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/crossfeed.c.o
+  In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/crossfeed.c:6:
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+    472 |         void(*process)(struct dspsys *, size_t);
+        |                               ^
+  1 warning generated.
+  [13/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/dbb.c.o
+  In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/dbb.c:6:
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+    472 |         void(*process)(struct dspsys *, size_t);
+        |                               ^
+  1 warning generated.
+  [14/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/cpthread.c.o
+  [15/103] Building CXX object CMakeFiles/jamesdsp-wrapper.dir/libjamesdsp-wrapper/clarity/ClarityProcessor.cpp.o
+  [16/103] Building CXX object CMakeFiles/jamesdsp-wrapper.dir/libjamesdsp-wrapper/JamesDspWrapper.cpp.o
+  [17/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/nseel-ram.c.o
+  [18/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/fft.c.o
+  [19/103] Building CXX object CMakeFiles/jamesdsp-wrapper.dir/libjamesdsp-wrapper/fieldsurround/FieldSurroundProcessor.cpp.o
+  [20/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/FilterDesign/eqnerror.c.o
+  [21/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/FilterDesign/firls.c.o
+  [22/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/dynamic.c.o
+  In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/dynamic.c:8:
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+    472 |         void(*process)(struct dspsys *, size_t);
+        |                               ^
+  1 warning generated.
+  [23/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/FilterDesign/cos_fib_paraunitary.c.o
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/FilterDesign/cos_fib_paraunitary.c:522:26: warning: result of comparison of constant -2 with expression of type 'char' is always false [-Wtautological-constant-out-of-range-compare]
+    522 |                                         if (U0l[j * Lh + i] == -2)
+        |                                             ~~~~~~~~~~~~~~~ ^  ~~
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/FilterDesign/cos_fib_paraunitary.c:524:31: warning: result of comparison of constant -1 with expression of type 'char' is always false [-Wtautological-constant-out-of-range-compare]
+    524 |                                         else if (U0l[j * Lh + i] == -1)
+        |                                                  ~~~~~~~~~~~~~~~ ^  ~~
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/FilterDesign/cos_fib_paraunitary.c:539:25: warning: result of comparison of constant -2 with expression of type 'char' is always false [-Wtautological-constant-out-of-range-compare]
+    539 |                                         if (QQ[j * Lh + i] == -2)
+        |                                             ~~~~~~~~~~~~~~ ^  ~~
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/FilterDesign/cos_fib_paraunitary.c:541:30: warning: result of comparison of constant -1 with expression of type 'char' is always false [-Wtautological-constant-out-of-range-compare]
+    541 |                                         else if (QQ[j * Lh + i] == -1)
+        |                                                  ~~~~~~~~~~~~~~ ^  ~~
+  4 warnings generated.
+  [24/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/FilterDesign/polyphaseASRC.c.o
+  [25/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/atox.c.o
+  [26/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/FilterDesign/generalFdesign.c.o
+  [27/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/constant.c.o
+  [28/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/FilterDesign/polyphaseFilterbank.c.o
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/FilterDesign/polyphaseFilterbank.c:55:1: warning: non-void function does not return a value in all control paths [-Wreturn-type]
+     55 | }
+        | ^
+  1 warning generated.
+  [29/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/cxaop.c.o
+  [30/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/cxconstant.c.o
+  [31/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/cxbasic.c.o
+  [32/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/cxconvf.c.o
+  [33/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/FFTConvolver.c.o
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/FFTConvolver.c:886:27: warning: expression result unused [-Wunused-value]
+    886 |                 conv2->_segmentsLLIRRe[1];
+        |                 ~~~~~~~~~~~~~~~~~~~~~~ ~^
+  1 warning generated.
+  [34/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/cxexp.c.o
+  [35/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/cxhypb.c.o
+  [36/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/cxpow.c.o
+  [37/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/cxprcmp.c.o
+  [38/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/cxidiv.c.o
+  [39/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/hpaconf.c.o
+  [40/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/print.c.o
+  [41/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/prcxpr.c.o
+  [42/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/sfmod.c.o
+  [43/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/cxtrig.c.o
+  [44/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/xchcof.c.o
+  [45/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/xdiv.c.o
+  [46/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/shift.c.o
+  [47/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/xadd.c.o
+  [48/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/xevtch.c.o
+  [49/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/xexp.c.o
+  [50/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/xfmod.c.o
+  [51/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/prxpr.c.o
+  [52/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/xfrac.c.o
+  [53/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/xivhypb.c.o
+  [54/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/xhypb.c.o
+  [55/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/xmul.c.o
+  [56/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/xneg.c.o
+  [57/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/xivtrg.c.o
+  [58/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/xlog.c.o
+  [59/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/xprcmp.c.o
+  [60/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/xsigerr.c.o
+  [61/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/xpwr.c.o
+  [62/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/xtoflt.c.o
+  [63/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/xtodbl.c.o
+  [64/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/xsqrt.c.o
+  [65/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/MersenneTwister.c.o
+  [66/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/HPFloat/xtrig.c.o
+  [67/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/SolveLinearSystem/inv.c.o
+  [68/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/SolveLinearSystem/mldivide.c.o
+  [69/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/SolveLinearSystem/pinv.c.o
+  [70/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/SolveLinearSystem/mrdivide.c.o
+  [71/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/libsamplerate/samplerate.c.o
+  [72/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/SolveLinearSystem/qr_fact.c.o
+  [73/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/libsamplerate/src_linear.c.o
+  [74/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/libsamplerate/src_sinc.c.o
+  [75/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/cpoly.c.o
+  [76/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/s_str.c.o
+  [77/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/quadprog.c.o
+  [78/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/liveprogWrapper.c.o
+  In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/liveprogWrapper.c:3:
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+    472 |         void(*process)(struct dspsys *, size_t);
+        |                               ^
+  1 warning generated.
+  [79/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/multimodalEQ.c.o
+  In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/multimodalEQ.c:6:
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+    472 |         void(*process)(struct dspsys *, size_t);
+        |                               ^
+  1 warning generated.
+  [80/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/y.tab.c.o
+  [81/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/spectrumExtension.c.o
+  In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/spectrumExtension.c:4:
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+    472 |         void(*process)(struct dspsys *, size_t);
+        |                               ^
+  1 warning generated.
+  [82/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/stereoEnhancement.c.o
+  In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/stereoEnhancement.c:4:
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+    472 |         void(*process)(struct dspsys *, size_t);
+        |                               ^
+  1 warning generated.
+  [83/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/solvopt.c.o
+  [84/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/vacuumTube.c.o
+  In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/vacuumTube.c:6:
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+    472 |         void(*process)(struct dspsys *, size_t);
+        |                               ^
+  1 warning generated.
+  [85/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/vdc.c.o
+  In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/vdc.c:6:
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+    472 |         void(*process)(struct dspsys *, size_t);
+        |                               ^
+  1 warning generated.
+  [86/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/generalDSP/ArbFIRGen.c.o
+  In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/generalDSP/ArbFIRGen.c:5:
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/generalDSP/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+    472 |         void(*process)(struct dspsys *, size_t);
+        |                               ^
+  1 warning generated.
+  [87/103] Building C object CMakeFiles/jdspimprestoolbox.dir/libjdspimptoolbox/main/JdspImpResToolbox.c.o
+  In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjdspimptoolbox/main/JdspImpResToolbox.c:7:
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+    472 |         void(*process)(struct dspsys *, size_t);
+        |                               ^
+  1 warning generated.
+  [88/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/reverb.c.o
+  In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/reverb.c:10:
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+    472 |         void(*process)(struct dspsys *, size_t);
+        |                               ^
+  1 warning generated.
+  [89/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/binaryBlobs.c.o
+  In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/binaryBlobs.c:1:
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+    472 |         void(*process)(struct dspsys *, size_t);
+        |                               ^
+  1 warning generated.
+  [90/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/generalDSP/digitalFilters.c.o
+  [91/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/generalDSP/generalProg.c.o
+  [92/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/generalDSP/spectralInterpolatorFloat.c.o
+  [93/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/generalDSP/interpolation.c.o
+  In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/generalDSP/interpolation.c:4:
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/generalDSP/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+    472 |         void(*process)(struct dspsys *, size_t);
+        |                               ^
+  1 warning generated.
+  [94/103] Building C object CMakeFiles/jamesdsp.dir/EELStdOutExtension.c.o
+  [95/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/codelet.c.o
+  [96/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/jdspController.c.o
+  In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/jdspController.c:9:
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+    472 |         void(*process)(struct dspsys *, size_t);
+        |                               ^
+  1 warning generated.
+  [97/103] Building CXX object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/clarity_adapter.cpp.o
+  [98/103] Building CXX object CMakeFiles/jamesdsp.dir/libjamesdsp-wrapper/clarity/ClarityProcessor.cpp.o
+  FAILED: CMakeFiles/jamesdsp.dir/libjamesdsp-wrapper/clarity/ClarityProcessor.cpp.o 
+  /usr/local/lib/android/sdk/ndk/27.0.12077973/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++ --target=aarch64-none-linux-android29 --sysroot=/usr/local/lib/android/sdk/ndk/27.0.12077973/toolchains/llvm/prebuilt/linux-x86_64/sysroot -Djamesdsp_EXPORTS -I/home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp -I/home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp-wrapper/clarity -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O2 -g -DNDEBUG -fPIC -O2 -std=c++17 -MD -MT CMakeFiles/jamesdsp.dir/libjamesdsp-wrapper/clarity/ClarityProcessor.cpp.o -MF CMakeFiles/jamesdsp.dir/libjamesdsp-wrapper/clarity/ClarityProcessor.cpp.o.d -o CMakeFiles/jamesdsp.dir/libjamesdsp-wrapper/clarity/ClarityProcessor.cpp.o -c /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp-wrapper/clarity/ClarityProcessor.cpp
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp-wrapper/clarity/ClarityProcessor.cpp:4:10: fatal error: 'Log.h' file not found
+      4 | #include <Log.h>
+        |          ^~~~~~~
+  1 error generated.
+  [99/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/generalDSP/TwoStageFFTConvolver.c.o
+  In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/generalDSP/TwoStageFFTConvolver.c:7:
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/generalDSP/../jdsp_header.h:472:24: warning: declaration of 'struct dspsys' will not be visible outside of this function [-Wvisibility]
+    472 |         void(*process)(struct dspsys *, size_t);
+        |                               ^
+  1 warning generated.
+  [100/103] Building C object CMakeFiles/jamesdsp.dir/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/nseel-compiler.c.o
+  In file included from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/nseel-compiler.c:30:
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/eel_matrix.h:94:38: warning: passing 'int32_t[2]' (aka 'int[2]') to parameter of type 'unsigned int *' converts between pointers to integer types with different sign [-Wpointer-sign]
+     94 |         geninv(matIn, rows1, cols1, matOut, size);
+        |                                             ^~~~
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/numericSys/quadprog.h:25:82: note: passing argument to parameter 'size' here
+     25 | void geninv(double *G, unsigned int m1, unsigned int n1, double *Y, unsigned int size[2]);
+        |                                                                                  ^
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/nseel-compiler.c:2596:8: warning: assigning to 'const unsigned char *' from 'const char *' converts between pointers to integer types where one is of the unique plain 'char' type and the other is not [-Wpointer-sign]
+   2596 |                         end = src + len;
+        |                             ^ ~~~~~~~~~
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/nseel-compiler.c:2597:7: warning: assigning to 'const unsigned char *' from 'const char *' converts between pointers to integer types where one is of the unique plain 'char' type and the other is not [-Wpointer-sign]
+   2597 |                         in = src;
+        |                            ^ ~~~
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/nseel-compiler.c:2633:36: warning: passing 'unsigned char *' to parameter of type 'const char *' converts between pointers to integer types where one is of the unique plain 'char' type and the other is not [-Wpointer-sign]
+   2633 |                         *dest = s_str_create_from_c_str(out);
+        |                                                         ^~~
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/s_str.h:61:49: note: passing argument to parameter 'c_str_ptr' here
+     61 | s_str s_str_create_from_c_str(const char *const c_str_ptr);
+        |                                                 ^
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/nseel-compiler.c:2747:41: warning: passing 'unsigned char *' to parameter of type 'const char *' converts between pointers to integer types where one is of the unique plain 'char' type and the other is not [-Wpointer-sign]
+   2747 |                         *dest = s_str_create_from_c_str_0Inc(out, out_len);
+        |                                                              ^~~
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/s_str.h:62:54: note: passing argument to parameter 'c_str_ptr' here
+     62 | s_str s_str_create_from_c_str_0Inc(const char *const c_str_ptr, const size_t length);
+        |                                                      ^
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/nseel-compiler.c:4367:34: warning: passing 'unsigned char *' to parameter of type 'const char *' converts between pointers to integer types where one is of the unique plain 'char' type and the other is not [-Wpointer-sign]
+   4367 |         *dest = s_str_create_from_c_str(base64String);
+        |                                         ^~~~~~~~~~~~
+  /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/src/main/cpp/libjamesdsp/Main/libjamesdsp/jni/jamesdsp/jdsp/Effects/eel2/s_str.h:61:49: note: passing argument to parameter 'c_str_ptr' here
+     61 | s_str s_str_create_from_c_str(const char *const c_str_ptr);
+        |                                                 ^
+  6 warnings generated.
+  ninja: build stopped: subcommand failed.
+  
+  C++ build system [build] failed while executing:
+      /usr/local/lib/android/sdk/cmake/3.22.1/bin/ninja \
+        -C \
+        /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app/.cxx/RelWithDebInfo/2r275p33/arm64-v8a \
+        crashlytics-connector \
+        jamesdsp \
+        jamesdsp-wrapper \
+        jdspimprestoolbox
+    from /home/runner/work/RootlessJamesDSP/RootlessJamesDSP/app
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 2m 7s
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.10.2/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+6 actionable tasks: 6 executed
+Error: Gradle build failed: see console output for details
+0s
+0s
+0s
+

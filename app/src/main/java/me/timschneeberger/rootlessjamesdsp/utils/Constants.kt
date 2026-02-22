@@ -28,7 +28,7 @@ object Constants {
     const val DEFAULT_CONVOLVER_ADVIMP = "-80;-100;0;0;0;0"
     const val DEFAULT_GEQ = "GraphicEQ: "
     const val DEFAULT_GEQ_INTERNAL = "GraphicEQ: 0.0 0.0;"
-    const val DEFAULT_EQ = "25.0;40.0;63.0;100.0;160.0;250.0;400.0;630.0;1000.0;1600.0;2500.0;4000.0;6300.0;10000.0;16000.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0"
+    const val DEFAULT_EQ = "31.0;62.0;125.0;250.0;500.0;1000.0;2000.0;4000.0;8000.0;16000.0;17000.0;18000.0;19000.0;20000.0;22000.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0"
 
     // Intent actions
     const val ACTION_PREFERENCES_UPDATED = BuildConfig.APPLICATION_ID + ".action.preferences.UPDATED"

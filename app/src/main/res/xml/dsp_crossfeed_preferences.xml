@@ -15,5 +15,29 @@
             android:entryValues="@array/crossfeed_modes_values"
             app:useSimpleSummaryProvider="true"
             app:iconSpaceReserved="false"/>
+        <me.timschneeberger.rootlessjamesdsp.preference.MaterialSeekbarPreference
+            android:key="@string/key_crossfeed_custom_fcut"
+            android:title="@string/crossfeed_custom_fcut"
+            android:defaultValue="700"
+            app:minValue="300"
+            app:maxValue="2000"
+            app:unit=" Hz"
+            app:seekBarIncrement="10"
+            app:allowDividerAbove="false"
+            app:updatesContinuously="true"
+            app:showSeekBarValue="true"
+            app:iconSpaceReserved="false"/>
+        <me.timschneeberger.rootlessjamesdsp.preference.MaterialSeekbarPreference
+            android:key="@string/key_crossfeed_custom_feed"
+            android:title="@string/crossfeed_custom_feed"
+            android:defaultValue="45"
+            app:minValue="10"
+            app:maxValue="150"
+            app:precision="0"
+            app:seekBarIncrement="1"
+            app:allowDividerAbove="false"
+            app:updatesContinuously="true"
+            app:showSeekBarValue="true"
+            app:iconSpaceReserved="false"/>
     </me.timschneeberger.rootlessjamesdsp.preference.SwitchPreferenceGroup>
 </PreferenceScreen>

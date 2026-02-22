@@ -20,9 +20,9 @@
         <me.timschneeberger.rootlessjamesdsp.preference.MaterialSeekbarPreference
             android:key="@string/key_spectrum_ext_strength_percent"
             android:title="@string/spectrum_ext_strength"
-            android:defaultValue="100"
-            app:minValue="1"
-            app:maxValue="400"
+            android:defaultValue="10"
+            app:minValue="0"
+            app:maxValue="100"
             app:unit=" %"
             app:allowDividerAbove="false"
             app:updatesContinuously="true"
@@ -32,9 +32,9 @@
         <me.timschneeberger.rootlessjamesdsp.preference.MaterialSeekbarPreference
             android:key="@string/key_spectrum_ext_strength_db"
             android:title="@string/spectrum_ext_strength"
-            android:defaultValue="0"
+            android:defaultValue="-20"
             app:minValue="-40"
-            app:maxValue="12"
+            app:maxValue="0"
             app:unit=" dB"
             app:precision="1"
             app:allowDividerAbove="false"
@@ -46,7 +46,7 @@
             android:key="@string/key_spectrum_ext_ref_freq"
             android:title="@string/spectrum_ext_ref_freq"
             android:defaultValue="7600"
-            app:minValue="800"
+            app:minValue="20"
             app:maxValue="20000"
             app:unit=" Hz"
             app:allowDividerAbove="false"
@@ -70,8 +70,8 @@
             android:key="@string/key_spectrum_ext_post_gain"
             android:title="@string/spectrum_ext_post_gain"
             android:defaultValue="0"
-            app:minValue="-15"
-            app:maxValue="15"
+            app:minValue="-24"
+            app:maxValue="24"
             app:unit=" dB"
             app:allowDividerAbove="false"
             app:updatesContinuously="true"
@@ -81,7 +81,8 @@
         <SwitchPreferenceCompat
             android:key="@string/key_spectrum_ext_safety"
             android:title="@string/spectrum_ext_safety"
-            android:defaultValue="true"
+            android:defaultValue="false"
+            android:summary="@string/spectrum_ext_safety_summary"
             app:allowDividerAbove="false"
             app:iconSpaceReserved="false" />
 
@@ -93,8 +94,8 @@
                 android:key="@string/key_spectrum_ext_hp_q"
                 android:title="@string/spectrum_ext_hp_q"
                 android:defaultValue="0.717"
-                app:minValue="0.2"
-                app:maxValue="2.0"
+                app:minValue="0.1"
+                app:maxValue="3.0"
                 app:precision="3"
                 app:allowDividerAbove="false"
                 app:updatesContinuously="true"
@@ -105,8 +106,8 @@
                 android:key="@string/key_spectrum_ext_lp_q"
                 android:title="@string/spectrum_ext_lp_q"
                 android:defaultValue="0.717"
-                app:minValue="0.2"
-                app:maxValue="2.0"
+                app:minValue="0.1"
+                app:maxValue="3.0"
                 app:precision="3"
                 app:allowDividerAbove="false"
                 app:updatesContinuously="true"
@@ -129,11 +130,11 @@
                 android:key="@string/key_spectrum_ext_harmonics"
                 android:title="@string/spectrum_ext_harmonics"
                 android:defaultValue="0.02;0;0.02;0;0.02;0;0.02;0;0.02;0"
-                android:inputType="text"
+                android:dialogTitle="@string/spectrum_ext_harmonics"
+                android:inputType="textMultiLine"
                 app:useSimpleSummaryProvider="true"
-                app:allowDividerAbove="false"
                 app:iconSpaceReserved="false" />
-
         </PreferenceCategory>
+
     </me.timschneeberger.rootlessjamesdsp.preference.SwitchPreferenceGroup>
 </PreferenceScreen>

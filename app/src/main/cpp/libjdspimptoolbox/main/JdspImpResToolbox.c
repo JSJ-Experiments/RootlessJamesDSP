@@ -6,6 +6,10 @@
 
 #include <jdsp_header.h>
 
+// ViPER IIR EQ preview uses the same band gain scale as runtime SetBandLevel:
+// linearGain * 0.636 (approximately 2/pi) for behavior parity.
+#define VIPER_BAND_GAIN_SCALE 0.636
+
 void channel_splitFloat(float *buffer, unsigned int num_frames, float **chan_buffers, unsigned int num_channels)
 {
 	unsigned int i, samples = num_frames * num_channels;
@@ -330,6 +334,7 @@ void circshift(float *x, int n, int k)
 }
 #define NUMPTS 15
 #define NUMPTS_DRS (7)
+#define VIPER_PREVIEW_BANDS (10)
 ierper pch1, pch2, pch3;
 __attribute__((constructor)) static void initialize(void)
 {
@@ -691,6 +696,188 @@ JNIEXPORT void JNICALL Java_me_timschneeberger_rootlessjamesdsp_interop_JdspImpR
 
     (*env)->ReleaseDoubleArrayElements(env, dispFreq, javadispFreqPtr, 0);
     (*env)->SetFloatArrayRegion(env, response, 0, queryPts, javaResponsePtr);
+}
+
+static const double VIPER_PREVIEW_CENTER_FREQS[VIPER_PREVIEW_BANDS] = {
+    31.0, 62.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0, 16000.0
+};
+
+static double ViperPreviewFindF1(double centerFreq, double widthOctaves)
+{
+    double octaveScale = pow(2.0, widthOctaves * 0.5);
+    return centerFreq / octaveScale;
+}
+
+static int ViperPreviewSolveRoot(double a, double b, double c, double *root)
+{
+    if (fabs(a) < 1.0e-24)
+        return -1;
+    double x = (c - (b * b) / (a * 4.0)) / a;
+    double y = b / (a + a);
+    if (x >= 0.0)
+        return -1;
+    double z = sqrt(-x);
+    double r1 = -y - z;
+    double r2 = z - y;
+    *root = r1 > r2 ? r2 : r1;
+    return 0;
+}
+
+static void ViperPreviewUpdateCoeffs(int sampleRate, float *coeff0, float *coeff1, float *coeff2)
+{
+    const double bandwidthOctaves = 1.0;
+    memset(coeff0, 0, VIPER_PREVIEW_BANDS * sizeof(float));
+    memset(coeff1, 0, VIPER_PREVIEW_BANDS * sizeof(float));
+    memset(coeff2, 0, VIPER_PREVIEW_BANDS * sizeof(float));
+    if (sampleRate <= 0)
+        return;
+    for (int i = 0; i < VIPER_PREVIEW_BANDS; i++)
+    {
+        double f1 = ViperPreviewFindF1(VIPER_PREVIEW_CENTER_FREQS[i], bandwidthOctaves);
+        double x = (2.0 * M_PI * VIPER_PREVIEW_CENTER_FREQS[i]) / (double)sampleRate;
+        double y = (2.0 * M_PI * f1) / (double)sampleRate;
+        double cosX = cos(x);
+        double cosY = cos(y);
+        double sinY = sin(y);
+        double a = cosX * cosY;
+        double b = (cosX * cosX) * 0.5;
+        double c = sinY * sinY;
+        double d = ((b - a) + 0.5) - c;
+        double e = c + (((b + cosY * cosY) - a) - 0.5);
+        double f = (((cosX * cosX) * 0.125 - cosX * cosY * 0.25) + 0.125) - c * 0.25;
+        double root = 0.0;
+        if (ViperPreviewSolveRoot(d, e, f, &root) == 0)
+        {
+            coeff0[i] = (float)(root + root);
+            coeff1[i] = (float)(0.5 - root);
+            coeff2[i] = (float)((root + 0.5) * cosX * 2.0);
+        }
+    }
+}
+
+JNIEXPORT void JNICALL Java_me_timschneeberger_rootlessjamesdsp_interop_JdspImpResToolbox_ComputeViperOriginalEqResponse(
+    JNIEnv *env,
+    jobject obj,
+    jint srate,
+    jint interpolationMode,
+    jdoubleArray jfreq,
+    jdoubleArray jgain,
+    jint nPts,
+    jdoubleArray jdispFreq,
+    jfloatArray jresponse
+)
+{
+    (void)obj;
+
+    jsize freqLen = (*env)->GetArrayLength(env, jfreq);
+    jsize gainLen = (*env)->GetArrayLength(env, jgain);
+    int eqPts = (int)freqLen < (int)gainLen ? (int)freqLen : (int)gainLen;
+    if (eqPts > NUMPTS)
+        eqPts = NUMPTS;
+    if (eqPts < 2 || nPts <= 0)
+        return;
+
+    jdouble *freqs = (jdouble*) (*env)->GetDoubleArrayElements(env, jfreq, 0);
+    jdouble *gains = (jdouble*) (*env)->GetDoubleArrayElements(env, jgain, 0);
+    jdouble *dispFreq = (jdouble*) (*env)->GetDoubleArrayElements(env, jdispFreq, 0);
+    jfloat *response = (jfloat*) (*env)->GetFloatArrayElements(env, jresponse, 0);
+    if (freqs == NULL || gains == NULL || dispFreq == NULL || response == NULL)
+    {
+        if (freqs != NULL)
+            (*env)->ReleaseDoubleArrayElements(env, jfreq, freqs, JNI_ABORT);
+        if (gains != NULL)
+            (*env)->ReleaseDoubleArrayElements(env, jgain, gains, JNI_ABORT);
+        if (dispFreq != NULL)
+            (*env)->ReleaseDoubleArrayElements(env, jdispFreq, dispFreq, JNI_ABORT);
+        if (response != NULL)
+            (*env)->ReleaseFloatArrayElements(env, jresponse, response, JNI_ABORT);
+
+        jclass oomCls = (*env)->FindClass(env, "java/lang/OutOfMemoryError");
+        if (oomCls != NULL)
+        {
+            (*env)->ThrowNew(env, oomCls, "Failed to access EQ preview arrays");
+            (*env)->DeleteLocalRef(env, oomCls);
+        }
+        return;
+    }
+
+    double interpFreq[NUMPTS + 2];
+    double interpGain[NUMPTS + 2];
+    memcpy(interpFreq + 1, freqs, eqPts * sizeof(double));
+    memcpy(interpGain + 1, gains, eqPts * sizeof(double));
+    interpFreq[0] = 0.0;
+    interpGain[0] = interpGain[1];
+    interpFreq[eqPts + 1] = 24000.0;
+    interpGain[eqPts + 1] = interpGain[eqPts];
+
+    cubic_hermite *curve;
+    if (interpolationMode == 1)
+    {
+        makima(&pch2, interpFreq, interpGain, eqPts + 2, 1, 1);
+        curve = &pch2.cb;
+    }
+    else
+    {
+        pchip(&pch1, interpFreq, interpGain, eqPts + 2, 1, 1);
+        curve = &pch1.cb;
+    }
+
+    float coeff0[VIPER_PREVIEW_BANDS];
+    float coeff1[VIPER_PREVIEW_BANDS];
+    float coeff2[VIPER_PREVIEW_BANDS];
+    float bandGain[VIPER_PREVIEW_BANDS];
+    ViperPreviewUpdateCoeffs((int)srate, coeff0, coeff1, coeff2);
+    for (int i = 0; i < VIPER_PREVIEW_BANDS; i++)
+    {
+        double gainDb = getValueAt(curve, VIPER_PREVIEW_CENTER_FREQS[i]);
+        bandGain[i] = (float)(pow(10.0, gainDb / 20.0) * VIPER_BAND_GAIN_SCALE);
+    }
+
+    const double sampleRate = srate > 0 ? (double)srate : 1.0;
+    for (int i = 0; i < nPts; i++)
+    {
+        double omega = (2.0 * M_PI * dispFreq[i]) / sampleRate;
+        double sinW = sin(omega);
+        double cosW = cos(omega);
+        double sin2W = sin(omega + omega);
+        double cos2W = cos(omega + omega);
+        double sumRe = 0.0;
+        double sumIm = 0.0;
+
+        for (int band = 0; band < VIPER_PREVIEW_BANDS; band++)
+        {
+            double c0 = coeff0[band];
+            double c1 = coeff1[band];
+            double c2 = coeff2[band];
+            double g = bandGain[band];
+
+            double numRe = c1 * (1.0 - cos2W);
+            double numIm = c1 * sin2W;
+            double denRe = 1.0 - c2 * cosW + c0 * cos2W;
+            double denIm = c2 * sinW - c0 * sin2W;
+            double denMagSq = denRe * denRe + denIm * denIm;
+            // Conservative denominator floor to avoid unstable 1/denMagSq amplification
+            // near poles/zeros. 1e-24 is intentionally well above DBL_MIN and effectively
+            // skips near-singular bands where denRe^2 + denIm^2 is too close to zero.
+            if (denMagSq < 1.0e-24)
+                continue;
+
+            double hRe = (numRe * denRe + numIm * denIm) / denMagSq;
+            double hIm = (numIm * denRe - numRe * denIm) / denMagSq;
+            sumRe += hRe * g;
+            sumIm += hIm * g;
+        }
+
+        double magnitude = hypot(sumRe, sumIm);
+        if (magnitude < 1.0e-20)
+            magnitude = 1.0e-20;
+        response[i] = (float)(20.0 * log10(magnitude));
+    }
+
+    (*env)->ReleaseDoubleArrayElements(env, jfreq, freqs, JNI_ABORT);
+    (*env)->ReleaseDoubleArrayElements(env, jgain, gains, JNI_ABORT);
+    (*env)->ReleaseDoubleArrayElements(env, jdispFreq, dispFreq, JNI_ABORT);
+    (*env)->ReleaseFloatArrayElements(env, jresponse, response, 0);
 }
 
 JNIEXPORT void JNICALL Java_me_timschneeberger_rootlessjamesdsp_interop_JdspImpResToolbox_ComputeIIREqualizerCplx(JNIEnv *env, jobject obj, jint srate, jint order, jdoubleArray jfreq, jdoubleArray jgain, jint nPts, jdoubleArray jdispFreq, jdoubleArray jcplxRe, jdoubleArray jcplxIm)

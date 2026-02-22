@@ -15,7 +15,7 @@ class JamesDspLocalEngine(context: Context, callbacks: JamesDspWrapper.JamesDspC
     override var sampleRate: Float
         set(value) {
             super.sampleRate = value
-            JamesDspWrapper.setSamplingRate(handle, value, false)
+            JamesDspWrapper.setSamplingRate(handle, value, true)
             context.sendLocalBroadcast(Intent(Constants.ACTION_SAMPLE_RATE_UPDATED))
         }
         get() = super.sampleRate
@@ -172,7 +172,16 @@ class JamesDspLocalEngine(context: Context, callbacks: JamesDspWrapper.JamesDspC
         interpolationMode: Int,
         bands: DoubleArray
     ): Boolean {
-        return JamesDspWrapper.setMultiEqualizer(handle, enable, filterType, interpolationMode, bands)
+        // ViPER wrapper compatibility transport is 65551 (enable) + 65552 (band index + centi-dB).
+        // Local libjamesdsp has no safe per-command equivalent and applies EQ via one JNI payload,
+        // so we keep behavior parity by normalizing to canonical axes before forwarding.
+        return JamesDspWrapper.setMultiEqualizer(
+            handle,
+            enable,
+            filterType,
+            interpolationMode,
+            EqNormalization.normalizeMultiEqBands(filterType, bands, EQ_FILTER_TYPE_VIPER_ORIGINAL)
+        )
     }
 
     override fun setCompanderInternal(
@@ -219,6 +228,8 @@ class JamesDspLocalEngine(context: Context, callbacks: JamesDspWrapper.JamesDspC
         lpCutoffOffsetHz: Int,
         harmonics: DoubleArray
     ): Boolean {
+        // Local engine talks to libjamesdsp directly, so ViPER transport IDs 65548/65549/65550
+        // are represented by this single JNI call instead of discrete parameter writes.
         return JamesDspWrapper.setSpectrumExtension(
             handle,
             enable,
@@ -289,5 +300,9 @@ class JamesDspLocalEngine(context: Context, callbacks: JamesDspWrapper.JamesDspC
     override fun freezeLiveprogExecution(freeze: Boolean)
     {
         JamesDspWrapper.freezeLiveprogExecution(handle, freeze)
+    }
+
+    companion object {
+        private const val EQ_FILTER_TYPE_VIPER_ORIGINAL = 6
     }
 }
