@@ -110,8 +110,10 @@
     <string name="key_spectrum_ext_strength_unit" translatable="false">spectrum_ext_strength_unit</string>
     <string name="key_spectrum_ext_strength_percent" translatable="false">spectrum_ext_strength_percent</string>
     <string name="key_spectrum_ext_strength_db" translatable="false">spectrum_ext_strength_db</string>
+    <string name="key_spectrum_ext_allow_boost" translatable="false">spectrum_ext_allow_boost</string>
     <string name="key_spectrum_ext_ref_freq" translatable="false">spectrum_ext_ref_freq</string>
     <string name="key_spectrum_ext_wet_mix" translatable="false">spectrum_ext_wet_mix</string>
+    <string name="key_spectrum_ext_wet_only_monitor" translatable="false">spectrum_ext_wet_only_monitor</string>
     <string name="key_spectrum_ext_post_gain" translatable="false">spectrum_ext_post_gain</string>
     <string name="key_spectrum_ext_safety" translatable="false">spectrum_ext_safety</string>
     <string name="key_spectrum_ext_hp_q" translatable="false">spectrum_ext_hp_q</string>

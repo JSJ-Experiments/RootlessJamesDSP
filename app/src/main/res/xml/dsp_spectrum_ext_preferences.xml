@@ -42,6 +42,14 @@
             app:showSeekBarValue="true"
             app:iconSpaceReserved="false" />
 
+        <SwitchPreferenceCompat
+            android:key="@string/key_spectrum_ext_allow_boost"
+            android:title="@string/spectrum_ext_allow_boost"
+            android:summary="@string/spectrum_ext_allow_boost_summary"
+            android:defaultValue="false"
+            app:allowDividerAbove="false"
+            app:iconSpaceReserved="false" />
+
         <me.timschneeberger.rootlessjamesdsp.preference.MaterialSeekbarPreference
             android:key="@string/key_spectrum_ext_ref_freq"
             android:title="@string/spectrum_ext_ref_freq"
@@ -64,6 +72,14 @@
             app:allowDividerAbove="false"
             app:updatesContinuously="true"
             app:showSeekBarValue="true"
+            app:iconSpaceReserved="false" />
+
+        <SwitchPreferenceCompat
+            android:key="@string/key_spectrum_ext_wet_only_monitor"
+            android:title="@string/spectrum_ext_wet_only_monitor"
+            android:summary="@string/spectrum_ext_wet_only_monitor_summary"
+            android:defaultValue="false"
+            app:allowDividerAbove="false"
             app:iconSpaceReserved="false" />
 
         <me.timschneeberger.rootlessjamesdsp.preference.MaterialSeekbarPreference

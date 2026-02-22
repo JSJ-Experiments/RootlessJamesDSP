@@ -478,6 +478,7 @@ class JamesDspRemoteEngine(
         strengthLinear: Float,
         referenceFreq: Int,
         wetMix: Float,
+        wetOnlyMonitor: Boolean,
         postGainDb: Float,
         safetyEnabled: Boolean,
         hpQ: Float,
@@ -503,6 +504,9 @@ class JamesDspRemoteEngine(
 
         if (enable) {
             val fallbackToLegacy = {
+                if (wetOnlyMonitor) {
+                    Timber.w("Spectrum wet-only monitor is unavailable in legacy protocol mode.")
+                }
                 val referenceResult = effect.setParameter(PARAM_SPECTRUM_EXTENSION_BARK, referenceFreq)
                 if (referenceResult != AudioEffect.SUCCESS) {
                     markUnsupported(referenceResult, true)
@@ -533,7 +537,7 @@ class JamesDspRemoteEngine(
                     hpQ,
                     lpQ,
                     lpCutoffOffsetHz.toFloat()
-                ) + safeHarmonics.map { it.toFloat() }
+                ) + safeHarmonics.map { it.toFloat() } + floatArrayOf(if (wetOnlyMonitor) 1.0f else 0.0f)
                 val payloadResult = effect.setParameterFloatArray(PARAM_SPECTRUM_EXTENSION, payload)
 
                 if (payloadResult == AudioEffect.SUCCESS) {

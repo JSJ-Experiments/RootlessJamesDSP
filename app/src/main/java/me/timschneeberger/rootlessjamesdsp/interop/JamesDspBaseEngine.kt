@@ -32,12 +32,14 @@ abstract class JamesDspBaseEngine(val context: Context, val callbacks: JamesDspW
         private const val SPECTRUM_STRENGTH_UNIT_PERCENT = "percent"
         private const val SPECTRUM_STRENGTH_UNIT_DB = "db"
         private const val SPECTRUM_STRENGTH_DB_MIN = -40.0f
-        private const val SPECTRUM_STRENGTH_DB_MAX = 0.0f
+        private const val SPECTRUM_STRENGTH_DB_DEFAULT_MAX = 0.0f
+        private const val SPECTRUM_STRENGTH_DB_BOOST_MAX = 12.0f
         private const val SPECTRUM_STRENGTH_PERCENT_MIN = 0.0f
         private const val SPECTRUM_STRENGTH_PERCENT_MAX = 100.0f
         private const val SPECTRUM_HARMONICS_DEFAULT_RAW = "0.02;0;0.02;0;0.02;0;0.02;0;0.02;0"
         private const val MAX_EQ_INTERPOLATION_MODE = 1
         private val DEFAULT_SPECTRUM_HARMONICS = doubleArrayOf(0.02, 0.0, 0.02, 0.0, 0.02, 0.0, 0.02, 0.0, 0.02, 0.0)
+        private val SPECTRUM_STRENGTH_PERCENT_BOOST_MAX = 10.0.pow((SPECTRUM_STRENGTH_DB_BOOST_MAX / 20.0f).toDouble()).toFloat() * SPECTRUM_STRENGTH_PERCENT_MAX
     }
 
     abstract var enabled: Boolean
@@ -128,8 +130,10 @@ abstract class JamesDspBaseEngine(val context: Context, val callbacks: JamesDspW
             val spectrumStrengthUnit = cache.get(R.string.key_spectrum_ext_strength_unit, SPECTRUM_STRENGTH_UNIT_PERCENT)
             val spectrumStrengthPercent = cache.get(R.string.key_spectrum_ext_strength_percent, 10f)
             val spectrumStrengthDb = cache.get(R.string.key_spectrum_ext_strength_db, -20f)
+            val spectrumAllowBoost = cache.get(R.string.key_spectrum_ext_allow_boost, false)
             val spectrumRefFreq = cache.get(R.string.key_spectrum_ext_ref_freq, 7600f).toInt()
             val spectrumWetMix = cache.get(R.string.key_spectrum_ext_wet_mix, 100f)
+            val spectrumWetOnlyMonitor = cache.get(R.string.key_spectrum_ext_wet_only_monitor, false)
             val spectrumPostGain = cache.get(R.string.key_spectrum_ext_post_gain, 0f)
             val spectrumSafety = cache.get(R.string.key_spectrum_ext_safety, false)
             val spectrumHpQ = cache.get(R.string.key_spectrum_ext_hp_q, 0.717f)
@@ -246,8 +250,10 @@ abstract class JamesDspBaseEngine(val context: Context, val callbacks: JamesDspW
                         spectrumStrengthUnit,
                         spectrumStrengthPercent,
                         spectrumStrengthDb,
+                        spectrumAllowBoost,
                         spectrumRefFreq,
                         spectrumWetMix,
+                        spectrumWetOnlyMonitor,
                         spectrumPostGain,
                         spectrumSafety,
                         spectrumHpQ,
@@ -491,8 +497,10 @@ abstract class JamesDspBaseEngine(val context: Context, val callbacks: JamesDspW
         strengthUnit: String,
         strengthPercent: Float,
         strengthDb: Float,
+        allowBoost: Boolean,
         referenceFreq: Int,
         wetMixPercent: Float,
+        wetOnlyMonitor: Boolean,
         postGainDb: Float,
         safetyEnabled: Boolean,
         hpQ: Float,
@@ -500,8 +508,10 @@ abstract class JamesDspBaseEngine(val context: Context, val callbacks: JamesDspW
         lpCutoffOffsetHz: Int,
         harmonicsRaw: String,
     ): Boolean {
+        val maxDb = if (allowBoost) SPECTRUM_STRENGTH_DB_BOOST_MAX else SPECTRUM_STRENGTH_DB_DEFAULT_MAX
+        val maxPercent = if (allowBoost) SPECTRUM_STRENGTH_PERCENT_BOOST_MAX else SPECTRUM_STRENGTH_PERCENT_MAX
         val uiStrength = if (strengthUnit == SPECTRUM_STRENGTH_UNIT_DB) {
-            val clampedDb = strengthDb.coerceIn(SPECTRUM_STRENGTH_DB_MIN, SPECTRUM_STRENGTH_DB_MAX)
+            val clampedDb = strengthDb.coerceIn(SPECTRUM_STRENGTH_DB_MIN, maxDb)
             // Map the minimum db value to full-off for stable round-tripping with percent mode.
             if (clampedDb <= SPECTRUM_STRENGTH_DB_MIN) {
                 0.0f
@@ -510,7 +520,7 @@ abstract class JamesDspBaseEngine(val context: Context, val callbacks: JamesDspW
             }
         } else {
             strengthPercent
-        }.coerceIn(SPECTRUM_STRENGTH_PERCENT_MIN, SPECTRUM_STRENGTH_PERCENT_MAX)
+        }.coerceIn(SPECTRUM_STRENGTH_PERCENT_MIN, maxPercent)
 
         // Stock ViPER mapping: param65550 = trunc(strength * 5.6), core uses /100.
         // The local JNI path applies Spectrum params as a single native call instead of discrete
@@ -524,6 +534,7 @@ abstract class JamesDspBaseEngine(val context: Context, val callbacks: JamesDspW
             exciter,
             referenceFreq,
             wetMixPercent.coerceIn(0f, 100f) / 100.0f,
+            wetOnlyMonitor,
             postGainDb.coerceIn(-24f, 24f),
             safetyEnabled,
             hpQ.coerceIn(0.1f, 3.0f),
@@ -791,6 +802,7 @@ abstract class JamesDspBaseEngine(val context: Context, val callbacks: JamesDspW
         strengthLinear: Float,
         referenceFreq: Int,
         wetMix: Float,
+        wetOnlyMonitor: Boolean,
         postGainDb: Float,
         safetyEnabled: Boolean,
         hpQ: Float,

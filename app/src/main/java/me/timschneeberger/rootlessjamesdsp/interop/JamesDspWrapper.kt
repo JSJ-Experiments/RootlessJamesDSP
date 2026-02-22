@@ -67,6 +67,7 @@ object JamesDspWrapper {
         strengthLinear: Float,
         referenceFreq: Int,
         wetMix: Float,
+        wetOnlyMonitor: Boolean,
         postGainDb: Float,
         safetyEnabled: Boolean,
         hpQ: Float,

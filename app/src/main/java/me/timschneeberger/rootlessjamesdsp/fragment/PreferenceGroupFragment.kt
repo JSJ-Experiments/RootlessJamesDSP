@@ -15,6 +15,7 @@ import androidx.preference.Preference.SummaryProvider
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.ListPreference
 import androidx.preference.PreferenceScreen
+import androidx.preference.SwitchPreferenceCompat
 import androidx.recyclerview.widget.RecyclerView
 import me.timschneeberger.rootlessjamesdsp.R
 import me.timschneeberger.rootlessjamesdsp.activity.GraphicEqualizerActivity
@@ -248,18 +249,52 @@ class PreferenceGroupFragment : PreferenceFragmentCompat(), KoinComponent {
                 val unitPref = findPreference<ListPreference>(getString(R.string.key_spectrum_ext_strength_unit))
                 val strengthPercentPref = findPreference<MaterialSeekbarPreference>(getString(R.string.key_spectrum_ext_strength_percent))
                 val strengthDbPref = findPreference<MaterialSeekbarPreference>(getString(R.string.key_spectrum_ext_strength_db))
+                val allowBoostPref = findPreference<SwitchPreferenceCompat>(getString(R.string.key_spectrum_ext_allow_boost))
                 val harmonicsPref = findPreference<EditTextPreference>(getString(R.string.key_spectrum_ext_harmonics))
 
                 bindStrengthUnitPreferences(
                     unitPref = unitPref,
                     strengthPercentPref = strengthPercentPref,
                     strengthDbPref = strengthDbPref,
-                    maxDb = 0.0f,
+                    maxDbProvider = {
+                        if (allowBoostPref?.isChecked == true) {
+                            SPECTRUM_STRENGTH_BOOST_DB_MAX
+                        } else {
+                            SPECTRUM_STRENGTH_DB_DEFAULT_MAX
+                        }
+                    },
                     minPercent = 0.0f,
-                    maxPercent = 100.0f,
+                    maxPercentProvider = {
+                        if (allowBoostPref?.isChecked == true) {
+                            strengthPercentFromDb(SPECTRUM_STRENGTH_BOOST_DB_MAX)
+                        } else {
+                            100.0f
+                        }
+                    },
                     minLinear = 0.0f,
                     mapMinDbToZero = true
                 )
+
+                fun applyBoostUi(isEnabled: Boolean) {
+                    val maxDb = if (isEnabled) SPECTRUM_STRENGTH_BOOST_DB_MAX else SPECTRUM_STRENGTH_DB_DEFAULT_MAX
+                    val maxPercent = if (isEnabled) strengthPercentFromDb(SPECTRUM_STRENGTH_BOOST_DB_MAX) else 100.0f
+
+                    strengthDbPref?.setMax(maxDb)
+                    strengthPercentPref?.setMax(maxPercent)
+
+                    if ((strengthDbPref?.getValue() ?: maxDb) > maxDb) {
+                        strengthDbPref?.setValue(maxDb)
+                    }
+                    if ((strengthPercentPref?.getValue() ?: maxPercent) > maxPercent) {
+                        strengthPercentPref?.setValue(maxPercent)
+                    }
+                }
+
+                applyBoostUi(allowBoostPref?.isChecked == true)
+                allowBoostPref?.setOnPreferenceChangeListener { _, newValue ->
+                    applyBoostUi(newValue as Boolean)
+                    true
+                }
 
                 harmonicsPref?.setOnPreferenceChangeListener { _, newValue ->
                     val harmonicsRaw = (newValue as? String)?.trim().orEmpty()
@@ -279,9 +314,9 @@ class PreferenceGroupFragment : PreferenceFragmentCompat(), KoinComponent {
                     unitPref = unitPref,
                     strengthPercentPref = strengthPercentPref,
                     strengthDbPref = strengthDbPref,
-                    maxDb = CLARITY_STRENGTH_DB_MAX,
+                    maxDbProvider = { CLARITY_STRENGTH_DB_MAX },
                     minPercent = 0.0f,
-                    maxPercent = 800.0f,
+                    maxPercentProvider = { 800.0f },
                     minLinear = 0.0f,
                     mapMinDbToZero = true
                 )
@@ -322,19 +357,19 @@ class PreferenceGroupFragment : PreferenceFragmentCompat(), KoinComponent {
         unitPref: ListPreference?,
         strengthPercentPref: MaterialSeekbarPreference?,
         strengthDbPref: MaterialSeekbarPreference?,
-        maxDb: Float,
+        maxDbProvider: () -> Float,
         minPercent: Float,
-        maxPercent: Float,
+        maxPercentProvider: () -> Float,
         minLinear: Float = 0.01f,
         mapMinDbToZero: Boolean = false,
     ) {
-        val maxLinear = dbToLinear(maxDb)
         val minDb = MIN_STRENGTH_DB
         val percentUnit = requireContext().getString(R.string.strength_unit_value_percent)
         val dbUnit = requireContext().getString(R.string.strength_unit_value_db)
         var internalUpdate = false
 
         fun percentToLinear(percent: Float): Float {
+            val maxLinear = dbToLinear(maxDbProvider())
             return clampLinear(percent / 100.0f, minLinear, maxLinear)
         }
 
@@ -342,6 +377,7 @@ class PreferenceGroupFragment : PreferenceFragmentCompat(), KoinComponent {
             if (mapMinDbToZero && db <= minDb) {
                 return 0.0f
             }
+            val maxLinear = dbToLinear(maxDbProvider())
             return clampLinear(dbToLinear(db), minLinear, maxLinear)
         }
 
@@ -349,12 +385,12 @@ class PreferenceGroupFragment : PreferenceFragmentCompat(), KoinComponent {
             if (mapMinDbToZero && linear <= 0.0f) {
                 return minDb
             }
-            return linearToDb(linear).coerceIn(minDb, maxDb)
+            return linearToDb(linear).coerceIn(minDb, maxDbProvider())
         }
 
         strengthPercentPref?.setOnPreferenceChangeListener { _, newValue ->
             if (internalUpdate) return@setOnPreferenceChangeListener true
-            val percent = (newValue as Float).coerceIn(minPercent, maxPercent)
+            val percent = (newValue as Float).coerceIn(minPercent, maxPercentProvider())
             val linear = percentToLinear(percent)
             val db = linearToDbMapped(linear)
             internalUpdate = true
@@ -365,9 +401,9 @@ class PreferenceGroupFragment : PreferenceFragmentCompat(), KoinComponent {
 
         strengthDbPref?.setOnPreferenceChangeListener { _, newValue ->
             if (internalUpdate) return@setOnPreferenceChangeListener true
-            val db = (newValue as Float).coerceIn(minDb, maxDb)
+            val db = (newValue as Float).coerceIn(minDb, maxDbProvider())
             val linear = dbToLinearMapped(db)
-            val percent = (linear * 100.0f).coerceIn(minPercent, maxPercent)
+            val percent = (linear * 100.0f).coerceIn(minPercent, maxPercentProvider())
             internalUpdate = true
             strengthPercentPref?.setValue(percent)
             internalUpdate = false
@@ -384,7 +420,7 @@ class PreferenceGroupFragment : PreferenceFragmentCompat(), KoinComponent {
             } else if (newUnit == percentUnit) {
                 val db = strengthDbPref?.getValue() ?: minDb
                 val linear = dbToLinearMapped(db)
-                strengthPercentPref?.setValue((linear * 100.0f).coerceIn(minPercent, maxPercent))
+                strengthPercentPref?.setValue((linear * 100.0f).coerceIn(minPercent, maxPercentProvider()))
             }
             internalUpdate = false
             setStrengthVisibility(newUnit, strengthPercentPref, strengthDbPref)
@@ -412,6 +448,8 @@ class PreferenceGroupFragment : PreferenceFragmentCompat(), KoinComponent {
     private fun linearToDb(linear: Float): Float = if (linear <= 0.0f) MIN_STRENGTH_DB else 20.0f * log10(linear)
 
     private fun dbToLinear(db: Float): Float = 10.0.pow((db / 20.0f).toDouble()).toFloat()
+
+    private fun strengthPercentFromDb(db: Float): Float = dbToLinear(db) * 100.0f
 
     /**
      * Domain-specific clamping for linear gain values used by [linearToDb] and [dbToLinear].
@@ -460,6 +498,8 @@ class PreferenceGroupFragment : PreferenceFragmentCompat(), KoinComponent {
         private const val CROSSFEED_MODE_DEFAULT_VALUE = "5"
         private const val CUSTOM_CROSSFEED_MODE_VALUE = "99"
         private const val MIN_STRENGTH_DB = -40.0f
+        private const val SPECTRUM_STRENGTH_DB_DEFAULT_MAX = 0.0f
+        private const val SPECTRUM_STRENGTH_BOOST_DB_MAX = 12.0f
         private const val CLARITY_STRENGTH_LINEAR_MAX = 8.0f
         private val CLARITY_STRENGTH_DB_MAX = (20.0 * log10(CLARITY_STRENGTH_LINEAR_MAX.toDouble())).toFloat()
         // Semicolon-separated decimal numbers used by Spectrum Extension harmonics list.

@@ -147,10 +147,14 @@
     <string name="spectrum_ext_enable">Spectrum extension</string>
     <string name="spectrum_ext_strength">Strength</string>
     <string name="spectrum_ext_strength_unit">Strength unit</string>
+    <string name="spectrum_ext_allow_boost">Allow strength above 0 dB</string>
+    <string name="spectrum_ext_allow_boost_summary">Experimental. Expands the strength range above stock limits.</string>
     <string name="strength_unit_percent">Percent</string>
     <string name="strength_unit_db">dB</string>
     <string name="spectrum_ext_ref_freq">Reference frequency</string>
     <string name="spectrum_ext_wet_mix">Wet mix</string>
+    <string name="spectrum_ext_wet_only_monitor">Monitor added signal only</string>
+    <string name="spectrum_ext_wet_only_monitor_summary">Mutes the original signal and outputs only Spectrum Extension content.</string>
     <string name="spectrum_ext_post_gain">Post gain</string>
     <string name="spectrum_ext_safety">Safety limiter</string>
     <string name="spectrum_ext_safety_summary">Disabled by default. Enable to reduce overload and clipping.</string>
