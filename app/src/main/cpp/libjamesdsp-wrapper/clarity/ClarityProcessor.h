@@ -148,6 +148,7 @@ public:
 private:
     void applyMode(float* samples, uint32_t frames);
     void applyPostGainAndSafety(float* samples, uint32_t frames);
+    void updateSafetyReleaseCoef();
     void syncFilterGain();
 
     NoiseSharpening natural;
@@ -155,13 +156,15 @@ private:
     HiFi xhifi;
 
     bool enabled = false;
-    Mode mode = Mode::NATURAL;
+    int mode = static_cast<int>(Mode::NATURAL);
     uint32_t samplingRate = DEFAULT_SR;
-    float gain = 1.0f;
+    float gain = 0.0f;
+    int ozoneFreqHz = 8250;
     float postGainLinear = 1.0f;
 
     bool safetyEnabled = false;
-    float safetyThreshold = 0.95f;
+    float safetyThresholdLinear = 0.95f;
+    float safetyReleaseMs = 60.0f;
     float safetyEnv = 0.0f;
     float safetyReleaseCoef = 0.995f;
 };

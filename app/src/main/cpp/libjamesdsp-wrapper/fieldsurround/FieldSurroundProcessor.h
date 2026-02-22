@@ -12,6 +12,7 @@ public:
 
 private:
     std::vector<float> samples;
+    uint32_t sampleCount = 0;
     uint32_t offset = 0;
 };
 
@@ -69,7 +70,7 @@ private:
 class DepthSurround {
 public:
     void setSamplingRate(uint32_t samplingRate);
-    void setStrength(int strength);
+    void setStrength(int16_t strength);
     void setDelayMs(float leftMs, float rightMs);
     void setHighPass(float frequencyHz, float gainDb, float qFactor);
     void setBranchThreshold(int threshold);
@@ -81,7 +82,7 @@ private:
     void configureFilters();
     void refreshStrength();
 
-    int strength = 0;
+    int16_t strength = 0;
     bool enabled = false;
     bool strengthAtLeastThreshold = false;
     float gain = 0.0f;

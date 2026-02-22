@@ -94,9 +94,11 @@ class EqualizerDialogFragment : PreferenceDialogFragmentCompat() {
             true
         }
 
-        val type = PreferenceCache.uncachedGet(requireContext(), Constants.PREF_EQ, R.string.key_eq_filter_type, "0").toIntOrNull() ?: 0
+        val type = PreferenceCache.uncachedGet(requireContext(), Constants.PREF_EQ, R.string.key_eq_filter_type, "6").toIntOrNull() ?: 6
+        val interpolationMode = PreferenceCache.uncachedGet(requireContext(), Constants.PREF_EQ, R.string.key_eq_interpolation, "0").toIntOrNull() ?: 0
         equalizer!!.isViperOriginalMode = (type == 6)
         equalizer!!.mode = if(type == 0) EqualizerSurface.Mode.Fir else EqualizerSurface.Mode.Iir
+        equalizer!!.interpolationMode = interpolationMode
         equalizer!!.iirOrder = when(type) {
             1 -> 4
             2 -> 6
@@ -159,27 +161,20 @@ class EqualizerDialogFragment : PreferenceDialogFragmentCompat() {
         val gains = mLevels.copyOf()
 
         if (equalizer?.isViperOriginalMode == true) {
-            val extraFreqs = doubleArrayOf(17000.0, 18000.0, 19000.0, 20000.0, 22000.0)
-            if (EqualizerSurface.SCALE.size != EqualizerSurface.VIPER_ORIGINAL_SCALE.size + extraFreqs.size ||
-                gains.size < EqualizerSurface.VIPER_ORIGINAL_SCALE.size ||
+            if (freqs.size < EqualizerSurface.VIPER_ORIGINAL_FULL_SCALE.size ||
+                gains.size < EqualizerSurface.VIPER_ORIGINAL_FULL_SCALE.size ||
                 freqs.size != gains.size
             ) {
                 Timber.e(
-                    "buildCurrentSettingValue: invalid scale invariant (scale=%d, viper=%d, extra=%d, gains=%d)",
+                    "buildCurrentSettingValue: invalid scale invariant (scale=%d, viperFull=%d, gains=%d)",
                     EqualizerSurface.SCALE.size,
-                    EqualizerSurface.VIPER_ORIGINAL_SCALE.size,
-                    extraFreqs.size,
+                    EqualizerSurface.VIPER_ORIGINAL_FULL_SCALE.size,
                     gains.size
                 )
                 return (freqs + gains).joinToString(";")
             }
-            for (i in EqualizerSurface.VIPER_ORIGINAL_SCALE.indices) {
-                freqs[i] = EqualizerSurface.VIPER_ORIGINAL_SCALE[i]
-            }
-            val lastViperGain = gains[EqualizerSurface.VIPER_ORIGINAL_SCALE.lastIndex]
-            for ((offset, i) in (EqualizerSurface.VIPER_ORIGINAL_SCALE.size until gains.size).withIndex()) {
-                freqs[i] = extraFreqs[offset]
-                gains[i] = lastViperGain
+            for (i in EqualizerSurface.VIPER_ORIGINAL_FULL_SCALE.indices) {
+                freqs[i] = EqualizerSurface.VIPER_ORIGINAL_FULL_SCALE[i]
             }
         }
 

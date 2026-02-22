@@ -33,6 +33,7 @@ import me.timschneeberger.rootlessjamesdsp.utils.extensions.ContextExtensions.se
 import me.timschneeberger.rootlessjamesdsp.utils.extensions.ContextExtensions.toast
 import me.timschneeberger.rootlessjamesdsp.utils.extensions.ContextExtensions.unregisterLocalReceiver
 import me.timschneeberger.rootlessjamesdsp.utils.preferences.Preferences
+import me.timschneeberger.rootlessjamesdsp.utils.isRootless
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
@@ -114,6 +115,59 @@ class PreferenceGroupFragment : PreferenceFragmentCompat(), KoinComponent {
                         else
                             it.toString()
                     }
+            }
+            R.xml.dsp_crossfeed_preferences -> {
+                val modePref = findPreference<ListPreference>(getString(R.string.key_crossfeed_mode))
+                val customFcutPref = findPreference<MaterialSeekbarPreference>(getString(R.string.key_crossfeed_custom_fcut))
+                val customFeedPref = findPreference<MaterialSeekbarPreference>(getString(R.string.key_crossfeed_custom_feed))
+                val supportsCustomCrossfeed = isRootless()
+
+                fun updateCustomCrossfeedVisibility(mode: String?) {
+                    val isCustomMode = supportsCustomCrossfeed && mode == CUSTOM_CROSSFEED_MODE_VALUE
+                    customFcutPref?.isVisible = isCustomMode
+                    customFeedPref?.isVisible = isCustomMode
+                }
+
+                fun hideUnsupportedCustomMode() {
+                    if (supportsCustomCrossfeed || modePref == null) {
+                        return
+                    }
+
+                    val customIndex = modePref.entryValues
+                        .map(CharSequence::toString)
+                        .indexOf(CUSTOM_CROSSFEED_MODE_VALUE)
+                    if (customIndex >= 0) {
+                        modePref.entries = modePref.entries
+                            .filterIndexed { index, _ -> index != customIndex }
+                            .toTypedArray()
+                        modePref.entryValues = modePref.entryValues
+                            .filterIndexed { index, _ -> index != customIndex }
+                            .toTypedArray()
+                    }
+
+                    if (modePref.value == CUSTOM_CROSSFEED_MODE_VALUE) {
+                        modePref.value = CROSSFEED_MODE_DEFAULT_VALUE
+                        requireContext().toast("Custom crossfeed is unavailable on this backend. Using preset mode.", false)
+                    }
+                }
+
+                customFeedPref?.valueLabelOverride = fun(it: Float): String {
+                    return String.format("%.1f dB", it / 10.0f)
+                }
+
+                modePref?.setOnPreferenceChangeListener { _, newValue ->
+                    val selectedMode = newValue as? String
+                    if (!supportsCustomCrossfeed && selectedMode == CUSTOM_CROSSFEED_MODE_VALUE) {
+                        requireContext().toast("Custom crossfeed is unavailable on this backend.", false)
+                        false
+                    } else {
+                        updateCustomCrossfeedVisibility(selectedMode)
+                        true
+                    }
+                }
+
+                hideUnsupportedCustomMode()
+                updateCustomCrossfeedVisibility(modePref?.value)
             }
             R.xml.dsp_liveprog_preferences -> {
                 val liveprogParams = findPreference<Preference>(getString(R.string.key_liveprog_params))
@@ -199,9 +253,11 @@ class PreferenceGroupFragment : PreferenceFragmentCompat(), KoinComponent {
                     unitPref = unitPref,
                     strengthPercentPref = strengthPercentPref,
                     strengthDbPref = strengthDbPref,
-                    maxDb = 12.0f,
-                    minPercent = 1.0f,
-                    maxPercent = 400.0f
+                    maxDb = 0.0f,
+                    minPercent = 0.0f,
+                    maxPercent = 100.0f,
+                    minLinear = 0.0f,
+                    mapMinDbToZero = true
                 )
 
                 harmonicsPref?.setOnPreferenceChangeListener { _, newValue ->
@@ -222,9 +278,11 @@ class PreferenceGroupFragment : PreferenceFragmentCompat(), KoinComponent {
                     unitPref = unitPref,
                     strengthPercentPref = strengthPercentPref,
                     strengthDbPref = strengthDbPref,
-                    maxDb = 16.0f,
+                    maxDb = CLARITY_STRENGTH_DB_MAX,
                     minPercent = 0.0f,
-                    maxPercent = 631.0f
+                    maxPercent = 800.0f,
+                    minLinear = 0.0f,
+                    mapMinDbToZero = true
                 )
             }
         }
@@ -267,15 +325,37 @@ class PreferenceGroupFragment : PreferenceFragmentCompat(), KoinComponent {
         minPercent: Float,
         maxPercent: Float,
         minLinear: Float = 0.01f,
+        mapMinDbToZero: Boolean = false,
     ) {
         val maxLinear = dbToLinear(maxDb)
+        val minDb = -40.0f
+        val percentUnit = requireContext().getString(R.string.strength_unit_value_percent)
+        val dbUnit = requireContext().getString(R.string.strength_unit_value_db)
         var internalUpdate = false
+
+        fun percentToLinear(percent: Float): Float {
+            return clampLinear(percent / 100.0f, minLinear, maxLinear)
+        }
+
+        fun dbToLinearMapped(db: Float): Float {
+            if (mapMinDbToZero && db <= minDb) {
+                return 0.0f
+            }
+            return clampLinear(dbToLinear(db), minLinear, maxLinear)
+        }
+
+        fun linearToDbMapped(linear: Float): Float {
+            if (mapMinDbToZero && linear <= 0.0f) {
+                return minDb
+            }
+            return linearToDb(linear).coerceIn(minDb, maxDb)
+        }
 
         strengthPercentPref?.setOnPreferenceChangeListener { _, newValue ->
             if (internalUpdate) return@setOnPreferenceChangeListener true
             val percent = (newValue as Float).coerceIn(minPercent, maxPercent)
-            val linear = clampLinear(percent / 100.0f, minLinear, maxLinear)
-            val db = linearToDb(linear).coerceIn(-40.0f, maxDb)
+            val linear = percentToLinear(percent)
+            val db = linearToDbMapped(linear)
             internalUpdate = true
             strengthDbPref?.setValue(db)
             internalUpdate = false
@@ -284,8 +364,8 @@ class PreferenceGroupFragment : PreferenceFragmentCompat(), KoinComponent {
 
         strengthDbPref?.setOnPreferenceChangeListener { _, newValue ->
             if (internalUpdate) return@setOnPreferenceChangeListener true
-            val db = (newValue as Float).coerceIn(-40.0f, maxDb)
-            val linear = clampLinear(dbToLinear(db), minLinear, maxLinear)
+            val db = (newValue as Float).coerceIn(minDb, maxDb)
+            val linear = dbToLinearMapped(db)
             val percent = (linear * 100.0f).coerceIn(minPercent, maxPercent)
             internalUpdate = true
             strengthPercentPref?.setValue(percent)
@@ -294,7 +374,19 @@ class PreferenceGroupFragment : PreferenceFragmentCompat(), KoinComponent {
         }
 
         unitPref?.setOnPreferenceChangeListener { _, newValue ->
-            setStrengthVisibility(newValue as String, strengthPercentPref, strengthDbPref)
+            val newUnit = newValue as String
+            internalUpdate = true
+            if (newUnit == dbUnit) {
+                val percent = strengthPercentPref?.getValue() ?: minPercent
+                val linear = percentToLinear(percent)
+                strengthDbPref?.setValue(linearToDbMapped(linear))
+            } else if (newUnit == percentUnit) {
+                val db = strengthDbPref?.getValue() ?: minDb
+                val linear = dbToLinearMapped(db)
+                strengthPercentPref?.setValue((linear * 100.0f).coerceIn(minPercent, maxPercent))
+            }
+            internalUpdate = false
+            setStrengthVisibility(newUnit, strengthPercentPref, strengthDbPref)
             true
         }
 
@@ -316,7 +408,7 @@ class PreferenceGroupFragment : PreferenceFragmentCompat(), KoinComponent {
         strengthDbPref?.isVisible = unit == dbUnit
     }
 
-    private fun linearToDb(linear: Float): Float = 20.0f * log10(linear)
+    private fun linearToDb(linear: Float): Float = if (linear <= 0.0f) -40.0f else 20.0f * log10(linear)
 
     private fun dbToLinear(db: Float): Float = 10.0.pow((db / 20.0f).toDouble()).toFloat()
 
@@ -333,7 +425,10 @@ class PreferenceGroupFragment : PreferenceFragmentCompat(), KoinComponent {
             return false
         }
         val parts = raw.split(";")
-        return parts.size == EXPECTED_HARMONICS_COUNT && parts.all { it.isNotBlank() && it.trim().toDoubleOrNull() != null }
+        return parts.size == EXPECTED_HARMONICS_COUNT && parts.all {
+            val parsed = it.trim().toDoubleOrNull()
+            parsed != null && parsed.isFinite()
+        }
     }
 
     @Suppress("DEPRECATION")
@@ -361,6 +456,10 @@ class PreferenceGroupFragment : PreferenceFragmentCompat(), KoinComponent {
     companion object {
         private const val BUNDLE_PREF_NAME = "preferencesName"
         private const val BUNDLE_XML_RES = "preferencesXmlRes"
+        private const val CROSSFEED_MODE_DEFAULT_VALUE = "5"
+        private const val CUSTOM_CROSSFEED_MODE_VALUE = "99"
+        private const val CLARITY_STRENGTH_LINEAR_MAX = 8.0f
+        private val CLARITY_STRENGTH_DB_MAX = (20.0 * log10(CLARITY_STRENGTH_LINEAR_MAX.toDouble())).toFloat()
         // Semicolon-separated decimal numbers used by Spectrum Extension harmonics list.
         private const val EXPECTED_HARMONICS_COUNT = 10
 

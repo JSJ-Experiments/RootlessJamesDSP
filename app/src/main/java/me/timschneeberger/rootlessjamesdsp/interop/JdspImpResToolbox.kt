@@ -51,6 +51,16 @@ object JdspImpResToolbox {
         response: FloatArray,
     )
 
+    external fun ComputeViperOriginalEqResponse(
+        srate: Int,
+        interpolationMode: Int,
+        freq: DoubleArray,
+        gain: DoubleArray,
+        nPts: Int,
+        dispFreq: DoubleArray,
+        response: FloatArray
+    )
+
     init {
         System.loadLibrary("jdspimprestoolbox")
     }

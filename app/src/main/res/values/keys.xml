@@ -144,6 +144,8 @@
 
     <string name="key_crossfeed_enable" translatable="false">bs2b_crossfeed_enable</string>
     <string name="key_crossfeed_mode" translatable="false">bs2b_crossfeed_mode</string>
+    <string name="key_crossfeed_custom_fcut" translatable="false">bs2b_crossfeed_custom_fcut</string>
+    <string name="key_crossfeed_custom_feed" translatable="false">bs2b_crossfeed_custom_feed</string>
 
     <string name="key_clarity_enable" translatable="false">clarity_enable</string>
     <string name="key_clarity_mode" translatable="false">clarity_mode</string>

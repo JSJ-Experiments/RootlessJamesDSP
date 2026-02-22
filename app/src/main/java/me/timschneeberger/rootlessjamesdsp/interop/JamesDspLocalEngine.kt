@@ -15,7 +15,7 @@ class JamesDspLocalEngine(context: Context, callbacks: JamesDspWrapper.JamesDspC
     override var sampleRate: Float
         set(value) {
             super.sampleRate = value
-            JamesDspWrapper.setSamplingRate(handle, value, false)
+            JamesDspWrapper.setSamplingRate(handle, value, true)
             context.sendLocalBroadcast(Intent(Constants.ACTION_SAMPLE_RATE_UPDATED))
         }
         get() = super.sampleRate
@@ -172,7 +172,41 @@ class JamesDspLocalEngine(context: Context, callbacks: JamesDspWrapper.JamesDspC
         interpolationMode: Int,
         bands: DoubleArray
     ): Boolean {
-        return JamesDspWrapper.setMultiEqualizer(handle, enable, filterType, interpolationMode, bands)
+        // ViPER wrapper compatibility transport is 65551 (enable) + 65552 (band index + centi-dB).
+        // Local libjamesdsp has no safe per-command equivalent and applies EQ via one JNI payload,
+        // so we keep behavior parity by normalizing to canonical axes before forwarding.
+        return JamesDspWrapper.setMultiEqualizer(
+            handle,
+            enable,
+            filterType,
+            interpolationMode,
+            normalizeMultiEqBands(filterType, bands)
+        )
+    }
+
+    private fun normalizeMultiEqBands(filterType: Int, bands: DoubleArray): DoubleArray {
+        if (bands.size != EQ_FIELDS) {
+            return bands
+        }
+
+        val normalized = bands.copyOf()
+        when (filterType) {
+            EQ_FILTER_TYPE_VIPER_ORIGINAL -> {
+                VIPER_SCALE.forEachIndexed { index, freq ->
+                    normalized[index] = freq
+                }
+                VIPER_EXT_SCALE.forEachIndexed { offset, freq ->
+                    normalized[VIPER_SCALE.size + offset] = freq
+                }
+            }
+            else -> {
+                STANDARD_SCALE.forEachIndexed { index, freq ->
+                    normalized[index] = freq
+                }
+            }
+        }
+
+        return normalized
     }
 
     override fun setCompanderInternal(
@@ -219,6 +253,8 @@ class JamesDspLocalEngine(context: Context, callbacks: JamesDspWrapper.JamesDspC
         lpCutoffOffsetHz: Int,
         harmonics: DoubleArray
     ): Boolean {
+        // Local engine talks to libjamesdsp directly, so ViPER transport IDs 65548/65549/65550
+        // are represented by this single JNI call instead of discrete parameter writes.
         return JamesDspWrapper.setSpectrumExtension(
             handle,
             enable,
@@ -289,5 +325,19 @@ class JamesDspLocalEngine(context: Context, callbacks: JamesDspWrapper.JamesDspC
     override fun freezeLiveprogExecution(freeze: Boolean)
     {
         JamesDspWrapper.freezeLiveprogExecution(handle, freeze)
+    }
+
+    companion object {
+        private const val EQ_FIELDS = 30
+        private const val EQ_FILTER_TYPE_VIPER_ORIGINAL = 6
+        private val STANDARD_SCALE = doubleArrayOf(
+            25.0, 40.0, 63.0, 100.0, 160.0, 250.0, 400.0, 630.0, 1000.0, 1600.0, 2500.0, 4000.0, 6300.0, 10000.0, 16000.0
+        )
+        private val VIPER_SCALE = doubleArrayOf(
+            31.0, 62.0, 125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0, 8000.0, 16000.0
+        )
+        private val VIPER_EXT_SCALE = doubleArrayOf(
+            17000.0, 18000.0, 19000.0, 20000.0, 22000.0
+        )
     }
 }

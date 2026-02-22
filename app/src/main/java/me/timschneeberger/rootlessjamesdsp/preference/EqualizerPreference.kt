@@ -87,9 +87,11 @@ class EqualizerPreference : DialogPreference, SharedPreferences.OnSharedPreferen
     }
 
     fun updateFilterType() {
-        val type = PreferenceCache.uncachedGet(context, Constants.PREF_EQ, R.string.key_eq_filter_type, "0").toIntOrNull() ?: 0
+        val type = PreferenceCache.uncachedGet(context, Constants.PREF_EQ, R.string.key_eq_filter_type, "6").toIntOrNull() ?: 6
+        val interpolationMode = PreferenceCache.uncachedGet(context, Constants.PREF_EQ, R.string.key_eq_interpolation, "0").toIntOrNull() ?: 0
         equalizerView?.isViperOriginalMode = (type == 6)
         equalizerView?.mode = if(type == 0) EqualizerSurface.Mode.Fir else EqualizerSurface.Mode.Iir
+        equalizerView?.interpolationMode = interpolationMode
         equalizerView?.iirOrder = when(type) {
             1 -> 4
             2 -> 6
@@ -110,7 +112,7 @@ class EqualizerPreference : DialogPreference, SharedPreferences.OnSharedPreferen
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
-        if(key == context.getString(R.string.key_eq_filter_type)) {
+        if(key == context.getString(R.string.key_eq_filter_type) || key == context.getString(R.string.key_eq_interpolation)) {
             updateFilterType()
         }
     }
