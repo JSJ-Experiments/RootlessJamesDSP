@@ -6,9 +6,9 @@
 
 ## 0. How to use this document
 
-- Treat sections 4 through 11 as the normative DSP and parameter contract.
-- Treat sections 12 and 13 as app/wrapper compatibility behavior.
-- Treat section 14 as a mandatory portability safeguard for clean-room implementations.
+- Consider sections 4 through 11 the normative DSP and parameter contract.
+- Regard sections 12 and 13 as app/wrapper compatibility behavior.
+- Section 14 should be used as a mandatory portability safeguard for clean-room implementations.
 - Use section 18 for direct source-file lookup.
 
 ## 1. Scope

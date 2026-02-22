@@ -56,7 +56,7 @@ This document describes ViPER Clarity as implemented in this repo's reverse-engi
   - Source: `Viper4LinuxV2-GUI/misc/converter.cpp:313`
   - This clamp applies before mode-specific export branching, so it affects both `officialV4A` and `teamDeWittV4A`.
 - So effective internal `g` range depends on path:
-  - UI/plugin path commonly `0.0..8.0`
+  - UI/plugin path `0.0..8.0`
   - export-compatibility path commonly `0.0..4.5`
   - core dispatch itself is unclamped (`g = val1 / 100.0f`), so direct callers can send out-of-range values.
 
@@ -316,7 +316,7 @@ struct ViPERClarity {
 - Core command mapping does not clamp `mode` or `g`; for OZone+, `g + 1.0` must remain `> 0` because gain uses `log10(g + 1.0)`.
 - `ViPERClarity::Process` has no `default` branch in its mode switch; invalid mode values can effectively bypass processing.
 - OZone+ path intentionally resets filter history on gain update; if you skip this, automation behavior will differ.
-- XHiFi delays are sample-rate dependent integer sample delays (`sr/400`, `sr/200`), not fixed milliseconds.
+- XHiFi delays are sample-rate-dependent integer sample delays (`sr/400`, `sr/200`), not fixed milliseconds.
 - Converter caveat: `teamDeWittV4A` export currently writes key `66580` for clarity level, while import mapping expects `65580`.
 
 ## 10) Validation Checklist
@@ -325,7 +325,7 @@ To verify a reimplementation:
 
 1. Set `mode=Natural`, `g=0`: output should be close to near-Nyquist LPF of input.
 2. Increase `g` in Natural: attack/transient emphasis should increase, but audibility is content-dependent.
-3. Set `mode=OZone+`, compare low vs high frequency sine gain; highs should rise with `g`.
+3. Set `mode=OZone+`, compare low vs high-frequency sine gain; highs should rise with `g`.
 4. Set `mode=XHiFi`, feed impulse: observe an immediate HP component plus delayed components around 2.5 ms and 5 ms.
 5. Confirm mode switch and SR switch both clear state (history).
 
@@ -366,5 +366,5 @@ To verify a reimplementation:
 
 - `sudo docker run --rm --platform linux/amd64 -v "$PWD":/work -w /work debian:bookworm bash -lc 'apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq gstreamer1.0-tools gstreamer1.0-plugins-base && GST_PLUGIN_PATH=/work/Viper4LinuxV1 gst-inspect-1.0 viperfx'`
   - Runtime output confirms `vc-level` range `0..800`, default `0`.
-  - Runtime output confirms `vc-mode` range `0..2`, default `0`.
+  - The same runtime output shows `vc-mode` range `0..2`, default `0`.
   - Saved output artifact: `docker_gst_inspect_viperfx.txt`.

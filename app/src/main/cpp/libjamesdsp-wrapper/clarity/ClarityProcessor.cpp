@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <limits>
 #include <cstring>
 
 namespace clarity {
@@ -145,7 +146,8 @@ void NoiseSharpening::process(float* buffer, uint32_t frames) {
 }
 
 void HighShelf::setGainLinear(float gain) {
-    gainDb = 20.0 * std::log10(static_cast<double>(gain));
+    const float safeGain = std::max(gain, std::numeric_limits<float>::min());
+    gainDb = 20.0 * std::log10(static_cast<double>(safeGain));
 }
 
 void HighShelf::setSamplingRate(uint32_t samplingRate) {

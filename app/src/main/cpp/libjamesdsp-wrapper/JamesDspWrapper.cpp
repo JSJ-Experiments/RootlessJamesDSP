@@ -319,7 +319,9 @@ Java_me_timschneeberger_rootlessjamesdsp_interop_JamesDspWrapper_processInt16(JN
                 output[i] = static_cast<jshort>(INT16_MAX);
             } else {
                 const float scaled = sample * kScale;
-                output[i] = static_cast<jshort>(scaled > 0.0f ? scaled + 0.5f : scaled - 0.5f);
+                const int rounded = static_cast<int>(scaled > 0.0f ? scaled + 0.5f : scaled - 0.5f);
+                const int clamped = std::clamp(rounded, static_cast<int>(INT16_MIN), static_cast<int>(INT16_MAX));
+                output[i] = static_cast<jshort>(clamped);
             }
         }
     } else {

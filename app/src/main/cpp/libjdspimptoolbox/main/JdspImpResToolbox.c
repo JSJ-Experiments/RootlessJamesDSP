@@ -852,6 +852,9 @@ JNIEXPORT void JNICALL Java_me_timschneeberger_rootlessjamesdsp_interop_JdspImpR
             double denRe = 1.0 - c2 * cosW + c0 * cos2W;
             double denIm = c2 * sinW - c0 * sin2W;
             double denMagSq = denRe * denRe + denIm * denIm;
+            // Conservative denominator floor to avoid unstable 1/denMagSq amplification
+            // near poles/zeros. 1e-24 is intentionally well above DBL_MIN and effectively
+            // skips near-singular bands where denRe^2 + denIm^2 is too close to zero.
             if (denMagSq < 1.0e-24)
                 continue;
 
