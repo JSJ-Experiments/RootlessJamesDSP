@@ -139,30 +139,12 @@ jobs:
             remote_path: '/srv/http/nightly.timschneeberger.me/jamesdsp-rootfull'
             sftpArgs: '-o ConnectTimeout=5'
        
-      - name: Changelog
-        if: startsWith(github.ref, 'refs/tags/')
-        uses: ardalanamini/auto-changelog@v3
-        id: changelog
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          release-name: ${{ env.VERSION_TAG }}
-          mention-authors: false
-          mention-new-contributors: false
-          include-compare: true
-          
-      - name: Read changelog template
-        id: changelog_post
-        uses: andstor/file-reader-action@v1
-        with:
-          path: ".github/CHANGELOG_POSTFIX.md"
-          
       - name: Create Release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ env.VERSION_TAG }}
           name: RootlessJamesDSP ${{ env.VERSION_TAG }}
-          body: "${{ steps.changelog.outputs.changelog }} &#x20; ${{ steps.changelog_post.outputs.contents }}"
           files: |
             app/build/outputs/apk/${{ steps.flavor.outputs.lowercase }}Full/${{ env.BUILD_TYPE }}/*-signed.apk
           overwrite_files: true
@@ -170,3 +152,120 @@ jobs:
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  finalize_release_notes:
+    name: Finalize release notes
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Ensure required CLI tools
+        run: |
+          set -euo pipefail
+          need_apt_update=0
+
+          if ! command -v gh >/dev/null 2>&1; then
+            need_apt_update=1
+          fi
+          if ! command -v jq >/dev/null 2>&1; then
+            need_apt_update=1
+          fi
+
+          if [ "$need_apt_update" -eq 1 ]; then
+            sudo apt-get update
+          fi
+
+          command -v gh >/dev/null 2>&1 || sudo apt-get install -y gh
+          command -v jq >/dev/null 2>&1 || sudo apt-get install -y jq
+
+      - name: Build downloads table from release assets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          TAG="${GITHUB_REF#refs/tags/}"
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json assets > assets.json
+
+          {
+            echo "> Note: The root version is unmaintained and does not have feature parity with the rootless version."
+            echo
+            echo "## Downloads"
+            echo
+            echo "| Variant | Architecture | Download | Asset |"
+            echo "| --- | --- | --- | --- |"
+
+            for variant in rootless root; do
+              if [ "$variant" = "rootless" ]; then
+                variant_label="RootlessJamesDSP"
+              else
+                variant_label="JamesDSP (root)"
+              fi
+
+              for arch in universal arm64-v8a armeabi-v7a x86_64 x86; do
+                url="$(jq -r --arg variant "$variant" --arg arch "$arch" '.assets[] | select(.name | test("-" + $variant + "-full-" + $arch + "-release-signed\\.apk$")) | .url' assets.json | head -n 1)"
+
+                if [ -n "$url" ] && [ "$url" != "null" ]; then
+                  asset_name="${url##*/}"
+                  echo "| ${variant_label} | ${arch} | [Download](${url}) | \`${asset_name}\` |"
+                else
+                  echo "| ${variant_label} | ${arch} | N/A | - |"
+                fi
+              done
+            done
+          } > release_downloads.md
+
+      - name: Build flat changelog from commits
+        run: |
+          set -euo pipefail
+          TAG="${GITHUB_REF#refs/tags/}"
+          PREV_TAG="$(git for-each-ref --sort=-creatordate --format='%(refname:short)' refs/tags | awk -v cur="$TAG" '$0 != cur { print; exit }')"
+
+          if [ -n "$PREV_TAG" ]; then
+            RANGE="${PREV_TAG}..${TAG}"
+          else
+            RANGE="$TAG"
+          fi
+
+          {
+            echo "## Changelog"
+            echo
+
+            if [ -n "$PREV_TAG" ]; then
+              echo "_Changes since ${PREV_TAG}_"
+              echo
+            fi
+
+            commit_count="$(git log --no-merges --oneline "$RANGE" | wc -l | tr -d '[:space:]')"
+            if [ "$commit_count" -eq 0 ]; then
+              echo "- No commit entries found."
+            else
+              git log --no-merges --pretty=format:'- %s ([`%h`](https://github.com/'"$GITHUB_REPOSITORY"'/commit/%H))' "$RANGE"
+              echo
+            fi
+
+            if [ -n "$PREV_TAG" ]; then
+              echo
+              echo "**Full Changelog**: https://github.com/${GITHUB_REPOSITORY}/compare/${PREV_TAG}...${TAG}"
+            fi
+          } > release_changelog.md
+
+      - name: Compose release notes
+        run: |
+          set -euo pipefail
+          cat release_downloads.md > release_notes.md
+          printf '\n' >> release_notes.md
+          cat release_changelog.md >> release_notes.md
+
+      - name: Update Release notes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          TAG="${GITHUB_REF#refs/tags/}"
+          gh release edit "$TAG" --repo "$GITHUB_REPOSITORY" --notes-file release_notes.md
