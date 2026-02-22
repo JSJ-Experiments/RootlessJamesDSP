@@ -1,5 +1,8 @@
 #include "ClarityProcessor.h"
 
+#define TAG "ClarityProcessor_JNI"
+#include <Log.h>
+
 #include <algorithm>
 #include <cmath>
 #include <limits>
@@ -384,6 +387,8 @@ void ClarityProcessor::applyMode(float* samples, uint32_t frames) {
             xhifi.process(samples, frames);
             break;
         default:
+            LOGW("ClarityProcessor::applyMode: invalid mode=%d, falling back to NATURAL",
+                 static_cast<int>(mode));
             mode = Mode::NATURAL;
             reset();
             natural.process(samples, frames);

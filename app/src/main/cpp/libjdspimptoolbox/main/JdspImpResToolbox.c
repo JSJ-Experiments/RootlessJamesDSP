@@ -6,6 +6,10 @@
 
 #include <jdsp_header.h>
 
+// ViPER IIR EQ preview uses the same band gain scale as runtime SetBandLevel:
+// linearGain * 0.636 (approximately 2/pi) for behavior parity.
+#define VIPER_BAND_GAIN_SCALE 0.636
+
 void channel_splitFloat(float *buffer, unsigned int num_frames, float **chan_buffers, unsigned int num_channels)
 {
 	unsigned int i, samples = num_frames * num_channels;
@@ -826,7 +830,7 @@ JNIEXPORT void JNICALL Java_me_timschneeberger_rootlessjamesdsp_interop_JdspImpR
     for (int i = 0; i < VIPER_PREVIEW_BANDS; i++)
     {
         double gainDb = getValueAt(curve, VIPER_PREVIEW_CENTER_FREQS[i]);
-        bandGain[i] = (float)(pow(10.0, gainDb / 20.0) * 0.636);
+        bandGain[i] = (float)(pow(10.0, gainDb / 20.0) * VIPER_BAND_GAIN_SCALE);
     }
 
     const double sampleRate = srate > 0 ? (double)srate : 1.0;
