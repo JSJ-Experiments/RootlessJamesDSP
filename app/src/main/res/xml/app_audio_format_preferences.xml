@@ -13,11 +13,11 @@
         <me.timschneeberger.rootlessjamesdsp.preference.MaterialSeekbarPreference
             android:key="@string/key_audioformat_buffersize"
             android:title="@string/audio_format_buffer_size"
-            app:seekBarIncrement="128"
+            app:seekBarIncrement="2"
             app:precision="0"
             app:unit="@string/audio_format_buffer_size_unit"
             app:labelMinWidth="120dp"
-            app:minValue="128"
+            app:minValue="2"
             app:maxValue="16384"
             app:defaultValue="@integer/default_audioformat_buffersize"
             app:allowDividerAbove="false"

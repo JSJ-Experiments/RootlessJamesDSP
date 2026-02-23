@@ -110,7 +110,15 @@ class SettingsAudioFormatFragment : SettingsBaseFragment() {
         bufferSize?.setDefaultValue(preferences.getDefault<Float>(R.string.key_audioformat_buffersize))
         applyBufferSizeRange(preferences.get<Boolean>(R.string.key_audioformat_allow_low_samples))
         bufferSize?.setOnPreferenceChangeListener { _, newValue ->
-            if((newValue as Float) <= 1024){
+            val requestedValue = newValue as Float
+            val allowLow = preferences.get<Boolean>(R.string.key_audioformat_allow_low_samples)
+            if(!allowLow && requestedValue < Constants.AUDIO_BUFFER_MIN_DEFAULT) {
+                bufferSize?.setValue(Constants.AUDIO_BUFFER_MIN_DEFAULT.toFloat())
+                context?.sendLocalBroadcast(Intent(Constants.ACTION_SERVICE_HARD_REBOOT_CORE))
+                return@setOnPreferenceChangeListener false
+            }
+
+            if(requestedValue <= 1024){
                 requireContext().toast(R.string.audio_format_buffer_size_warning_low_value, false)
             }
             context?.sendLocalBroadcast(Intent(Constants.ACTION_SERVICE_HARD_REBOOT_CORE))
@@ -118,6 +126,7 @@ class SettingsAudioFormatFragment : SettingsBaseFragment() {
         }
         allowLowSamples?.setOnPreferenceChangeListener { _, newValue ->
             applyBufferSizeRange(newValue as Boolean)
+            context?.sendLocalBroadcast(Intent(Constants.ACTION_SERVICE_HARD_REBOOT_CORE))
             true
         }
         encoding?.setOnPreferenceChangeListener { _, _ ->
@@ -127,22 +136,18 @@ class SettingsAudioFormatFragment : SettingsBaseFragment() {
     }
 
     private fun applyBufferSizeRange(allowLow: Boolean) {
-        val minValue = if (allowLow) BUFFER_SIZE_MIN_LOW else BUFFER_SIZE_MIN_DEFAULT
-        val stepValue = if (allowLow) BUFFER_SIZE_STEP_LOW else BUFFER_SIZE_STEP_DEFAULT
-
-        bufferSize?.setMin(minValue.toFloat())
-        bufferSize?.setSeekBarIncrement(stepValue.toFloat())
+        if (allowLow) {
+            return
+        }
 
         val currentValue = preferences.get<Float>(R.string.key_audioformat_buffersize)
-        bufferSize?.setValue(if (currentValue < minValue) minValue.toFloat() else currentValue)
+        if(currentValue < Constants.AUDIO_BUFFER_MIN_DEFAULT) {
+            bufferSize?.setValue(Constants.AUDIO_BUFFER_MIN_DEFAULT.toFloat())
+            context?.sendLocalBroadcast(Intent(Constants.ACTION_SERVICE_HARD_REBOOT_CORE))
+        }
     }
 
     companion object {
-        private const val BUFFER_SIZE_MIN_DEFAULT = 128
-        private const val BUFFER_SIZE_STEP_DEFAULT = 128
-        private const val BUFFER_SIZE_MIN_LOW = 2
-        private const val BUFFER_SIZE_STEP_LOW = 2
-
         fun newInstance(): SettingsAudioFormatFragment {
             return SettingsAudioFormatFragment()
         }

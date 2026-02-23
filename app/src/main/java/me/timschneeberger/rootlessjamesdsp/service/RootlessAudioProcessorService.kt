@@ -423,9 +423,13 @@ class RootlessAudioProcessorService : BaseAudioProcessorService() {
             preferences.get<String>(R.string.key_audioformat_encoding).toIntOrNull() ?: 1
         )
         val allowLowSamples = preferences.get<Boolean>(R.string.key_audioformat_allow_low_samples)
-        val minBufferSize = if (allowLowSamples) 2 else 128
+        val minBufferSize = if (allowLowSamples) {
+            Constants.AUDIO_BUFFER_MIN_LOW
+        } else {
+            Constants.AUDIO_BUFFER_MIN_DEFAULT
+        }
         val requestedBufferSize = preferences.get<Float>(R.string.key_audioformat_buffersize).toInt()
-        var bufferSize = if (requestedBufferSize < minBufferSize) minBufferSize else requestedBufferSize
+        var bufferSize = maxOf(requestedBufferSize, minBufferSize)
         if ((bufferSize % 2) != 0) {
             bufferSize += 1
         }

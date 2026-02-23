@@ -30,6 +30,10 @@ object Constants {
     const val DEFAULT_GEQ_INTERNAL = "GraphicEQ: 0.0 0.0;"
     const val DEFAULT_EQ = "31.0;62.0;125.0;250.0;500.0;1000.0;2000.0;4000.0;8000.0;16000.0;17000.0;18000.0;19000.0;20000.0;22000.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0"
 
+    // Audio format bounds (samples per channel)
+    const val AUDIO_BUFFER_MIN_DEFAULT = 128
+    const val AUDIO_BUFFER_MIN_LOW = 2
+
     // Intent actions
     const val ACTION_PREFERENCES_UPDATED = BuildConfig.APPLICATION_ID + ".action.preferences.UPDATED"
     const val ACTION_SAMPLE_RATE_UPDATED = BuildConfig.APPLICATION_ID + ".action.sample_rate.UPDATED"
