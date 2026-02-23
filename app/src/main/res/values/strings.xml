@@ -391,6 +391,8 @@
     <string name="audio_format_buffer_size">Buffer size</string>
     <string name="audio_format_buffer_size_unit">&#xa0;samples</string>
     <string name="audio_format_buffer_size_warning_low_value">Warning: Low buffer sizes may cause audio issues such as clipping!</string>
+    <string name="audio_format_allow_low_samples">Allow low buffer sizes (&lt;128 samples)</string>
+    <string name="audio_format_allow_low_samples_summary">Experimental. Allows down to 2 samples with finer steps. May cause dropouts, crackling, or instability.</string>
     <string name="audio_format_optimization_header">Convolver module optimizations</string>
     <string name="audio_format_optimization_refresh">Refresh benchmarking data</string>
     <string name="audio_format_optimization_benchmark">Use benchmarks to optimize performance</string>

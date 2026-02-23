@@ -422,7 +422,13 @@ class RootlessAudioProcessorService : BaseAudioProcessorService() {
         val encoding = AudioEncoding.fromInt(
             preferences.get<String>(R.string.key_audioformat_encoding).toIntOrNull() ?: 1
         )
-        val bufferSize = preferences.get<Float>(R.string.key_audioformat_buffersize).toInt()
+        val allowLowSamples = preferences.get<Boolean>(R.string.key_audioformat_allow_low_samples)
+        val minBufferSize = if (allowLowSamples) 2 else 128
+        val requestedBufferSize = preferences.get<Float>(R.string.key_audioformat_buffersize).toInt()
+        var bufferSize = if (requestedBufferSize < minBufferSize) minBufferSize else requestedBufferSize
+        if ((bufferSize % 2) != 0) {
+            bufferSize += 1
+        }
         val bufferSizeBytes = when (encoding) {
             AudioEncoding.PcmFloat -> bufferSize * Float.SIZE_BYTES
             else -> bufferSize * Short.SIZE_BYTES
@@ -434,7 +440,8 @@ class RootlessAudioProcessorService : BaseAudioProcessorService() {
         val sampleRate = clamp(determineSamplingRate(), 44100, 48000)
 
         Timber.i("Sample rate: $sampleRate; Encoding: ${encoding.name}; " +
-                "Buffer size: $bufferSize; Buffer size (bytes): $bufferSizeBytes ; " +
+                "Buffer size: $bufferSize (requested: $requestedBufferSize); " +
+                "Buffer size (bytes): $bufferSizeBytes ; " +
                 "HAL buffer size (bytes): ${determineBufferSize()}")
 
         // Create recorder and track

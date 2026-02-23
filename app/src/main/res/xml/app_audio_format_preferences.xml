@@ -24,6 +24,12 @@
             app:updatesContinuously="false"
             app:showSeekBarValue="true"
             app:iconSpaceReserved="false"/>
+        <me.timschneeberger.rootlessjamesdsp.preference.MaterialSwitchPreference
+            android:key="@string/key_audioformat_allow_low_samples"
+            android:defaultValue="@bool/default_audioformat_allow_low_samples"
+            android:title="@string/audio_format_allow_low_samples"
+            android:summary="@string/audio_format_allow_low_samples_summary"
+            app:iconSpaceReserved="false" />
     </PreferenceCategory>
 
     <PreferenceCategory
